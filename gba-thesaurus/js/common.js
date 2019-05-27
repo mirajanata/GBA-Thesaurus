@@ -1,3 +1,4 @@
+//new
 function chgLang(lang) {
     if (location.href.indexOf('lang=') != -1) {
         if (lang == 'de') {
