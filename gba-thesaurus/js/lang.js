@@ -8,7 +8,7 @@ var lang = {
         this.LIST_THESAURUS_PROJECTS = [this.GeologicUnitDesc, this.lithologyDesc, this.structureDesc, this.GeologicTimeScaleDesc, this.tectonicunitDesc, this.mineralDesc, this.minresDesc];
     },
     // loading functions, one for each language
-    DE: function () {
+    de: function () {
         this.LABEL_LICENSE = 'Nutzungsbedingungen';
         this.LABEL_DISCLAIMER = 'Haftungsausschluss';
         this.LABEL_SERVICES = 'Services';
@@ -89,7 +89,7 @@ var lang = {
         };
         this.DESC_DISCLAIMER = '<h1>Haftungsausschluss:</h1>Die Geologische Bundesanstalt (GBA) &uuml;bernimmt keine Verantwortung f&uuml;r die Richtigkeit der Inhalte bzw. keine Haftung irgendeiner Art f&uuml;r die zur Verf&uuml;gung gestellten Informationen oder Services und etwaiger Folgesch&auml;den die aus deren Verwendung resultieren. Obwohl versucht wird die Daten sorgf&auml;ltig zu &uuml;berpr&uuml;fen sind die Inhalte dieser Seite nicht notwendigerweise vollst&auml;ndig, aktuell oder fehlerfrei. Die zur Verf&uuml;gung gestellten Daten und Dienste stellen eine (wissenschaftliche) Kompilation dar die nicht notwendigerweise die offizielle Meinung der GBA widerspiegelt. Es wird versucht die Information fehlerfrei und so aktuell wie m&ouml;glich zu halten, dar&uuml;ber hinaus wird versucht berichtete Fehler wenn m&ouml;glich zu korrigieren. Diese Webseite beinhaltet Links zu externen Seiten &uuml;ber die die GBA keine Kontrolle hat und daher keine Verantwortung &uuml;bernimmt. Weder die GBA noch Personen die in ihrem Auftrag handeln, k&ouml;nnen f&uuml;r die Inhalte auf dieser Webseite noch auf deren Verwendung in irgendeiner Weise haftbar gemacht werden. Die GBA beh&auml;lt sich das Recht vor die Inhalte dieser Seite bzw. die Nutzungsbedingungen ohne vorherige Ank&uuml;ndigung zu &auml;ndern. Der Nutzer nimmt diesen Haftungsausschluss ausdr&uuml;cklich zur Kenntnis.<br><br>Die Website nutzt die Standards HTML5/ES16/JQuery und wurde f&uuml;r die Ansicht in Firefox, Chrome, Safari oder Edge optimiert. MS InternetExplorer11 oder &auml;lter wird deshalb nicht mehr unterst&uuml;tzt.';
     },
-    EN: function () {
+    en: function () {
         this.LABEL_LICENSE = 'Terms of use';
         this.LABEL_DISCLAIMER = 'Disclaimer';
         this.LABEL_SERVICES = 'Services';
