@@ -26,9 +26,9 @@
     <script src="js/detail.js"></script>
 
     <script>
-        let USER_LANG = (navigator.language || navigator.language).substring(0, 2);
         let BASE = location.protocol + '//' + location.host + location.pathname;
         $(document).ready(function () {
+            var USER_LANG = (navigator.language || navigator.language).substring(0, 2);
             $('#appsCard').toggle();
             let endpoint = 'http://resource.geolba.ac.at/PoolParty/sparql/'; //noch zu belegen
 
@@ -41,11 +41,10 @@
             if (USER_LANG !== 'de') {
                 USER_LANG = 'en';
                 $('#lang').text('EN');
-                loadLangEN();
             } else {
                 $('#lang').text('DE');
-                loadLangDE();
             }
+            lang.load(USER_LANG);
 
             labelNavbarFooter(); //lang is global
             insertSearchCard('search_widget'); //inserts search widget only
@@ -120,7 +119,7 @@
             $('#appsBody1').append(`
                         <div class="apps">
                             <span class="appsIcon glyphicons glyphicons-cluster text-info"></span>
-                            <a href="http://resource.geolba.ac.at/thesaurus/network.html#${uri.split('geolba.ac.at/')[1]}/${USER_LANG}" title="Network Diagram" class="card-link">
+                            <a href="http://resource.geolba.ac.at/thesaurus/network.html#${uri.split('geolba.ac.at/')[1]}/${lang.ID}" title="Network Diagram" class="card-link">
                                 <br>Network<br>diagram
                             </a>
                         </div>`);
@@ -161,7 +160,7 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="javascript:location.replace(BASE + '?lang=' + USER_LANG);">
+                        <a class="nav-link" href="javascript:location.replace(BASE + '?lang=' + lang.ID);">
                             GBA Thesaurus
                             <span class="sr-only">(current)</span>
                         </a>
