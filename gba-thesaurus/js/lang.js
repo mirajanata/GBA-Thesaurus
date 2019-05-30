@@ -171,6 +171,6 @@ var lang = {
 
         this.DESC_DISCLAIMER = '<h1>Disclaimer:</h1>The Geological Survey of Austria takes no responsibility for the correctness of the contents and no liability (of any sorts) for the information and services provided and possible consequential damage resulting from the use of these. Although we try to scrutinise our data the information on this site is not necessarily complete, up to date or accurate. The provided data and services represent a scientific compilation that may not reflect the official opinion of the Geological Survey of Austria. We try to keep our data as accurate and up to date as possible and in addition we attempt to correct errors if they are reported to us. This website contains links to other external sites over which the Geological Survey of Austria has no control and therefore can take no responsibility. Neither the Geological Survey of Austria nor persons acting in their behalf can be held liable for the contents of this website or their use. The Geological Survey of Austria reserves its right to change the contents of this website and its terms of use without prior announcement. The user of this site takes note and approves this disclaimer.<br><br>The application uses standards like HTML5/ES16/JQuery and is best viewed with Firefox, Chrome, Safari or Edge. MS InternetExplorer11 and older versions are not supported.';
     },
-    // member vars
+    // current langId
     ID: null
 };
