@@ -1,0 +1,239 @@
+﻿body {
+}
+/*        adaption Simplex style ********************************/
+body {
+    background-color: #FFFFFF;
+    font-size: 100%;
+}
+
+a:not(.nav-link):not(.btn):not(.datatype) {
+    color: #069;
+    text-decoration: none;
+    border-bottom: 1px dotted #777;
+}
+
+a:hover {
+    color: red;
+}
+
+.dropdown-item:hover {
+    background-color: #ecf0f1 !important;
+}
+
+.bg-light {
+    background-color: #ecf0f1 !important;
+}
+
+/*        specific styling **************************************/
+
+
+#allConcepts {
+    min-height: 380px;
+}
+
+.cardHeaderRight {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+#allConceptsHeader {
+    padding-right: 5rem;
+}
+
+.card-body:not(#searchCard) {
+    font-size: small;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#titleCard {
+    flex-flow: row nowrap;
+    border: 0;
+}
+
+@media screen and (min-width: 1000px) {
+    #title {
+        font-size: 4vw;
+    }
+}
+
+#gbaLogo {
+    padding: 0.22rem;
+    background-color: white;
+    border: none;
+}
+
+#dropdown {
+    background-color: white;
+    min-width: 200px;
+    position: relative;
+    z-index: 999;
+}
+
+    #dropdown a {
+        color: black;
+    }
+
+    #dropdown td {
+        padding: .1rem;
+        padding-left: .75rem;
+    }
+
+.searchLink {
+    color: black;
+    cursor: pointer;
+}
+
+.searchResultURI {
+    font-size: small;
+    color: #069;
+    font-weight: 500;
+}
+
+#uri {
+    color: #069;
+    font-weight: 500;
+}
+
+.searchPropTyp {
+    color: #777;
+    font-size: small;
+}
+
+.searchResultText {
+    font-size: small;
+}
+
+.addVoc {
+    font-size: small;
+    color: gray;
+}
+
+.m-0 a {
+    color: white !important;
+    border-bottom: 1px none #777 !important;
+}
+
+.navbar a {
+    border-bottom: 1px none #777 !important;
+}
+
+ul.altLabel, ul.notation {
+    list-style-position: inside;
+    display: inline-block;
+    padding: 0;
+    margin-bottom: -0.2rem;
+}
+
+    ul.altLabel li {
+        display: inline;
+        float: left;
+        padding-right: 15px;
+    }
+
+figure {
+    float: right;
+    margin: 5px;
+    font-size: x-small;
+}
+
+.picture {
+    width: auto;
+    height: 120px;
+    padding-right: 20px;
+}
+
+.skosRel {
+    background: #eee;
+    width: 120px;
+    text-align: center;
+    border: 3px solid white;
+}
+
+.skosRel-1 {
+    background: lightgray;
+    width: 120px;
+    text-align: center;
+    border: 3px solid white;
+}
+
+.skosRelUl {
+    padding: 0.5rem 0rem 0rem 1rem;
+}
+
+.datatype {
+    display: inline-block;
+    padding: 2px;
+    font-size: 60%;
+    border-radius: 2px;
+    color: white;
+    background: #444;
+}
+
+.lang {
+    display: inline-block;
+    padding: 0px 2px;
+    font-size: 60%;
+    font-weight: 600;
+    border-radius: 2px;
+    color: white;
+    background: #444;
+}
+
+.colorBox {
+    font-size: 20pt;
+    border-radius: 2px;
+}
+
+.propTech {
+    padding-right: 5px;
+}
+
+#details th {
+    text-align: left;
+    padding-top: 0.3rem;
+}
+
+#details td {
+    vertical-align: middle;
+    padding-bottom: 0.7rem;
+}
+
+#details ul {
+    margin-bottom: 0rem;
+}
+
+#appsBody1, #appsBody2 {
+    margin: -10px;
+}
+
+.apps {
+    float: left;
+    margin: 10px;
+    text-align: center;
+    height: 85px;
+}
+
+.appsIcon {
+    border-bottom: 0;
+    font-size: 20pt;
+}
+
+.iconImg {
+    opacity: 0.6;
+}
+
+.tooltip-inner {
+    text-align: left;
+    background-color: #27292b;
+}
+
+.code {
+    font-family: "courier new";
+    line-height: 100%;
+    background-color: rgba(0, 0, 0, 0.03);
+}

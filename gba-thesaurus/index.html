@@ -10,19 +10,21 @@
     <title>Thesaurus | Geologische Bundesanstalt</title>
 
     <link rel="shortcut icon" type="image/png" href="img/favicon.png" />
-    <link rel="apple-touch-icon" href="img/icon.png"/>
-    <link rel="apple-touch-icon" sizes="72x72" href="img/icon.png"/>
-    <link rel="apple-touch-icon" sizes="114x114" href="img/icon.png"/>
+    <link rel="apple-touch-icon" href="img/icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="img/icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="img/icon.png" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://blackrockdigital.github.io/startbootstrap-blog-post/css/blog-post.css">
-    
+
+    <link rel="stylesheet" href="css/site.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.3.0/fuse.min.js" charset="utf-8"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
     <script src="js/lang.js"></script>
     <script src="js/common.js"></script>
     <script src="js/detail.js"></script>
-     
+
     <script>
         let USER_LANG = (navigator.language || navigator.language).substring(0, 2);
         let BASE = location.protocol + '//' + location.host + location.pathname;
@@ -31,12 +33,6 @@
             let endpoint = 'http://resource.geolba.ac.at/PoolParty/sparql/'; //noch zu belegen
 
             let urlParams = new URLSearchParams(window.location.search);
-
-            //console.log(urlParams.has('uri')); // true
-            //console.log(urlParams.get('uri')); // "http.."
-            //console.log(urlParams.getAll('lang')); // ["de"]
-            //console.log(urlParams.toString()); // "?post=1234&action=edit"
-            //console.log(urlParams.append('active', '1')); // "?post=1234&action=edit&active=1"
 
             if (urlParams.has('lang')) {
                 USER_LANG = urlParams.get('lang');
@@ -52,26 +48,26 @@
             }
 
             labelNavbarFooter(); //lang is global
-            insertSearchCard('search_widget'); //inserts search widget only                
-            
+            insertSearchCard('search_widget'); //inserts search widget only
+
             if (urlParams.has('search')) { //need lang parameter only for sparql requests
                 search(LIST_THESAURUS_PROJECTS, endpoint, decodeURI(urlParams.get('search')), USER_LANG);
                 insertProjCards('proj_links', LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //quick access cards, plus extended project comments from sparql
 
             } else if (urlParams.has('info')) {
                 info('page_desc', decodeURI(urlParams.get('info')));
-                insertProjCards('proj_links', LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //quick access cards, plus extended project comments from sparql 
+                insertProjCards('proj_links', LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //quick access cards, plus extended project comments from sparql
 
             } else if (urlParams.has('list')) {
                 $('#pageContent').empty();
-                let uri = '§'; 
+                let uri = '§';
                 let label = '§';
                 if (urlParams.has('uri')) {
                     uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
                     label = decodeURI(urlParams.get('list').replace(/["';><]/gi, '')); //avoid injection
                 }
                 sparql(endpoint, uri, label);
-                insertProjCards('proj_links', LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //quick access cards, plus extended project comments from sparql 
+                insertProjCards('proj_links', LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //quick access cards, plus extended project comments from sparql
 
             } else if (urlParams.has('uri')) {
                 let uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
@@ -79,19 +75,19 @@
                 initApps(uri);
                 details('pageContent', uri, endpoint);
                 sideCard_projInfo('proj_links', eval(uri.split('\/')[3] + 'Desc'));
-                
+
 
             } else {
                 insertPageDesc(); //general intro
                 insertComments('proj_desc', LIST_THESAURUS_PROJECTS); //project desc from js ,insert before ProjCards!
                 insertComments('other_desc', [DESC_INSPIRE, DESC_LINKEDDATA]);
-                insertProjCards('proj_links', LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //quick access cards, plus extended project comments from sparql                    
+                insertProjCards('proj_links', LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //quick access cards, plus extended project comments from sparql
             }
 
-            initSearch(LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //provides js for fuse search 
+            initSearch(LIST_THESAURUS_PROJECTS, endpoint, USER_LANG); //provides js for fuse search
         });
 
-        //**********************************************************************         
+        //**********************************************************************
 
         function insertPageDesc() {
 
@@ -100,240 +96,36 @@
             $('#page_desc').append('<p>' + DESC_THESAURUS + '</p>');
         }
 
-        //**********************************************************************         
+        //**********************************************************************
 
         function insertComments(divID, projects) {
             $('#' + divID).empty();
             projects.forEach(function (desc) {
                 $('#' + divID).append(`
-                            <div class="media mb-4">
-                                <img class="d-flex mr-3 rounded-circle" src="img/${desc.image}">
-                                <div id="${desc.id}Comment" class="media-body">
-                                    <h4 class="mt-0">${desc.name}</h4>
-                                    ${desc.desc}
-                                </div>
-                            </div>`);
+                                <div class="media mb-4">
+                                    <img class="d-flex mr-3 rounded-circle" src="img/${desc.image}">
+                                    <div id="${desc.id}Comment" class="media-body">
+                                        <h4 class="mt-0">${desc.name}</h4>
+                                        ${desc.desc}
+                                    </div>
+                                </div>`);
             });
-        }	
+        }
 
-        //**********************************************************************         
+        //**********************************************************************
 
         function initApps(uri) {
             $('#appsCard').toggle();
             $('#appsCard .card-header').text(APPS);
             $('#appsBody1').append(`
-                    <div class="apps">
-                        <span class="appsIcon glyphicons glyphicons-cluster text-info"></span>
-                        <a href="http://resource.geolba.ac.at/thesaurus/network.html#${uri.split('geolba.ac.at/')[1]}/${USER_LANG}" title="Network Diagram" class="card-link">
-                            <br>Network<br>diagram
-                        </a>
-                    </div>`);            
+                        <div class="apps">
+                            <span class="appsIcon glyphicons glyphicons-cluster text-info"></span>
+                            <a href="http://resource.geolba.ac.at/thesaurus/network.html#${uri.split('geolba.ac.at/')[1]}/${USER_LANG}" title="Network Diagram" class="card-link">
+                                <br>Network<br>diagram
+                            </a>
+                        </div>`);
         }
-	</script>
-
-    <style>
-
-        /*        adaption Simplex style ********************************/
-        body {
-            background-color: #FFFFFF;
-            font-size: 100%;
-        }
-
-        a:not(.nav-link):not(.btn):not(.datatype) {
-            color: #069;
-            text-decoration: none;
-            border-bottom: 1px dotted #777;
-        }
-        a:hover {
-            color: red;
-        }
-        .dropdown-item:hover {
-            background-color: #ecf0f1 !important;
-        }
-        .bg-light {
-            background-color: #ecf0f1 !important;
-        }
-
-        /*        specific styling **************************************/
-
-
-        #allConcepts {
-            min-height: 380px;
-
-        }
-        .cardHeaderRight {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-        }
-        #allConceptsHeader {
-            padding-right: 5rem;
-        }
-        .card-body:not(#searchCard) {
-            font-size: small;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        #titleCard {
-            flex-flow: row nowrap;
-            border: 0;
-        }
-        @media screen and (min-width: 1000px) {
-            #title {
-                font-size: 4vw;
-            }
-        }
-        #gbaLogo {
-            padding: 0.22rem;
-            background-color: white;
-            border: none;
-        }
-        #dropdown {
-            background-color: white;
-            min-width: 200px;
-            position: relative;
-            z-index: 999;
-        }
-        #dropdown a {
-            color: black;
-        }
-        #dropdown td {
-            padding: .1rem;
-            padding-left: .75rem;
-        }
-        .searchLink {
-            color: black;
-            cursor: pointer;
-        }
-        .searchResultURI {
-            font-size: small;
-            color: #069;
-            font-weight: 500;
-        }
-        #uri {
-            color: #069;
-            font-weight: 500;
-        }
-        .searchPropTyp {
-            color: #777;
-            font-size: small;
-        }
-        .searchResultText {
-            font-size: small;
-        }
-        .addVoc {
-            font-size: small;
-            color: gray;
-        }
-        .m-0 a {
-            color: white !important;
-            border-bottom: 1px none #777 !important;
-        }
-        .navbar a {
-            border-bottom: 1px none #777 !important;
-        }
-        ul.altLabel, ul.notation {
-            list-style-position: inside;
-            display: inline-block;
-            padding: 0;
-            margin-bottom: -0.2rem;
-        }
-        ul.altLabel li {
-            display: inline;
-            float: left;
-            padding-right: 15px;
-        }
-        figure {
-            float: right;
-            margin: 5px;
-            font-size: x-small;
-        }
-        .picture {
-            width: auto;
-            height: 120px;
-            padding-right: 20px;
-        }
-        .skosRel {
-            background: #eee;
-            width: 120px;
-            text-align: center;
-            border: 3px solid white;
-        }
-        .skosRel-1 {
-            background: lightgray;
-            width: 120px;
-            text-align: center;
-            border: 3px solid white;
-        }
-        .skosRelUl {
-            padding: 0.5rem 0rem 0rem 1rem;
-        }
-        .datatype {
-            display: inline-block;
-            padding: 2px;
-            font-size: 60%;
-            border-radius: 2px;
-            color: white;
-            background: #444;
-        }
-        .lang {
-            display: inline-block;
-            padding: 0px 2px;
-            font-size: 60%;
-            font-weight: 600;
-            border-radius: 2px;
-            color: white;
-            background: #444;
-        }
-        .colorBox {
-            font-size: 20pt;
-            border-radius: 2px;
-        }
-        .propTech {
-            padding-right: 5px;
-        }
-        #details th {
-            text-align: left;
-            padding-top: 0.3rem;
-        }
-        #details td {
-            vertical-align: middle;
-            padding-bottom: 0.7rem;
-        }
-        #details ul {
-            margin-bottom: 0rem;
-        }
-        #appsBody1, #appsBody2 {
-            margin: -10px;
-        }
-        .apps {
-            float:left;
-            margin: 10px;
-            text-align: center;
-            height: 85px;
-        }
-        .appsIcon {
-            border-bottom:0;
-            font-size: 20pt;
-        }
-        .iconImg {
-            opacity: 0.6;
-            
-        }
-        .tooltip-inner {
-            text-align:left;
-            background-color: #27292b;
-        }
-        .code {
-            font-family: "courier new";
-            line-height: 100%;
-            background-color: rgba(0, 0, 0, 0.03);
-        }
-  
-
-    </style>
+    </script>
 </head>
 
 <body>
