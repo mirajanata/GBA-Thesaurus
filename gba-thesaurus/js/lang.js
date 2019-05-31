@@ -1,4 +1,5 @@
-﻿"use strict";
+﻿// language context
+"use strict";
 var lang = {
     load: function (id) {
         this.ID = id || "de";
