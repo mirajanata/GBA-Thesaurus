@@ -45,7 +45,7 @@ var detail = {
             `;
 
         ws.json(uri.split("/")[3], query, function (data) {
-            for (key in this.FRONT_LIST) this.insertFrontPart('pageContent', uri, data, Array.from(this.FRONT_LIST[key].values()));
+            for (var key in detail.FRONT_LIST) detail.insertFrontPart(key, uri, data, Array.from(detail.FRONT_LIST[key].values()));
             var div = $('#pageContent');
             div.append(`<hr>
                                 <div style="cursor: pointer; color: #777;" id="detailsBtn" 
@@ -57,15 +57,15 @@ var detail = {
                                 </div>
                                 `);
 
-            for (key in this.TECHNICAL_LIST) this.insertTechnicalPart('details', data, Array.from(this.TECHNICAL_LIST[key].values()));
+            for (key in detail.TECHNICAL_LIST) detail.insertTechnicalPart(key, data, Array.from(detail.TECHNICAL_LIST[key].values()));
             div.append('');
 
-            this.insertConceptBrowser(divID, uri, 50);
+            detail.insertConceptBrowser('pageContent', uri, 50);
         });
     },
 
-    insertFrontPart: function (divID, uri, data, props) {
-        var div = $('#' + divID);
+    insertFrontPart: function (key, uri, data, props) {
+        var div = $('#pageContent');
         let html = '';
         props.forEach((i) => {
             let ul = this.getObj(data, i);
@@ -120,7 +120,7 @@ var detail = {
                         break;
                     case 'relatedConcepts':
                         if (html.search('<h4') == -1) {
-                            html += '<hr><h4 style="margin-bottom: 1rem;">' + SEM_REL + '</h4>';
+                            html += '<hr><h4 style="margin-bottom: 1rem;">' + lang.SEM_REL + '</h4>';
                         }
                         html += '<table><tr><td class="skosRel' + i.search('Match') + ' skosRel">' + i.replace(BaseUri.skos, '') + '</td><td class="skosRelUl"><ul><li>' +
                             this.shortenText(Array.from(ul).join('</li><li>')) + '</li></ul></td></tr></table>';
@@ -151,7 +151,7 @@ var detail = {
         return text;
     },
 
-    insertTechnicalPart: function (divID, data, props) { //loop all single properties
+    insertTechnicalPart: function (key, data, props) { //loop all single properties
         let html = '';
         let geoPath = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
         let coord = {};
@@ -181,11 +181,11 @@ var detail = {
 
 
         if (html.length > 0) {
-            $('#' + divID).append(`
+            $('#details').append(`
                     <tr id="${key}">
                         <th></th>
                         <th>
-                            ${eval(key + '_H')}
+                            ${lang[key + '_H']}
                         </th>
                     </tr>
                     <tr>
@@ -206,7 +206,7 @@ var detail = {
             x = '<a href="' + page.BASE + '?uri=' + x + '">' + x + '</a>';
         } else if (x.substring(0, 4) == 'http') {
             let a = x;
-            for (const [key, value] of Object.entries(n)) a = a.replace(value, key + ':');
+            for (const [key, value] of Object.entries(BaseUri)) a = a.replace(value, key + ':');
             x = '<a href="' + x + '">' + this.createPdfRef(a.replace(/_/g, ' ')) + '</a>';
         }
         return x;

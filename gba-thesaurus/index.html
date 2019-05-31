@@ -32,6 +32,7 @@
             page.setNavbarFooter();
             page.insertSearchCard(); //inserts search widget only
 
+            var urlParams = page.urlParams;
             if (urlParams.has('search')) { //need lang parameter only for sparql requests
                 page.insertSearch(decodeURI(urlParams.get('search')));
                 page.insertProjCards(); //quick access cards, plus extended project comments from sparql
@@ -53,12 +54,12 @@
                 $('#pageContent').empty();
                 page.initApps(uri);
                 detail.details(uri);
-                var project = eval(uri.split('\/')[3] + 'Desc');
+                var project = eval('lang.'+uri.split('\/')[3] + 'Desc');
                 page.insertSideCard_projectInfo(project);
             } else {
                 page.insertPageDesc(); //general intro
-                page.insertComments('proj_desc', LIST_THESAURUS_PROJECTS); //project desc from js ,insert before ProjCards!
-                page.insertComments('other_desc', [DESC_INSPIRE, DESC_LINKEDDATA]);
+                page.insertComments('proj_desc', lang.LIST_THESAURUS_PROJECTS); //project desc from js ,insert before ProjCards!
+                page.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
                 page.insertProjCards(); //quick access cards, plus extended project comments from sparql
             }
             page.initSearch(); //provides js for fuse search
@@ -71,20 +72,20 @@
         if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
             document.execCommand('Stop');
             $('body').empty().append(`
-                        <div class="alert alert-dismissible alert-warning">
-                            <button type="button" class="close" data-dismiss="alert">
-                                &times;
-                            </button>
-                            <h4 class="alert-heading">
-                                GBA Thesaurus
-                            </h4>
-                            <p class="mb-0">[Deutsch]<br>
-                                Die Website des GBA Thesaurus wurde f&uuml;r die Browser Firefox, Chrome, Safari oder MS Edge optimiert bzw. modernisiert und unterst&uuml;tzt nicht mehr die Darstellung im MS Internet Explorer 11 oder &auml;lter.
-                                <br>
-                                <br>
-                                [English]<br>The GBA Thesaurus website is optimized for browsers Firefox, Chrome, Safari or MS Edge. - MS Internet Explorer 11 or older is not supported any more.
-                            </p>
-                        </div>`);
+                            <div class="alert alert-dismissible alert-warning">
+                                <button type="button" class="close" data-dismiss="alert">
+                                    &times;
+                                </button>
+                                <h4 class="alert-heading">
+                                    GBA Thesaurus
+                                </h4>
+                                <p class="mb-0">[Deutsch]<br>
+                                    Die Website des GBA Thesaurus wurde f&uuml;r die Browser Firefox, Chrome, Safari oder MS Edge optimiert bzw. modernisiert und unterst&uuml;tzt nicht mehr die Darstellung im MS Internet Explorer 11 oder &auml;lter.
+                                    <br>
+                                    <br>
+                                    [English]<br>The GBA Thesaurus website is optimized for browsers Firefox, Chrome, Safari or MS Edge. - MS Internet Explorer 11 or older is not supported any more.
+                                </p>
+                            </div>`);
         }
     </script>
 

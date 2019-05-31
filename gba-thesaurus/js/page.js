@@ -9,8 +9,8 @@ var page = {
     init: function () {
         var USER_LANG = (navigator.language || navigator.language).substring(0, 2);
         $('#appsCard').toggle();
-        if (page.urlParams.has('lang')) {
-            USER_LANG = urlParams.get('lang');
+        if (this.urlParams.has('lang')) {
+            USER_LANG = this.urlParams.get('lang');
         }
 
         if (USER_LANG !== 'de') {
@@ -82,7 +82,7 @@ var page = {
                     a = [...a, ...jsonData.results.bindings];
                     b += 1;
 
-                    if (b == LIST_THESAURUS_PROJECTS.length) {
+                    if (b == lang.LIST_THESAURUS_PROJECTS.length) {
                         const options = {
                             shouldSort: true,
                             tokenize: true,
@@ -394,12 +394,12 @@ var page = {
 
                 jsonData.results.bindings.forEach(function (a) {
                     //console.log(a.topConcepts.value);
-                    $('#' + project.id + 'Card').append(a.cL.value + ':<br><a href="' + this.BASE + '?uri=' +
-                        a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' + this.BASE + '?uri=') + '</a><br>');
+                    $('#' + project.id + 'Card').append(a.cL.value + ':<br><a href="' + page.BASE + '?uri=' +
+                        a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' + page.BASE + '?uri=') + '</a><br>');
                     //add concept schemes + topConcepts to project descriptions
                     $('#' + project.id + 'ReadMore').append('<h5>' + a.cL.value + ' (' + a.count.value +
-                        '):</h5><a href="' + this.BASE + '?uri=' + a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' +
-                            this.BASE + '?uri=') + '</a><br>' + a.desc.value + '<br><br>');
+                        '):</h5><a href="' + page.BASE + '?uri=' + a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' +
+                            page.BASE + '?uri=') + '</a><br>' + a.desc.value + '<br><br>');
                 });
 
                 $('#' + project.id + 'ReadMore').append(`
@@ -444,7 +444,7 @@ var page = {
 
     initApps: function (uri) {
         $('#appsCard').toggle();
-        $('#appsCard .card-header').text(APPS);
+        $('#appsCard .card-header').text(lang.APPS);
         $('#appsBody1').append(`
                                         <div class="apps">
                                             <span class="appsIcon glyphicons glyphicons-cluster text-info"></span>
