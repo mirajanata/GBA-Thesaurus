@@ -256,7 +256,7 @@ var detail = {
                                     }`;
 
         ws.json("ref", query, jsonData => {
-            html = '<br><blockquote class="blockquote">';
+            var html = '<br><blockquote class="blockquote">';
             jsonData.results.bindings.forEach((i) => {
 
                 html += '<footer class="blockquote-footer">' + i.Citation.value.replace(/\:/g, ': <cite title="">') + '</cite>';

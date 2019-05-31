@@ -320,7 +320,7 @@ function search(projects, endpoint, searchText, lang) {
                 });
 
             }).catch(function (error) {
-                //console.log(error);
+                console.log(error);
             });
     });
 }

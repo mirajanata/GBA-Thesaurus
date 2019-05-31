@@ -172,9 +172,9 @@ var page = {
         })
 
         $.each(LIST_THESAURUS_PROJECTS, function (index, value) {
-            $('#endpointSelect').append(`<option value="${endpoint}${value.id}">${value.name} (${TOPIC})</option>`);
+            $('#endpointSelect').append(`<option value="${ws.endpoint}${value.id}">${value.name} (${TOPIC})</option>`);
             if (uri.search(value.id) > -1) {
-                $("#endpointSelect").val(`${endpoint}${value.id}`);
+                $("#endpointSelect").val(`${ws.endpoint}${value.id}`);
             }
         });
 
@@ -198,7 +198,7 @@ var page = {
                     $('#bmTbl tbody').append(`<tr id="${i}">
                                                 <td>
                                                     <span class="glyphicons glyphicons-align-left text-info style=""></span>
-                                                    ${jsonData.results.bindings[i].L.value.replace(/\+label/g, '<a href="' + this.BASE + '?uri=' + uri + '">' + decodeURIComponent(label) + '</a>')}
+                                                    ${jsonData.results.bindings[i].L.value.replace(/\+label/g, '<a href="' + page.BASE + '?uri=' + uri + '">' + decodeURIComponent(label) + '</a>')}
                                                 </td>
                                               </tr>`);
                 }
@@ -234,14 +234,14 @@ var page = {
         var searchInput = $('#searchInput');
         $('#searchInput').keydown(function (e) {
             if (e.which == 13) {
-                this.openParaLink('search=' + encodeURI(searchInput.val()));
+                page.openParaLink('search=' + encodeURI(searchInput.val()));
                 $('#dropdown').empty();
                 searchInput.val('');
             }
         });
 
         $('#searchBtn').click(function (e) { //provide search results 
-            this.openParaLink('search=' + encodeURI(searchInput.val()));
+            page.openParaLink('search=' + encodeURI(searchInput.val()));
             $('#dropdown').empty();
             searchInput.val('');
         });
@@ -271,7 +271,7 @@ var page = {
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
                             entry = entry + ' <span class="addVoc">(' + lang[value.s.value.split('\/')[3] + 'Desc'].name + ')</span>';
                         }
-                        $('#dropdown').append('<tr><td class="searchLink" onclick="document.location.href = \'' + this.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
+                        $('#dropdown').append('<tr><td class="searchLink" onclick="document.location.href = \'' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
                     });
                 }
             }, 200);
@@ -284,12 +284,10 @@ var page = {
         pageContent.empty().append('<br><h1>' + lang.TITLE_SEARCHRESULTS + '</h1><p id="hits" class="lead">' + lang.HITS_SEARCHRESULTS +
             '\"' + searchText + '\"</p><hr><ul id="searchresults" class="searchresults"></ul>');
         $('#searchresults').bind("DOMSubtreeModified", function () {
-            $('#hits').html(HITS_SEARCHRESULTS.replace('0', $('#searchresults li').length) + '\"' + searchText + '\"');
+            $('#hits').html(lang.HITS_SEARCHRESULTS.replace('0', $('#searchresults li').length) + '\"' + searchText + '\"');
         });
 
-        lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
-
-            let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
+        let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
                                         SELECT DISTINCT ?s (MIN(?pL) AS ?title) (GROUP_CONCAT(DISTINCT ?label; separator = "$") as ?text) (MIN(?so) AS ?sort) 
                                         (MIN(?stat) AS ?Status) 
                                         WHERE { 
@@ -297,7 +295,7 @@ var page = {
                                         VALUES ?p {skos:prefLabel skos:altLabel skos:definition skos:scopeNote <http://purl.org/dc/terms/description>} 
                                         ?s a skos:Concept; ?p ?L . FILTER((lang(?L)="${lang.ID}")) . 
                                         BIND(CONCAT(STR(?p),"|",STR(?L)) AS ?label) . FILTER(regex(?L,?n,"i")) 
-                                        ?s skos:prefLabel ?pL . FILTER((lang(?pL)="${lang}")) 
+                                        ?s skos:prefLabel ?pL . FILTER((lang(?pL)="${lang.ID}")) 
                                         BIND(IF(?p=skos:prefLabel,1,2) AS ?so) 
                                         OPTIONAL {?s <http://resource.geolba.ac.at/PoolParty/schema/GBA/GBA_Status> ?st} 
                                         BIND (IF(exists{?s <http://resource.geolba.ac.at/PoolParty/schema/GBA/GBA_Status> ?st} , ?st, 0) AS ?stat) 
@@ -305,6 +303,8 @@ var page = {
                                         GROUP BY ?s 
                                         ORDER BY ?sort 
                                         LIMIT 100`;
+
+        lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
 
             ws.projectJson(project.id, query, jsonData => {
 
@@ -314,7 +314,7 @@ var page = {
                     } else {
                         $('#searchresults').append(`
                                             <li>
-                                                <a href="${this.BASE}?uri=${a.s.value}&lang=${lang.ID}">
+                                                <a href="${page.BASE}?uri=${a.s.value}&lang=${lang.ID}">
                                                     <strong>${a.title.value}</strong> (${project.name})
                                                 </a>
                                                 <br>
