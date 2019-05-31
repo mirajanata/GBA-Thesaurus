@@ -1,6 +1,5 @@
 ﻿// page building&handling
 "use strict";
-
 var page = {
     BASE: location.protocol + '//' + location.host + location.pathname,
     urlParams: new URLSearchParams(window.location.search),
@@ -98,7 +97,7 @@ var page = {
 
     insertInfo: function (topic) {
         var div = $('#page_desc');
-        div.empty().append('<br>' + eval('lang.DESC_' + topic.toUpperCase()));
+        div.empty().append('<br>' + lang['DESC_' + topic.toUpperCase()]);
     },
 
 
@@ -270,7 +269,7 @@ var page = {
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         let entry = value.L.value;
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
-                            entry = entry + ' <span class="addVoc">(' + eval(value.s.value.split('\/')[3] + 'Desc').name + ')</span>';
+                            entry = entry + ' <span class="addVoc">(' + lang[value.s.value.split('\/')[3] + 'Desc'].name + ')</span>';
                         }
                         $('#dropdown').append('<tr><td class="searchLink" onclick="document.location.href = \'' + this.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
                     });
