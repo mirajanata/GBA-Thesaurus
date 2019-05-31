@@ -60,7 +60,7 @@ var detail = {
             for (key in detail.TECHNICAL_LIST) detail.insertTechnicalPart(key, data, Array.from(detail.TECHNICAL_LIST[key].values()));
             div.append('');
 
-            detail.insertConceptBrowser('pageContent', uri, 50);
+            detail.insertConceptBrowser(div, uri, 50);
         });
     },
 
@@ -128,7 +128,6 @@ var detail = {
                         break;
                 }
             }
-
         });
         div.append(html);
     },
@@ -178,8 +177,6 @@ var detail = {
             }
         });
 
-
-
         if (html.length > 0) {
             $('#details').append(`
                     <tr id="${key}">
@@ -201,7 +198,6 @@ var detail = {
     },
 
     createHref: function (x) { //PROVIDE_REDIRECT?
-
         if (x.substring(0, 22) == 'http://resource.geolba') { //vocabulary base URI
             x = '<a href="' + page.BASE + '?uri=' + x + '">' + x + '</a>';
         } else if (x.substring(0, 4) == 'http') {
@@ -342,9 +338,8 @@ var detail = {
         });
     },
 
-    insertConceptBrowser: function (divID, uri, offset) {
-
-        $('#' + divID).append(`
+    insertConceptBrowser: function (div, uri, offset) {
+        div.append(`
         <hr>
         <div class="card my-4">
             <ul id="coBr" class="pagination mb-4 cardHeaderRight">
