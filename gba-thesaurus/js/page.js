@@ -71,26 +71,27 @@ var page = {
     initSearch: function () {
         var a = [];
         var b = 0;
-        lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
-
-            ws.docJson(`PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
+        var query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
                                         SELECT ?s ?L 
                                         WHERE { 
                                         VALUES ?p {skos:prefLabel skos:altLabel} 
                                         ?s a skos:Concept; ?p ?L . FILTER(lang(?L)="${lang.ID}") 
-                                        } ORDER BY STRLEN(STR(?L)) ?L`, jsonData => {
-                    a = [...a, ...jsonData.results.bindings];
-                    b += 1;
+                                        } ORDER BY STRLEN(STR(?L)) ?L`;
 
-                    if (b == lang.LIST_THESAURUS_PROJECTS.length) {
-                        const options = {
-                            shouldSort: true,
-                            tokenize: true,
-                            keys: ['L.value']
-                        };
-                        window.fuse = new Fuse(a, options);
-                    }
-                });
+        lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
+            ws.projectJson(project.id, query, jsonData => {
+                a = [...a, ...jsonData.results.bindings];
+                b += 1;
+
+                if (b == lang.LIST_THESAURUS_PROJECTS.length) {
+                    const options = {
+                        shouldSort: true,
+                        tokenize: true,
+                        keys: ['L.value']
+                    };
+                    window.fuse = new Fuse(a, options);
+                }
+            });
         });
     },
 
@@ -258,9 +259,10 @@ var page = {
             clearTimeout(timer);
             $('#dropdown').empty();
             timer = setTimeout(function () {
-                if (searchInput.val().length > 0) {
+                var searchVal = searchInput.val();
+                if (searchVal.length > 0) {
                     $('#dropdown').show();
-                    let autoSuggest = window.fuse.search(searchInput.val());
+                    let autoSuggest = window.fuse.search(searchVal);
                     let c = [];
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         c.push(value.L.value)

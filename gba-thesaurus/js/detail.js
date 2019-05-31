@@ -126,6 +126,9 @@ var detail = {
                             this.shortenText(Array.from(ul).join('</li><li>')) + '</li></ul></td></tr></table>';
 
                         break;
+                    default:
+                        html += `<h1 class="mt-4">Error: Undefined key ${key}</h1><hr>`;
+                        break;
                 }
             }
         });
