@@ -1,4 +1,4 @@
-﻿// page building
+﻿// page building&handling
 "use strict";
 
 var page = {
@@ -231,36 +231,36 @@ var page = {
     },
 
     insertSearchCard: function (widgetID) {
-
+        var searchInput = $('#searchInput');
         $('#searchInput').keydown(function (e) {
             if (e.which == 13) {
-                this.openParaLink('search=' + encodeURI($('#searchInput').val()));
+                this.openParaLink('search=' + encodeURI(searchInput.val()));
                 $('#dropdown').empty();
-                $('#searchInput').val('');
+                searchInput.val('');
             }
         });
 
         $('#searchBtn').click(function (e) { //provide search results 
-            this.openParaLink('search=' + encodeURI($('#searchInput').val()));
+            this.openParaLink('search=' + encodeURI(searchInput.val()));
             $('#dropdown').empty();
-            $('#searchInput').val('');
+            searchInput.val('');
         });
 
-        $('#searchInput').focusout(function () {
+        searchInput.focusout(function () {
             $('#dropdown').delay(300).hide(0, function () {
                 $('#dropdown').empty();
-                $('#searchInput').val('');
+                searchInput.val('');
             });
         });
 
         let timer;
-        $('#searchInput').on('input', function () {
+        searchInput.on('input', function () {
             clearTimeout(timer);
             $('#dropdown').empty();
             timer = setTimeout(function () {
-                if ($('#searchInput').val().length > 0) {
+                if (searchInput.val().length > 0) {
                     $('#dropdown').show();
-                    let autoSuggest = window.fuse.search($('#searchInput').val());
+                    let autoSuggest = window.fuse.search(searchInput.val());
                     let c = [];
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         c.push(value.L.value)
@@ -339,7 +339,6 @@ var page = {
     },
 
     createSearchResultsText: function (sparqlText, searchText) {
-
         let searchText1 = searchText.toLowerCase();
         var regex1 = new RegExp(searchText1, "g");
         let searchText2 = searchText.charAt(0).toUpperCase() + searchText.slice(1);
@@ -438,7 +437,6 @@ var page = {
     },
 
     insertPageDesc: function () {
-
         $('#page_desc').append('<br><h1 id="title">GBA Thesaurus</h1>')
             .append('<h3>' + lang.TITLE_THES_2 + '</h3>')
             .append('<p>' + lang.DESC_THESAURUS + '</p>');
@@ -455,6 +453,4 @@ var page = {
                                             </a>
                                         </div>`);
     }
-
-
 };
