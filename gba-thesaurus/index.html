@@ -52,7 +52,7 @@
                 let uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
                 $('#pageContent').empty();
                 page.initApps(uri);
-                details('pageContent', uri, endpoint);
+                detail.details(uri);
                 var project = eval(uri.split('\/')[3] + 'Desc');
                 page.insertSideCard_projectInfo(project);
             } else {
@@ -72,20 +72,20 @@
             document.execCommand('Stop');
             $('body').empty();
             $('body').append(`
-                    <div class="alert alert-dismissible alert-warning">
-                        <button type="button" class="close" data-dismiss="alert">
-                            &times;
-                        </button>
-                        <h4 class="alert-heading">
-                            GBA Thesaurus
-                        </h4>
-                        <p class="mb-0">[Deutsch]<br>
-                            Die Website des GBA Thesaurus wurde f&uuml;r die Browser Firefox, Chrome, Safari oder MS Edge optimiert bzw. modernisiert und unterst&uuml;tzt nicht mehr die Darstellung im MS Internet Explorer 11 oder &auml;lter.
-                            <br>
-                            <br>
-                            [English]<br>The GBA Thesaurus website is optimized for browsers Firefox, Chrome, Safari or MS Edge. - MS Internet Explorer 11 or older is not supported any more.
-                        </p>
-                    </div>`);
+                        <div class="alert alert-dismissible alert-warning">
+                            <button type="button" class="close" data-dismiss="alert">
+                                &times;
+                            </button>
+                            <h4 class="alert-heading">
+                                GBA Thesaurus
+                            </h4>
+                            <p class="mb-0">[Deutsch]<br>
+                                Die Website des GBA Thesaurus wurde f&uuml;r die Browser Firefox, Chrome, Safari oder MS Edge optimiert bzw. modernisiert und unterst&uuml;tzt nicht mehr die Darstellung im MS Internet Explorer 11 oder &auml;lter.
+                                <br>
+                                <br>
+                                [English]<br>The GBA Thesaurus website is optimized for browsers Firefox, Chrome, Safari or MS Edge. - MS Internet Explorer 11 or older is not supported any more.
+                            </p>
+                        </div>`);
         }
     </script>
 
@@ -108,7 +108,7 @@
                         <a class="nav-link" href="#">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="feedback" href="javascript: feedBack();">Feedback</a>
+                        <a class="nav-link" id="feedback" href="javascript: page.openFeedBack();">Feedback</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="lang" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Language</a>

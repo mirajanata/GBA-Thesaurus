@@ -37,17 +37,36 @@ var page = {
         console.log(location.href);
     },
 
+
+    openParaLink: function (queryString) { //zB 'info=disclaimer'
+        window.open(this.BASE + '?' + queryString + '&lang=' + lang.ID, '_self', '', 'false');
+    },
+    toggleRead: function (divBtn, divTxt, text) {
+        let txt = $('#' + divTxt).is(':visible') ? '&#9654; <em>' + text + ' ..</em>' : '&#9660; <em>' + text + ' ..</em>';
+        $('#' + divBtn).html(txt);
+        $('#' + divTxt).slideToggle();
+    },
+
+    openFeedBack: function () {
+        let email = 'thesaurus@geologie.ac.at';
+        let subject = 'Anfrage';
+        let body = '';
+        if ($('#uri').length > 0) {
+            body = 'URI: ' + $('#uri').text();
+        }
+        if ($('.altLabel').length > 0) {
+            subject = $('.altLabel').html().replace(/<span class="lang">/g, '[').replace(/<\/span>/g, '] ').replace(/<li>/g, '').replace(/<\/li>/g, '').replace(/  /g, '');
+        }
+        let mailto_link = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+        window.location.href = mailto_link;
+    },
+
     insertSideCard_projectInfo: function (project) {
         $('#proj_links').append(`<div class="card border-info mb-3">
                                 <h5 class="card-header">${project.name} (${lang.TOPIC})</h5>
                                 <div id="${project.id}Card" class="card-body">${project.desc}</div>
                             </div>`);
     },
-
-    openParaLink: function (queryString) { //zB 'info=disclaimer'
-        window.open(this.BASE + '?' + queryString + '&lang=' + lang.ID, '_self', '', 'false');
-    },
-
 
     initSearch: function () {
         var a = [];
@@ -338,12 +357,6 @@ var page = {
             resultText += '<br>';
         }
         return resultText;
-    },
-
-    toggleRead: function (divBtn, divTxt, text) {
-        let txt = $('#' + divTxt).is(':visible') ? '&#9654; <em>' + text + ' ..</em>' : '&#9660; <em>' + text + ' ..</em>';
-        $('#' + divBtn).html(txt);
-        $('#' + divTxt).slideToggle();
     },
 
     insertProjCards: function () {
