@@ -29,40 +29,6 @@
     <script>
         $(document).ready(function () {
             page.init();
-            page.setNavbarFooter();
-            page.insertSearchCard(); //inserts search widget only
-
-            var urlParams = page.urlParams;
-            if (urlParams.has('search')) { //need lang parameter only for sparql requests
-                page.insertSearch(decodeURI(urlParams.get('search')));
-                page.insertProjCards(); //quick access cards, plus extended project comments from sparql
-            } else if (urlParams.has('info')) {
-                page.insertInfo(decodeURI(urlParams.get('info')));
-                page.insertProjCards(); //quick access cards, plus extended project comments from sparql
-            } else if (urlParams.has('list')) {
-                $('#pageContent').empty();
-                let uri = '§';
-                let label = '§';
-                if (urlParams.has('uri')) {
-                    uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
-                    label = decodeURI(urlParams.get('list').replace(/["';><]/gi, '')); //avoid injection
-                }
-                page.insertSparql(uri, label);
-                page.insertProjCards(); //quick access cards, plus extended project comments from sparql
-            } else if (urlParams.has('uri')) {
-                let uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
-                $('#pageContent').empty();
-                page.initApps(uri);
-                detail.details(uri);
-                var project = lang[uri.split('\/')[3] + 'Desc'];
-                page.insertSideCard_projectInfo(project);
-            } else {
-                page.insertPageDesc(); //general intro
-                page.insertComments('proj_desc', lang.LIST_THESAURUS_PROJECTS); //project desc from js ,insert before ProjCards!
-                page.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
-                page.insertProjCards(); //quick access cards, plus extended project comments from sparql
-            }
-            page.initSearch(); //provides js for fuse search
         });
     </script>
 </head>

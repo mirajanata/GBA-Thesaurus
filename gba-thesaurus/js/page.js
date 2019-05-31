@@ -19,6 +19,41 @@ var page = {
             $('#lang').text('DE');
         }
         lang.load(USER_LANG);
+
+        this.setNavbarFooter();
+        this.insertSearchCard(); //inserts search widget only
+
+        var urlParams = this.urlParams;
+        if (urlParams.has('search')) { //need lang parameter only for sparql requests
+            this.insertSearch(decodeURI(urlParams.get('search')));
+            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+        } else if (urlParams.has('info')) {
+            this.insertInfo(decodeURI(urlParams.get('info')));
+            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+        } else if (urlParams.has('list')) {
+            $('#pageContent').empty();
+            let uri = '§';
+            let label = '§';
+            if (urlParams.has('uri')) {
+                uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
+                label = decodeURI(urlParams.get('list').replace(/["';><]/gi, '')); //avoid injection
+            }
+            this.insertSparql(uri, label);
+            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+        } else if (urlParams.has('uri')) {
+            let uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
+            $('#pageContent').empty();
+            this.initApps(uri);
+            detail.details(uri);
+            var project = lang[uri.split('\/')[3] + 'Desc'];
+            this.insertSideCard_projectInfo(project);
+        } else {
+            this.insertPageDesc(); //general intro
+            this.insertComments('proj_desc', lang.LIST_THESAURUS_PROJECTS); //project desc from js ,insert before ProjCards!
+            this.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
+            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+        }
+        this.initSearch(); //provides js for fuse search
     },
 
     setLang: function (lang) {
