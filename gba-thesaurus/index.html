@@ -24,37 +24,31 @@
     <script src="js/ws.js"></script>
     <script src="js/lang.js"></script>
     <script src="js/page.js"></script>
+    <script src="js/search.js"></script>
     <script src="js/detail.js"></script>
 
     <script>
         $(document).ready(function () {
-            page.init();
+            if (typeof page == 'undefined' || window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
+                document.execCommand('Stop');
+                $('body').empty().append('<div class="alert alert-dismissible alert-warning">'+
+                                    '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                                    '<h4 class="alert-heading">GBA Thesaurus</h4>'+
+                                    '<p class="mb-0">[Deutsch]<br>'+
+                                        'Die Website des GBA Thesaurus wurde f&uuml;r die Browser Firefox, Chrome, Safari oder MS Edge optimiert bzw. modernisiert und unterst&uuml;tzt nicht mehr die Darstellung im MS Internet Explorer 11 oder &auml;lter.'+
+                                        '<br><br>'+
+                                        '[English]<br>The GBA Thesaurus website is optimized for browsers Firefox, Chrome, Safari or MS Edge. - MS Internet Explorer 11 or older is not supported any more.'+
+                                    '</p></div>');
+            }
+            else
+                page.init();
+
+
         });
     </script>
 </head>
 
 <body>
-    <script>
-        if (window.navigator.userAgent.indexOf('MSIE ') > 0 || window.navigator.userAgent.indexOf('Trident/') > 0) {
-            document.execCommand('Stop');
-            $('body').empty().append(`
-                                <div class="alert alert-dismissible alert-warning">
-                                    <button type="button" class="close" data-dismiss="alert">
-                                        &times;
-                                    </button>
-                                    <h4 class="alert-heading">
-                                        GBA Thesaurus
-                                    </h4>
-                                    <p class="mb-0">[Deutsch]<br>
-                                        Die Website des GBA Thesaurus wurde f&uuml;r die Browser Firefox, Chrome, Safari oder MS Edge optimiert bzw. modernisiert und unterst&uuml;tzt nicht mehr die Darstellung im MS Internet Explorer 11 oder &auml;lter.
-                                        <br>
-                                        <br>
-                                        [English]<br>The GBA Thesaurus website is optimized for browsers Firefox, Chrome, Safari or MS Edge. - MS Internet Explorer 11 or older is not supported any more.
-                                    </p>
-                                </div>`);
-        }
-    </script>
-
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
