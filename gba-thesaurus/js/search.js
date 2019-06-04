@@ -1,4 +1,4 @@
-﻿// search functions
+﻿// search features
 "use strict";
 var search = {
     initProjects: function () {

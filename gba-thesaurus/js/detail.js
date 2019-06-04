@@ -1,4 +1,4 @@
-﻿// detail building&handling
+﻿// detail features
 "use strict";
 const BaseUri = {
     skos: 'http://www.w3.org/2004/02/skos/core#',
