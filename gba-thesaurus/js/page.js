@@ -206,7 +206,7 @@ var page = {
         $('#appsCard .card-header').text(lang.APPS);
         $('#appsBody1').append(`
                                         <div class="apps">
-                                            <span class="appsIcon glyphicons glyphicons-cluster text-info"></span>
+                                            <span class="appsIcon fa fa-network-wired text-info"></span>
                                             <a href="http://resource.geolba.ac.at/thesaurus/network.html#${uri.split('geolba.ac.at/')[1]}/${lang.ID}" title="Network Diagram" class="card-link">
                                                 <br>Network<br>diagram
                                             </a>

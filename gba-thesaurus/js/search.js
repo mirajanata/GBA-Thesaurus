@@ -124,7 +124,7 @@ var search = {
                 if (label.length > 1 && jsonData.results.bindings[i].L.value.search('label') > -1) {
                     $('#bmTbl tbody').append(`<tr id="${i}">
                                                 <td>
-                                                    <span class="glyphicons glyphicons-align-left text-info style=""></span>
+                                                    <span class="fa fa-align-left text-info style=""></span>
                                                     ${jsonData.results.bindings[i].L.value.replace(/\+label/g, '<a href="' + page.BASE + '?uri=' + uri + '">' + decodeURIComponent(label) + '</a>')}
                                                 </td>
                                               </tr>`);
@@ -132,7 +132,7 @@ var search = {
                 if (jsonData.results.bindings[i].L.value.search('label') < 0) {
                     $('#bmTbl tbody').append(`<tr id="${i}">
                                                 <td>
-                                                    <span class="glyphicons glyphicons-align-left text-info style=""></span>
+                                                    <span class="fa fa-align-left text-info style=""></span>
                                                     ${jsonData.results.bindings[i].L.value}
                                                 </td>
                                               </tr>`);

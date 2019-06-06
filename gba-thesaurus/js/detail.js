@@ -79,13 +79,13 @@ var detail = {
                                     <a href="${uri}.rdf"> RDF download</a>
                                 </p>
                                 <hr>`;
-                        this.insertApp('Database', 'tables', `${page.BASE}?uri=${uri}&list=${encodeURIComponent(pL)}&lang=${lang.ID}`, 'table');
+                        this.insertApp('Database', 'tables', `${page.BASE}?uri=${uri}&list=${encodeURIComponent(pL)}&lang=${lang.ID}`, 'database');
                         break;
                     case 'dataViewer':
                         if (uri.search('/structure/') == -1) {
-                            this.insertApp('Data', 'Viewer', 'http://gisgba.geologie.ac.at/DataViewer/tdv/Index.aspx?url=' + uri + '&lang=' + lang.ID, 'map');
+                            this.insertApp('Data', 'Viewer', 'http://gisgba.geologie.ac.at/DataViewer/tdv/Index.aspx?url=' + uri + '&lang=' + lang.ID, 'table');
                         } else {
-                            this.insertApp('Structure', 'Viewer', 'http://www.geolba.net/thesaurus/structureViewer.html?uri=' + uri + '&lang=' + lang.ID, 'map-marker');
+                            this.insertApp('Structure', 'Viewer', 'http://www.geolba.net/thesaurus/structureViewer.html?uri=' + uri + '&lang=' + lang.ID, 'gem');
                         }
                         break;
                     case 'picture':
@@ -392,7 +392,7 @@ var detail = {
         } else {
             $('#appsBody1').append(`
                 <div class="apps">
-                    <span class="appsIcon glyphicons glyphicons-${glyphicon} text-info style=""></span>
+                    <span class="appsIcon fa fa-${glyphicon} text-info style=""></span>
                     <br>
                     <a href="${link}" class="card-link">
                         ${text1}<br>${text2}
