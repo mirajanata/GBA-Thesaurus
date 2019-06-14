@@ -150,6 +150,7 @@ var search = {
     },
 
     insertSearchCard: function (widgetID) {
+        $('#searchInputLabel').html(lang.LABEL_SEARCH);
         var searchInput = $('#searchInput');
         $('#searchInput').keydown(function (e) {
             if (e.which == 13) {

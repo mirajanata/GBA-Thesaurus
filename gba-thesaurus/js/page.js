@@ -54,6 +54,7 @@ var page = {
             this.insertProjCards(); //quick access cards, plus extended project comments from sparql
         }
         search.initProjects();
+        document.documentElement.setAttribute('lang', USER_LANG);
     },
 
     setLang: function (lang) {

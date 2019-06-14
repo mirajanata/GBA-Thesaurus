@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
@@ -53,7 +53,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
-            <a href="https://www.geologie.ac.at"><img id="IMG_GBALOGO" src="img/gbaLogo50.png" height="35"></a>
+            <a href="https://www.geologie.ac.at"><img alt="GBA Logo" id="IMG_GBALOGO" src="img/gbaLogo50.png" height="35"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -122,6 +122,7 @@
                         &nbsp;&nbsp;thesaurus
                     </h5>
                     <div id="searchCard" class="card-body">
+							<label for="searchInput" id="searchInputLabel">Suchen</label>
                         <div id="searchGroup" class="input-group">
                             <input id="searchInput" type="text" class="form-control" placeholder="Search for...">
                             <div style="position: absolute; top: 39px;">
@@ -149,7 +150,7 @@
     <!-- Footer -->
     <footer class="py-5 bg-dark">
         <div class="container">
-            <p class="m-0 text-center text-white">
+            <div style="display:inline;" class="m-0 text-center text-white">
                 &copy;
                 <script>
                     document.write(new Date().getFullYear());
@@ -160,7 +161,12 @@
                 <a id="contact" href="mailto:thesaurus@geologie.ac.at">contact</a> |
                 <a id="disclaimer" href="javascript:page.openParaLink('info=disclaimer');">disclaimer</a> |
                 <a href="http://resource.geolba.ac.at/thesaurus/FAQ.html">FAQ</a>
-            </p>
+            </div>
+            <div style="display:inline; float:right;">
+                <a href="https://achecker.ca/checker/index.php?uri=referer&gid=WCAG2-AA">
+                    <img src="https://achecker.ca/images/icon_W2_aa.jpg" alt="WCAG 2.0 (Level AA)" height="32" width="102" />
+                </a>
+            </div>
         </div>
     </footer>
 </body>
