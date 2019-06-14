@@ -98,7 +98,7 @@ var page = {
 
     insertSideCard_projectInfo: function (project) {
         $('#proj_links').append(`<div class="card border-info mb-3">
-                                <h5 class="card-header">${project.name} (${lang.TOPIC})</h5>
+                                <h4 class="card-header">${project.name} (${lang.TOPIC})</h4>
                                 <div id="${project.id}Card" class="card-body">${project.desc}</div>
                             </div>`);
     },
@@ -136,8 +136,8 @@ var page = {
 
         lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
             ws.projectJson(project.id, query, jsonData => {
-                div.append('<div class="card my-4"><h5 class="card-header">' + project.name +
-                    '</h5><div id="' + project.id + 'Card" class="card-body"></div></div>');
+                div.append('<div class="card my-4"><h4 class="card-header">' + project.name +
+                    '</h4><div id="' + project.id + 'Card" class="card-body"></div></div>');
 
                 //work around for HTML5 details and summary tags
                 //$('#' + project.id + 'Comment').append('<details id="'+ project.id + 'ReadMore' +'"><summary class="text-muted"><em>read more ..</em></summary><br></details>');
@@ -157,8 +157,8 @@ var page = {
                     $('#' + project.id + 'Card').append(a.cL.value + ':<br><a href="' + page.BASE + '?uri=' +
                         a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' + page.BASE + '?uri=') + '</a><br>');
                     //add concept schemes + topConcepts to project descriptions
-                    $('#' + project.id + 'ReadMore').append('<h5>' + a.cL.value + ' (' + a.count.value +
-                        '):</h5><a href="' + page.BASE + '?uri=' + a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' +
+                    $('#' + project.id + 'ReadMore').append('<h4>' + a.cL.value + ' (' + a.count.value +
+                        '):</h4><a href="' + page.BASE + '?uri=' + a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' +
                             page.BASE + '?uri=') + '</a><br>' + a.desc.value + '<br><br>');
                 });
 
@@ -187,7 +187,7 @@ var page = {
         projects.forEach(function (desc) {
             div.append(`
                                                 <div class="media mb-4">
-                                                    <img class="d-flex mr-3 rounded-circle" src="img/${desc.image}">
+                                                    <img alt="${desc.name}" class="d-flex mr-3 rounded-circle" src="img/${desc.image}">
                                                     <div id="${desc.id}Comment" class="media-body">
                                                         <h4 class="mt-0">${desc.name}</h4>
                                                         ${desc.desc}
@@ -197,7 +197,7 @@ var page = {
     },
 
     insertPageDesc: function () {
-        $('#page_desc').append('<br><h1 id="title">GBA Thesaurus</h1>')
+        $('#page_desc').append('<br><h3 id="title">GBA Thesaurus</h3>')
             .append('<h3>' + lang.TITLE_THES_2 + '</h3>')
             .append('<p>' + lang.DESC_THESAURUS + '</p>');
     },

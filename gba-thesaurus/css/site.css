@@ -6,6 +6,7 @@ body {
     font-size: 100%;
 }
 
+
 a:not(.nav-link):not(.btn):not(.datatype) {
     color: #069;
     text-decoration: none;

@@ -34,7 +34,7 @@ var search = {
                 <div class="card border-info">
                     <div class="card-body">
                         <div style="">
-                            <div style="float:left;"><h2>${lang.DB_QUERY}&nbsp;</h2></div>
+                            <div style="float:left;"><h3>${lang.DB_QUERY}&nbsp;</h3></div>
                             <div style="float:right; min-width:210px" class="form-group">
                                 <select class="form-control" id="endpointSelect"></select>
                             </div>
@@ -151,6 +151,7 @@ var search = {
 
     insertSearchCard: function (widgetID) {
         $('#searchInputLabel').html(lang.LABEL_SEARCH);
+        $('#searchInput').attr('placeholder', lang.TIP_SEARCH);
         var searchInput = $('#searchInput');
         $('#searchInput').keydown(function (e) {
             if (e.which == 13) {
@@ -201,7 +202,7 @@ var search = {
     insertSearch: function (searchText) {
         var gbaStatusStyle = ['bold', 'success', 'danger', 'primary'];
         var pageContent = $('#pageContent');
-        pageContent.empty().append('<br><h1>' + lang.TITLE_SEARCHRESULTS + '</h1><p id="hits" class="lead">' + lang.HITS_SEARCHRESULTS +
+        pageContent.empty().append('<br><h3 id="title">' + lang.TITLE_SEARCHRESULTS + '</h3><p id="hits" class="lead">' + lang.HITS_SEARCHRESULTS +
             '\"' + searchText + '\"</p><hr><ul id="searchresults" class="searchresults"></ul>');
         $('#searchresults').bind("DOMSubtreeModified", function () {
             $('#hits').html(lang.HITS_SEARCHRESULTS.replace('0', $('#searchresults li').length) + '\"' + searchText + '\"');

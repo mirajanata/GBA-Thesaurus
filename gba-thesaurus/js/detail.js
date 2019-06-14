@@ -47,7 +47,7 @@ var detail = {
             for (var key in detail.FRONT_LIST) detail.insertFrontPart(key, uri, data, Array.from(detail.FRONT_LIST[key].values()));
             var div = $('#pageContent');
             div.append(`<hr>
-                                <div style="cursor: pointer; color: #777;" id="detailsBtn" 
+                                <div style="cursor: pointer; color: #404040;" id="detailsBtn" 
                                     onclick="javascript: page.toggleRead(\'detailsBtn\', \'detailsToggle\', \'read more\');"> &#9654; <em>read more ..</em>
                                 </div>
                                 <div style="display:none;" id="detailsToggle">
@@ -72,9 +72,9 @@ var detail = {
                 switch (key) {
                     case 'prefLabel':
                         let pL = this.setUserLang(Array.from(ul).join('|').replace(/  <span class="lang">/g, '@').replace(/<\/span>/g, ''));
-                        html += '<h1 class="mt-4">' + pL + '</h1>';
+                        html += '<h3 id="title" class="mt-4">' + pL + '</h3>';
                         html += `   <p class="lead">URI: 
-                                    <span id="uri" class="">${uri}</span>
+                                    <span id="uri" class="" style="word-wrap:break-word;">${uri}</span>
                                         &nbsp;&nbsp;&nbsp;&#8658;
                                     <a href="${uri}.rdf"> RDF download</a>
                                 </p>
@@ -126,7 +126,7 @@ var detail = {
 
                         break;
                     default:
-                        html += `<h1 class="mt-4">Error: Undefined key ${key}</h1><hr>`;
+                        html += `<h3 id="title" class="mt-4">Error: Undefined key ${key}</h3><hr>`;
                         break;
                 }
             }
@@ -160,7 +160,7 @@ var detail = {
         props.forEach((i) => {
             let ul = this.getObj(data, i);
             if (ul.size > 0) {
-                html += '<tr><td class="propTech">' + this.createHref(i) + '</td><td><ul><li>' + Array.from(ul).join('</li><li>') + '</li></ul></td></tr>';
+                html += '<tr><td headers="th1' + key + '" class="propTech">' + this.createHref(i) + '</td><td headers="th2' + key +'"><ul><li>' + Array.from(ul).join('</li><li>') + '</li></ul></td></tr>';
 
                 if (i == geoPath + 'lat') {
                     coord.lat = Number(ul.values().next().value);
@@ -182,8 +182,8 @@ var detail = {
         if (html.length > 0) {
             $('#details').append(`
                     <tr id="${key}">
-                        <th></th>
-                        <th>
+                        <th id='th1${key}'></th>
+                        <th id='th2${key}'>
                             ${lang[key + '_H']}
                         </th>
                     </tr>
@@ -356,7 +356,7 @@ var detail = {
                     </button>
                 </li>
             </ul>
-            <h5 id="allConceptsHeader" class="card-header"></h5>
+            <h4 id="allConceptsHeader" class="card-header"></h4>
             <div id="allConcepts" class="card-body"></div>
         </div>
                            `);
@@ -367,7 +367,7 @@ var detail = {
         var pdfImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAIcKAACMDQABBbcAAIDoAABSBQABFVsAADavAAAfQQLQ3GkAAAFDSURBVHjaADYByf4B////+gAAurGy5f/39vz6Cfn8Bu/1EwgRPEFFEyMWAf6ajgHZ5vjF2Pz+AwIGBef67PdANSx6b6nJxhAuKATxk4QB0+4PAAAAAAAAAADRAAD1E/3p3Du259X3+ucE6CIv9Q70BPfyDgAC5vr84Pf9QVhZ4+DvMA4q9vf9Af///+kA/r7NtSMjJwrw+uO3xklYZgDh7QAABs7KzAQAAAAA5usu3AwrGSLr49385fz90dj8LiPJCfuU7vgEAAAAAAQDCxQTAPX++Le8LyAW08y57sXyDSwkavz8BAAAAP76+O/05va1yRoeBf1LKwkIKBfQ0BPn7w3x+wQAAAAJBwcC8+oZLR4QQ0f7APAA8+oQNz8W+grJqK8EAAAABQcHu+Pi29HP87OxBvX+CfsE9Pj89QACHCsrAwCLf5kn2fkcxQAAAABJRU5ErkJggg==";
 
         if (a.split('.').slice(-1).pop().toLowerCase() == 'pdf') {
-            a += ' - <img src="' + pdfImage + '">';
+            a += ' - <img alt="PDF version" src="' + pdfImage + '">';
         }
         return a;
     },
@@ -379,7 +379,7 @@ var detail = {
             $('#appsBody2').append(`
                 <div class="apps thumbNail">
                     <a href="${link}">
-                        <img src="${this.imgPng(link)}" class="img-thumbnail" alt="Image" title="Image" onerror="$(this).remove();" style="width:75px; height:75px; overflow:hidden;">
+                        <img alt="${text1}" src="${this.imgPng(link)}" class="img-thumbnail" alt="Image" title="Image" onerror="$(this).remove();" style="width:75px; height:75px; overflow:hidden;">
                     </a>
                 </div>`);
         } else if (glyphicon == '') {
