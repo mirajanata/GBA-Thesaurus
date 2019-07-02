@@ -89,6 +89,18 @@ ul {
     cursor: pointer;
 }
 
+    .searchLink:hover {
+        background-color: gray;
+        color: white;
+        cursor:pointer;
+    }
+    .searchLink.selected {
+        background-color: gray;
+        color: white;
+        cursor: pointer;
+    }
+
+
 .searchResultURI {
     font-size: small;
     color: #069;

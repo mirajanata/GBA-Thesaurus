@@ -148,16 +148,45 @@ var search = {
             });
         });
     },
-
+    __selectSearchLink: function (up) {
+        var options = $(".searchLink");
+        if (options.length == 0)
+            return;
+        for (var c = 0; c < options.length; c++) {
+            if ($(options[c]).hasClass("selected"))
+                break;
+        }
+        if (c >= options.length)
+            c = -1;
+        if (up)
+            c = c < 1 ? options.length - 1 : c - 1;
+        else
+            c = c == -1 || c == options.length - 1 ? 0 : c + 1;
+        options.removeClass("selected");
+        if (c >= 0) {
+            var o = $(options[c]);
+            o.addClass("selected");
+            var searchInput = $('#searchInput');
+            searchInput.val(o.text());
+        }
+    },
     insertSearchCard: function (widgetID) {
         $('#searchInputLabel').html(lang.LABEL_SEARCH);
         $('#searchInput').attr('placeholder', lang.TIP_SEARCH);
         var searchInput = $('#searchInput');
         $('#searchInput').keydown(function (e) {
-            if (e.which == 13) {
-                page.openParaLink('search=' + encodeURI(searchInput.val()));
-                $('#dropdown').empty();
-                searchInput.val('');
+            switch (e.which) {
+                case 13:
+                    page.openParaLink('search=' + encodeURI(searchInput.val()));
+                    $('#dropdown').empty();
+                    searchInput.val('');
+                    break;
+                case 38: // up
+                    search.__selectSearchLink(1);
+                    break;
+                case 40: // down
+                    search.__selectSearchLink(0);
+                    break;
             }
         });
 
@@ -232,7 +261,7 @@ var search = {
                 jsonData.results.bindings.forEach(function (a) {
                     if ($('#searchresults li').length > 199) {
                         return false;
-                    } else {
+                    } else if (a.title && a.s) {
                         $('#searchresults').append(`
                                             <li>
                                                 <a href="${page.BASE}?uri=${a.s.value}&lang=${lang.ID}">
