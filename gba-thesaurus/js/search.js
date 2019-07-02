@@ -308,7 +308,4 @@ var search = {
         }
         return resultText;
     }
-
-
-
 };
