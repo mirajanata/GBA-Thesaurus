@@ -58,17 +58,21 @@ var page = {
 
         this.updateSharingUrl($('#fbShare'));
         this.updateSharingUrl($('#twShare'));
+        this.updateSharingUrl($('#liShare'));
     },
     updateSharingUrl: function (e) {
-        var s = e.attr("href").replace("www.geolba.net", encodeURIComponent(window.location.href));
+        var v = encodeURIComponent(window.location.href);
+        var s = e.attr("href").replace("wwwgeolbanet", v).replace("wwwgeolbanet", v);
         e.attr("href", s);
     },
     updateSharingTexts: function (title) {
         this.updateSharingText($('#fbShare'), title);
         this.updateSharingText($('#twShare'), title);
+        this.updateSharingText($('#liShare'), title);
     },
     updateSharingText: function (e, title) {
-        var s = e.attr("href").replace("GBA%20Thesaurus", encodeURIComponent(title));
+        var v = encodeURIComponent(title);
+        var s = e.attr("href").replace("GBA%20Thesaurus", v).replace("GBA%20Thesaurus", v);
         e.attr("href", s);
     },
     setLang: function (lang) {
