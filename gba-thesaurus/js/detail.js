@@ -80,6 +80,7 @@ var detail = {
                                 </p>
                                 <hr>`;
                         this.insertApp('Database', 'tables', `${page.BASE}?uri=${uri}&list=${encodeURIComponent(pL)}&lang=${lang.ID}`, 'database');
+                        page.updateSharingTexts(pL);
                         break;
                     case 'dataViewer':
                         if (uri.search('/structure/') == -1) {

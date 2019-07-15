@@ -55,8 +55,22 @@ var page = {
         }
         search.initProjects();
         document.documentElement.setAttribute('lang', USER_LANG);
-    },
 
+        this.updateSharingUrl($('#fbShare'));
+        this.updateSharingUrl($('#twShare'));
+    },
+    updateSharingUrl: function (e) {
+        var s = e.attr("href").replace("www.geolba.net", encodeURIComponent(window.location.href));
+        e.attr("href", s);
+    },
+    updateSharingTexts: function (title) {
+        this.updateSharingText($('#fbShare'), title);
+        this.updateSharingText($('#twShare'), title);
+    },
+    updateSharingText: function (e, title) {
+        var s = e.attr("href").replace("GBA%20Thesaurus", encodeURIComponent(title));
+        e.attr("href", s);
+    },
     setLang: function (lang) {
         if (location.href.indexOf('lang=') != -1) {
             if (lang == 'de') {
@@ -69,7 +83,7 @@ var page = {
         } else {
             location.replace(location.href + '?lang=' + lang);
         }
-        console.log(location.href);
+        //console.log(location.href);
     },
 
 
