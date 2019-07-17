@@ -148,13 +148,16 @@ var search = {
             });
         });
     },
-    __selectSearchLink: function (up) {
+    __selectSearchLink: function (up, click) {
         var options = $(".searchLink");
         if (options.length == 0)
             return;
         for (var c = 0; c < options.length; c++) {
             if ($(options[c]).hasClass("selected"))
                 break;
+        }
+        if (click) {
+            return c >= options.length ? null : $(options[c]);
         }
         if (c >= options.length)
             c = -1;
@@ -177,6 +180,12 @@ var search = {
         $('#searchInput').keydown(function (e) {
             switch (e.which) {
                 case 13:
+                    var item = search.__selectSearchLink(1, 1);
+                    if (item) {
+                        var url = item.attr("data_url");
+                        document.location.href = url;
+                        return;
+                    }
                     page.openParaLink('search=' + encodeURI(searchInput.val()));
                     $('#dropdown').empty();
                     searchInput.val('');
@@ -221,7 +230,7 @@ var search = {
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
                             entry = entry + ' <span class="addVoc">(' + lang[value.s.value.split('\/')[3] + 'Desc'].name + ')</span>';
                         }
-                        $('#dropdown').append('<tr><td class="searchLink" onclick="document.location.href = \'' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
+                        $('#dropdown').append('<tr><td class="searchLink" data_url="' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '" onclick="document.location.href=\'' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
                     });
                 }
             }, 200);
