@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>GBA Thesaurus | Bibliographic Resources</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/ws.js"></script>
+    <script>
+        $(document).ready(function() {
+            let urlParams = new URLSearchParams(window.location.search);
+            let thesProjName = urlParams.get('proj');
+            //$('#headRef').text(`Bibliographic references used for ${thesProjName}`);
+            //console.log(urlParams.get('uri')); // "http.."   
+            let query1 = encodeURIComponent(`PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
+                                                PREFIX dcterms:<http://purl.org/dc/terms/>
+                                                SELECT DISTINCT ?o
+                                                WHERE {
+                                                ?s dcterms:references ?o
+                                                }`);
+            let query2 = encodeURIComponent(`PREFIX dcterms:<http://purl.org/dc/terms/>
+                                                SELECT DISTINCT *
+                                                WHERE {
+                                                ?s dcterms:bibliographicCitation ?C
+                                                OPTIONAL {?s dcterms:source ?pdf}
+                                                OPTIONAL {?s dcterms:identifier ?id}
+                                                }
+                                                ORDER BY ?C`);
+
+            let url = `${ws.endpoint}${thesProjName}?query=${query1}&format=application/json`;
+            let refs = [];
+
+
+            let result = fetch(url, {
+                    method: 'get',
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(data) {
+                    refs = Array.from(data.results.bindings, a => (a.o.value));
+                    //console.log(refs);
+                    return fetch(`${ws.endpoint}ref?query=${query2}&format=application/json`);
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .catch(function(error) {
+                    console.log('Request failed', error);
+                });
+
+            result.then(function(r) {
+                let firstChar = '§';
+                let ariaExp = true;
+                let collapse = ' show';
+                let count = 0;
+
+                for (let i of r.results.bindings) {
+                    if (refs.includes(i.s.value)) {
+                        count += 1;
+                        let idx = '';
+                        let pdfx = '';
+                        //console.log(i);
+                        if (i.hasOwnProperty('pdf')) {
+                            pdfx = ` <a href="${i.pdf.value}">[PDF]</a>`;
+                        }
+                        if (i.hasOwnProperty('id')) {
+                            idx = ` <a href="https://opac.geologie.ac.at/document/${i.id.value}">[Catalog]</a>`;
+                        }
+                        let citArr = i.C.value.split(':');
+                        let listGroupItem = `<li class="list-group-item">
+                                                    <strong>${citArr[0]}:</strong>
+                                                    ${citArr.slice(1).join()} ${pdfx}${idx}
+                                            </li>`;
+                        
+                        if (i.C.value.charAt(0).toUpperCase() == firstChar) {
+                            $(`#ref${firstChar} ul`).append(listGroupItem);
+                            //console.log(i.C.value);
+                        } else {
+                            firstChar = i.C.value.charAt(0).toUpperCase();
+                            //console.log(firstChar);
+                            $('#refList').append(`<div class="panel-heading" role="tab" id="refHeading${firstChar}">
+                                                    <h4 class="panel-title">
+                                                        <a class="collapsed" data-toggle="collapse" href="#ref${firstChar}" aria-expanded="${ariaExp}" aria-controls="ref${firstChar}">
+                                                            ${firstChar}
+                                                        </a>
+                                                    </h4>
+                                                </div>
+                                                <div id="ref${firstChar}" class="panel-collapse collapse${collapse}" role="tabpanel" aria-labelledby="refHeading${firstChar}">
+                                                    <ul class="list-group">
+                                                        ${listGroupItem}
+                                                    </ul>
+                                                </div>`);
+                            ariaExp = false;
+                            collapse = '';
+                            //console.log(i.C.value);
+                        }
+                    }
+                }
+                if (count < 10) {
+                    expandAll();
+                }
+            });
+        });
+
+        function expandAll() {
+            $('.collapsed').attr("aria-expanded","true");
+            $('.panel-collapse').attr("class","collapse show");
+            $('#expBut').hide();
+        }
+        
+    </script>
+</head>
+
+<body>
+    <div class="col-lg-8">
+        <button type="button" id="expBut" class="btn btn-outline-primary" onclick="expandAll()">expand all</button>
+        <div class="panel-group" role="tablist">
+            <div class="panel panel-default" id="refList"></div>
+        </div>
+    </div>
+</body>
+
+</html>
