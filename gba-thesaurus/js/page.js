@@ -59,6 +59,17 @@ var page = {
         this.updateSharingUrl($('#fbShare'));
         this.updateSharingUrl($('#twShare'));
         this.updateSharingUrl($('#liShare'));
+
+        if ((screen.width < 1000) && (window.location.search == null || window.location.search == "" || urlParams.has('search'))) {
+            var r = $("#rightSidebar");
+            r.detach().prependTo("#contentRow1");
+            r.removeClass("col-lg-4");
+            r.addClass("col-lg-8");
+            $("#appsCard").css('visibility', 'collapse');
+            $("#proj_links").css('display', 'none');
+            $("#search_widget").css('visibility', 'inherit');
+        }
+
     },
     updateSharingUrl: function (e) {
         var v = encodeURIComponent(window.location.href);
