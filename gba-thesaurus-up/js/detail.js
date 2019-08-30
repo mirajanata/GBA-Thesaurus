@@ -62,10 +62,13 @@ var detail = {
             detail.insertConceptBrowser(div, uri, 50);
         });
     },
-
+    rdfTS: function (url) {
+        document.getElementById('irdfQuery').value = "describe <" + url + ">";
+        document.getElementById('irdfForm').submit();
+    },
     insertFrontPart: function (key, uri, data, props) {
         var div = $('#pageContent');
-        let html = '';
+        let html = '<form id="irdfForm" target="_blank" style="display:none;" method="post" action="https://resource.geolba.ac.at/PoolParty/sparql/GeologicTimeScale"><input type="hidden" name="query" id="irdfQuery"/></form>';
         props.forEach((i) => {
             let ul = this.getObj(data, i);
             if (ul.size > 0) {
@@ -76,7 +79,7 @@ var detail = {
                         html += `   <p class="lead">URI: 
                                     <span id="uri" class="" style="word-wrap:break-word;">${uri}</span>
                                         &nbsp;&nbsp;&nbsp;&#8658;
-                                    <a href="${uri}.rdf"> RDF download</a>
+                                    <a href="javascript:detail.rdfTS('${uri}')"> RDF download</a>
                                 </p>
                                 <hr>`;
                         this.insertApp('Database', 'queries', `${ws.endpoint}${uri.split('/')[3]}`, 'list-alt'); //&list=${encodeURIComponent(pL)}&lang=${lang.ID}`, 'list-alt');
