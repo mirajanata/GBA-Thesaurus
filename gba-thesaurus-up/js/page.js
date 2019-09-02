@@ -60,14 +60,20 @@ var page = {
         this.updateSharingUrl($('#twShare'));
         this.updateSharingUrl($('#liShare'));
 
-        if ((screen.width < 1000) && (window.location.search == null || window.location.search == "" || urlParams.has('search'))) {
+        var nr = urlParams.has('noright');
+        if (nr||((screen.width < 1000) && (window.location.search == null || window.location.search == "" || urlParams.has('search')))) {
             var r = $("#rightSidebar");
-            r.detach().prependTo("#contentRow1");
+            r.detach();
+            if (!nr)
+                r.prependTo("#contentRow1");
             r.removeClass("col-lg-4");
             r.addClass("col-lg-8");
             $("#appsCard").css('visibility', 'collapse');
             $("#proj_links").css('display', 'none');
-            $("#search_widget").css('visibility', 'inherit');
+            if (!nr)
+                $("#search_widget").css('visibility', 'inherit');
+            else
+                $("#search_widget").css('visibility', 'collapse');
         }
     },
     updateSharingUrl: function (e) {
@@ -125,10 +131,12 @@ var page = {
     },
 
     insertSideCard_projectInfo: function (project) {
-        $('#proj_links').append(`<div class="card border-info mb-3">
+        if (project) {
+            $('#proj_links').append(`<div class="card border-info mb-3">
                                 <h4 class="card-header">${project.name} (${lang.TOPIC})</h4>
                                 <div id="${project.id}Card" class="card-body">${project.desc}</div>
                             </div>`);
+        }
     },
 
     insertInfo: function (topic) {

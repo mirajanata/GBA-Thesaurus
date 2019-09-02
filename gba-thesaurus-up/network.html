@@ -1,30 +1,58 @@
 ﻿<!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <title>GBA Thesaurus | Visualization</title>
-
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/vis-network.min.js"></script>
-    <script src="js/ws.js"></script>
     <link rel="stylesheet" href="css/vis-network.min.css" media="screen" charset="utf-8">
-    <link rel="stylesheet" href="css/bootstrap.min.css" media="screen" charset="utf-8">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/vis-network.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.11/split.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" />
+    <script src="js/ws.js"></script>
 
     <style type="text/css">
+
         #mynetwork {
             height: 700px;
             border: 1px solid lightgray;
             background: lightgrey;
-
         }
 
         #help {
             float: right;
         }
 
-    </style>
+        .split {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
 
+        .gutter {
+            background-color: transparent;
+            background-repeat: no-repeat;
+            background-position: 50%;
+        }
+
+            .gutter.gutter-horizontal {
+                cursor: col-resize;
+                background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+            }
+
+            .gutter.gutter-vertical {
+                cursor: row-resize;
+                background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+            }
+
+            .split.split-horizontal, .gutter.gutter-horizontal {
+                height: 500px;
+                float: left;
+            }
+    </style>
     <script>
         let visData = {};
         let edgesArr = [];
@@ -33,13 +61,13 @@
         let pageUri = null;
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             let urlParams = new URLSearchParams(window.location.search);
             pageUri = urlParams.get('uri');
             let project = pageUri.split('/')[3];
             let lang = urlParams.get('lang');
-            
+
             createNetwork(pageUri, lang, ws.endpoint, project);
 
 
@@ -48,21 +76,21 @@
         function createNetwork(uri, lang, endpoint, project) {
 
             let query = encodeURIComponent(`PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
-                                            PREFIX dbpo:<http://dbpedia.org/ontology/>
-                                            SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o 
-                                            (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor)
-                                            WHERE {
-                                            VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
-                                            VALUES ?p2 {skos:broadMatch}
-                                            {?s ?p1 ?o BIND (?p1 AS ?x)}
-                                            UNION
-                                            {?o ?p2 ?s BIND (skos:narrowMatch AS ?x)}
-                                            OPTIONAL {?s skos:prefLabel ?sL . FILTER(lang(?sL)='${lang}')}
-                                            OPTIONAL {?o skos:prefLabel ?oL . FILTER(lang(?oL)='${lang}')}
-                                            OPTIONAL {?s dbpo:colourHexCode ?sC}
-                                            OPTIONAL {?o dbpo:colourHexCode ?oC}
-                                            }
-                                            ORDER BY ?sL`);
+                                                PREFIX dbpo:<http://dbpedia.org/ontology/>
+                                                SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
+                                                (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor)
+                                                WHERE {
+                                                VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
+                                                VALUES ?p2 {skos:broadMatch}
+                                                {?s ?p1 ?o BIND (?p1 AS ?x)}
+                                                UNION
+                                                {?o ?p2 ?s BIND (skos:narrowMatch AS ?x)}
+                                                OPTIONAL {?s skos:prefLabel ?sL . FILTER(lang(?sL)='${lang}')}
+                                                OPTIONAL {?o skos:prefLabel ?oL . FILTER(lang(?oL)='${lang}')}
+                                                OPTIONAL {?s dbpo:colourHexCode ?sC}
+                                                OPTIONAL {?o dbpo:colourHexCode ?oC}
+                                                }
+                                                ORDER BY ?sL`);
             //console.log(decodeURIComponent(query));
 
             fetch(`${endpoint}${project}?query=${query}&format=application/json`)
@@ -162,13 +190,12 @@
                 }
 
             }
+            document.getElementById("itopic").src = "index.html?noright=1&uri=" + visID;
         }
 
         function createNode(id, nodeText, color, extConcepts) {
             //if (!nodeText.includes('//') || extConcepts) {
-            console.log(id + "," + nodeText + "," + color);
             if (!nodesArr.some(a => a.id === id)) {
-                console.log(id);
                 let Label = nodeText;
                 let font = {
                     face: 'Open Sans'
@@ -231,7 +258,7 @@
             //}
         }
 
-        var currentUri=null;
+        var currentUri = null;
         function drawNetwork(edgesArr, extConcepts) {
             // create array with nodes and edges
             let nodes = new vis.DataSet(nodesArr);
@@ -247,7 +274,7 @@
 
             let network = new vis.Network(container, data, options);
 
-            network.on("doubleClick", function(params) {
+            network.on("doubleClick", function (params) {
                 //console.log('doubleClick Event:', params);
                 if (params.nodes[0].indexOf('resource.geolba') == -1) {
                     window.location.href = params.nodes;
@@ -255,7 +282,7 @@
                     window.location.href = 'index.html?uri=' + params.nodes;
                 }
             });
-            network.on("click", function(params) {
+            network.on("click", function (params) {
                 //console.log('doubleClick Event:', params);
                 var uri = params.nodes[0];
                 if (currentUri != uri) {
@@ -264,7 +291,7 @@
                     drawNetwork(edgesArr, extConcepts);
                 }
             });
-            network.on("hold", function(params) {
+            network.on("hold", function (params) {
                 //console.log('hold Event:', params);
                 if (params.nodes[0].indexOf('resource.geolba') == -1) {
                     window.location.href = params.nodes;
@@ -280,7 +307,7 @@
                 }
             });
 
-            document.body.addEventListener('keydown', function(e) {
+            document.body.addEventListener('keydown', function (e) {
 
                 if (e.key == 'x') {
                     drawAll();
@@ -313,7 +340,7 @@
                     enabled: false
                 },
                 configure: {
-                    filter: function(option, path) {
+                    filter: function (option, path) {
                         if (path.indexOf('hierarchical') !== -1) {
                             return true;
                         }
@@ -332,15 +359,35 @@
 
     </script>
 </head>
-
 <body>
-
-    <div class="card border-info mb-3" style="margin: 10px;">
-        <div class="card-header">Visual Network</div>
-        <div class="card-body">
-            <div id="mynetwork"></div>
-            <span>powered by <a href="http://visjs.org"><img src="data:image/gif;base64,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"></a></span>
-            <span id="help"><strong>click</strong> to add relations / <strong>hold</strong> to open Thesaurus page</span><!-- / press <strong>x</strong> for hierarchical layout</span>-->
+    <div class="row no-gutters">
+        <div id="one" class="card col">
+            <div class="card-header" style="height:70px;">Visual Network</div>
+            <div class="card-body">
+                <div id="mynetwork"></div>
+                <span id="help"><strong>click node</strong> to open Thesaurus page and expand relations</span><!-- / press <strong>x</strong> for hierarchical layout</span>-->
+            </div>
+        </div>
+        <div id="two" class="card col">
+            <iframe id="itopic" style="width:100%;height:100%;padding-bottom:20px;" frameBorder='0'></iframe>
+        </div>
+    </div>
+    <script>
+        var splitobj = Split(["#one", "#two"], {
+            elementStyle: function (dimension, size, gutterSize) {
+                //$(window).trigger('resize'); // Optional
+                return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)' }
+            },
+            gutterStyle: function (dimension, gutterSize) { return { 'flex-basis': gutterSize + 'px' } },
+            sizes: [40, 60],
+            minSize: 150,
+            gutterSize: 6,
+            cursor: 'col-resize'
+        });
+    </script>
+    <div class="row">
+        <div class="col" style="text-align:center;">
+            powered by <a href="http://visjs.org"><img src="data:image/gif;base64,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"></a>
         </div>
     </div>
 </body>
