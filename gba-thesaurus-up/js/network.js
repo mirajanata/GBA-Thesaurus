@@ -107,7 +107,7 @@ var visNet = {
     },
     extGraph: function (visID, extConcepts) {
         visNet.currentUri = visID;
-
+        var cnt = visNet.nodesArr.length;
         for (var i of visNet.visData) {
 
             if (i.s.value == visID) {
@@ -121,6 +121,8 @@ var visNet = {
 
         }
         document.getElementById("itopic").src = "index.html?noright=1&uri=" + visID;
+
+        return visNet.nodesArr.length != cnt;
     },
     createNode: function (id, nodeText, color, extConcepts) {
         if (!visNet.nodesArr.some(a => a.id === id)) {
@@ -162,8 +164,6 @@ var visNet = {
                     background: '#6AAFFF'
                 };
 
-            } else {
-
             }
 
             visNet.nodesArr.push({
@@ -186,6 +186,12 @@ var visNet = {
     },
     drawNetwork: function (extConcepts) {
         // create array with nodes and edges
+
+        visNet.nodesArr.forEach((n1) => {
+            n1.shadow = visNet.edgesArr.some(e => e.from == n1.id && !visNet.nodesArr.some(n2 => n2.id == e.to));
+        });
+
+
         let nodes = new vis.DataSet(visNet.nodesArr);
         let edges = new vis.DataSet(visNet.edgesArr);
 
@@ -199,21 +205,21 @@ var visNet = {
 
         let network = new vis.Network(container, data, options);
 
-        network.on("doubleClick", function (params) {
+        /*network.on("doubleClick", function (params) {
             //console.log('doubleClick Event:', params);
             if (params.nodes[0].indexOf('resource.geolba') == -1) {
                 window.location.href = params.nodes;
             } else {
                 window.location.href = 'index.html?uri=' + params.nodes;
             }
-        });
+        });*/
         network.on("click", function (params) {
             //console.log('doubleClick Event:', params);
             var uri = params.nodes[0];
             if (visNet.currentUri != uri) {
                 //visNet.nodesArr = [];
-                visNet.extGraph(params.nodes[0], extConcepts);
-                visNet.drawNetwork(extConcepts);
+                if (visNet.extGraph(params.nodes[0], extConcepts))
+                    visNet.drawNetwork(extConcepts);
             }
         });
         network.on("hold", function (params) {
