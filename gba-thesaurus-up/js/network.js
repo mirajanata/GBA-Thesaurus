@@ -6,6 +6,7 @@ var visNet = {
     nodesArr: [],
     layout: {},
     currentUri: null,
+    extConcepts: true,
 
     init: function () {
         let urlParams = new URLSearchParams(window.location.search);
@@ -65,31 +66,6 @@ var visNet = {
                     }
                 });
                 visNet.extGraph(uri, true);
-                visNet.layout = {
-                    edges: {
-                        font: {
-                            size: 12
-                        },
-                        widthConstraint: {
-                            maximum: 90
-                        }
-                    },
-                    nodes: {
-                        shape: 'box',
-                        margin: 10,
-                        widthConstraint: {
-                            maximum: 200
-                        }
-                    },
-                    interaction: {
-                        hover: true
-                    },
-                    physics: {
-                        enabled: true
-                    }
-
-                };
-
                 visNet.drawNetwork();
             });
     },
@@ -105,59 +81,66 @@ var visNet = {
             }
         }
     },
-    extGraph: function (visID, extConcepts) {
+    extGraph: function (visID) {
         visNet.currentUri = visID;
         var cnt = visNet.nodesArr.length;
         for (var i of visNet.visData) {
 
             if (i.s.value == visID) {
-                visNet.createNode(i.s.value, i.sLabel.value, i.sColor.value, extConcepts);
-                visNet.createNode(i.o.value, i.oLabel.value, i.oColor.value, extConcepts);
+                visNet.createNode(i.s.value, i.sLabel.value, i.sColor.value);
+                visNet.createNode(i.o.value, i.oLabel.value, i.oColor.value);
             }
             if (i.o.value == visID) {
-                visNet.createNode(i.s.value, i.sLabel.value, i.sColor.value, extConcepts);
-                visNet.createNode(i.o.value, i.oLabel.value, i.oColor.value, extConcepts);
+                visNet.createNode(i.s.value, i.sLabel.value, i.sColor.value);
+                visNet.createNode(i.o.value, i.oLabel.value, i.oColor.value);
             }
 
         }
-        document.getElementById("itopic").src = "index.html?noright=1&uri=" + visID;
+        if (visID) {
+            document.getElementById("itopic").src = visNet.isExternal(visID) ?
+                visID :
+                "index.html?noright=1&uri=" + visID;
+        }
 
         return visNet.nodesArr.length != cnt;
     },
-    createNode: function (id, nodeText, color, extConcepts) {
+    abbrev: {
+        INSPIRE: 'http://inspire.ec.europa.eu/codelist/',
+        CGI: 'http://resource.geosciml.org/classifier/cgi/',
+        ICS: 'http://resource.geosciml.org/classifier/ics/',
+        DBpedia: 'dbpedia.org/resource/',
+        BGS: 'http://data.bgs.ac.uk/id/EarthMaterialClass/',
+        WIKIDATA: 'http://www.wikidata.org/entity/',
+        GEMET: 'http://www.eionet.europa.eu/gemet/',
+        GBA: 'resource.geolba.ac.at'
+    },
+    isExternal: function (uri) {
+        return !uri.includes(visNet.abbrev.GBA);
+    },
+    createNode: function (id, nodeText, color) {
         if (!visNet.nodesArr.some(a => a.id === id)) {
             let Label = nodeText;
+            let Extern = false;
             let font = {
                 face: 'Open Sans'
             };
             let widthConstraint = {
                 maximum: 150
             };
-            let abbrev = {
-                INSPIRE: 'http://inspire.ec.europa.eu/codelist/',
-                CGI: 'http://resource.geosciml.org/classifier/cgi/',
-                ICS: 'http://resource.geosciml.org/classifier/ics/',
-                DBpedia: 'http://dbpedia.org/resource/',
-                BGS: 'http://data.bgs.ac.uk/id/EarthMaterialClass/',
-                WIKIDATA: 'http://www.wikidata.org/entity/',
-                GEMET: 'http://www.eionet.europa.eu/gemet/',
-                GBA: 'resource.geolba.ac.at'
-            };
-
 
             if (Label.includes('//')) {
-                for (let i in abbrev) {
-                    if (Label.search(abbrev[i]) != -1) {
+                for (let i in visNet.abbrev) {
+                    if (Label.includes(visNet.abbrev[i])) {
                         Label = nodeText.split('/').pop() + ' (' + i + ')';
+                        Label = (Label.charAt(0).toUpperCase() + Label.slice(1)).replace(/_/g, ' ');
                     }
                 }
-                Label = (Label.charAt(0).toUpperCase() + Label.slice(1)).replace(/_/g, ' ');
                 color = 'lightgrey';
                 font = {
                     size: 12,
                     background: 'lightgrey'
                 };
-
+                Extern = true;
             } else if (color == '') {
                 color = {
                     border: '#406897',
@@ -168,6 +151,7 @@ var visNet = {
 
             visNet.nodesArr.push({
                 id: id,
+                extern: Extern,
                 label: Label,
                 color: color,
                 font: font,
@@ -184,7 +168,7 @@ var visNet = {
             });
         }
     },
-    drawNetwork: function (extConcepts) {
+    drawNetwork: function () {
         // create array with nodes and edges
 
         visNet.nodesArr.forEach((n1) => {
@@ -192,7 +176,7 @@ var visNet = {
         });
 
 
-        let nodes = new vis.DataSet(visNet.nodesArr);
+        let nodes = new vis.DataSet(visNet.extConcepts ? visNet.nodesArr : visNet.nodesArr.find(e => !e.extern));
         let edges = new vis.DataSet(visNet.edgesArr);
 
         // create a network
@@ -201,6 +185,74 @@ var visNet = {
             nodes: nodes,
             edges: edges
         };
+
+
+        visNet.layout = visNet._isHierarchy ?
+            {
+                edges: {
+                    font: {
+                        size: 12
+                    },
+                    widthConstraint: {
+                        maximum: 90
+                    }
+                },
+                nodes: {
+                    shape: 'box',
+                    margin: 10,
+                    widthConstraint: {
+                        maximum: 200
+                    }
+                },
+                layout: {
+                    hierarchical: {
+                        direction: 'LR',
+                        sortMethod: "directed"
+                    }
+                },
+                interaction: {
+                    dragNodes: false
+                },
+                physics: {
+                    enabled: false
+                },
+                configure: {
+                    filter: function (option, path) {
+                        if (path.indexOf('hierarchical') !== -1) {
+                            return true;
+                        }
+                        return false;
+                    },
+                    showButton: false
+                }
+            } :
+            {
+                edges: {
+                    font: {
+                        size: 12
+                    },
+                    widthConstraint: {
+                        maximum: 90
+                    }
+                },
+                nodes: {
+                    shape: 'box',
+                    margin: 10,
+                    widthConstraint: {
+                        maximum: 200
+                    }
+                },
+                interaction: {
+                    dragNodes: false,
+                    hover: true
+                },
+                physics: {
+                    enabled: true
+                }
+
+            };
+
+
         let options = visNet.layout;
 
         let network = new vis.Network(container, data, options);
@@ -218,17 +270,17 @@ var visNet = {
             var uri = params.nodes[0];
             if (visNet.currentUri != uri) {
                 //visNet.nodesArr = [];
-                if (visNet.extGraph(params.nodes[0], extConcepts))
-                    visNet.drawNetwork(extConcepts);
+                if (visNet.extGraph(params.nodes[0]))
+                    visNet.drawNetwork();
             }
         });
         network.on("hold", function (params) {
             //console.log('hold Event:', params);
-            if (params.nodes[0].indexOf('resource.geolba') == -1) {
+            /*if (params.nodes[0].indexOf('resource.geolba') == -1) {
                 window.location.href = params.nodes;
             } else {
                 window.location.href = 'index.html?uri=' + params.nodes;
-            }
+            }*/
         });
         network.on("doubleClick", function (params) {
             if (params.nodes[0].indexOf('resource.geolba') == -1) {
@@ -241,48 +293,23 @@ var visNet = {
         document.body.addEventListener('keydown', function (e) {
 
             if (e.key == 'x') {
-                visNet.drawAll();
+                visNet.clickHierarchy();
             }
         });
 
         network.selectNodes([visNet.currentUri]);
     },
-    drawAll: function () {
-        visNet.layout = {
-            nodes: {
-                shape: 'box',
-                margin: 0,
-                widthConstraint: {
-                    maximum: 200
-                }
-            },
-            layout: {
-                hierarchical: {
-                    direction: 'LR',
-                    sortMethod: "directed"
-                }
-            },
-            interaction: {
-                dragNodes: false
-            },
-            physics: {
-                enabled: false
-            },
-            configure: {
-                filter: function (option, path) {
-                    if (path.indexOf('hierarchical') !== -1) {
-                        return true;
-                    }
-                    return false;
-                },
-                showButton: false
-            }
-        };
-        console.log(visNet.nodesArr);
-
-        visNet.nodesArr = visNet.nodesArr.filter((value, index, arr) => value.id.indexOf('geoba') < 0);
-
-        visNet.drawNetwork(false);
-
+    _isHierarchy: false,
+    clickHierarchy: function () {
+        visNet._isHierarchy = !visNet._isHierarchy;
+        var btnHierarchy = $("#btnHierarchy");
+        if (visNet._isHierarchy) {
+            btnHierarchy.removeClass("btn-primary");
+            btnHierarchy.addClass("btn-warn");
+        } else {
+            btnHierarchy.removeClass("btn-warn");
+            btnHierarchy.addClass("btn-primary");
+        }
+        visNet.drawNetwork();
     }
 };
