@@ -6,7 +6,8 @@ var visNet = {
     nodesArr: [],
     layout: {},
     currentUri: null,
-    extConcepts: true,
+    _extConcepts: true,
+    _isHierarchy: false,
 
     init: function () {
         let urlParams = new URLSearchParams(window.location.search);
@@ -175,7 +176,7 @@ var visNet = {
             n1.shadow = visNet.edgesArr.some(e => e.from == n1.id && !visNet.nodesArr.some(n2 => n2.id == e.to));
         });
 
-        let ns = visNet.extConcepts ? visNet.nodesArr : visNet.nodesArr.find(e => !e.extern);
+        let ns = visNet._extConcepts ? visNet.nodesArr : visNet.nodesArr.filter(e => !e.extern);
         let nodes = new vis.DataSet(ns);
         let edges = new vis.DataSet(visNet.edgesArr.filter(e => ns.some(n1 => n1.id == e.from) || ns.some(n2 => n2.id == e.to)));
 
@@ -290,18 +291,25 @@ var visNet = {
 
         network.selectNodes([visNet.currentUri]);
     },
-    _isHierarchy: false,
-    clickHierarchy: function () {
-        visNet._isHierarchy = !visNet._isHierarchy;
-        var btnHierarchy = $("#btnHierarchy");
-        if (visNet._isHierarchy) {
-            btnHierarchy.removeClass("btn-primary");
-            btnHierarchy.addClass("btn-warning");
+    toggleButton: function (btn, toggle) {
+        if (toggle) {
+            btn.removeClass("btn-outline-warning");
+            btn.addClass("btn-warning");
         } else {
-            btnHierarchy.removeClass("btn-warning");
-            btnHierarchy.addClass("btn-primary");
+            btn.removeClass("btn-warning");
+            btn.addClass("btn-outline-warning");
         }
         visNet.drawNetwork();
+    },
+    clickHierarchy: function () {
+        visNet._isHierarchy = !visNet._isHierarchy;
+        var btn = $("#btnHierarchy");
+        visNet.toggleButton(btn, visNet._isHierarchy);
+    },
+    clickExtConcepts: function () {
+        visNet._extConcepts = !visNet._extConcepts;
+        var btn = $("#btnExtConcepts");
+        visNet.toggleButton(btn, visNet._extConcepts);
     },
     onResize: function () {
         var h = $('#mynetworkContainer').height();

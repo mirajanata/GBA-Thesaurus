@@ -18,12 +18,13 @@
             height: 100%;
             margin: 0px;
         }
+
         body {
             height: 90%;
             margin: 0px;
         }
+
         #mynetwork {
-            
         }
 
         #help {
@@ -65,14 +66,17 @@
         });
     </script>
 </head>
-<body onload="visNet.onResize();" onresize="visNet.onResize();" >
+<body onload="visNet.onResize();" onresize="visNet.onResize();">
     <div class="container-fluid" style="height:100%;">
         <div class="row no-gutters" style="height:100%;">
             <div id="one" class="card col">
                 <a href="https://www.geologie.ac.at"><img alt="GBA Thesaurus" id="IMG_GBALOGO" src="img/gbaLogo50.png" height="35"></a>
                 <div class="card-header" style="height:70px;"><h2>GBA - Visual Network</h2></div>
                 <div id="mynetworkContainer" class="card-body">
-                    <div id="mynetworkToolbar" style="margin-bottom:5px;"><button id="btnHierarchy" type="button" class="btn btn-primary" style="margin-right:1px;" onclick="visNet.clickHierarchy();">Show hierarchy</button></div>
+                    <div id="mynetworkToolbar" style="margin-bottom:5px;">
+                        <button id="btnHierarchy" type="button" class="btn btn-outline-warning" style="margin-right:1px;" onclick="visNet.clickHierarchy();">Show hierarchy</button>
+                        <button id="btnExtConcepts" type="button" class="btn btn-warning" style="margin-right:1px;" onclick="visNet.clickExtConcepts();">Show external concepts</button>
+                    </div>
                     <div id="mynetwork"></div>
                     <span id="help">Tip: <strong>click node</strong> to show Thesaurus page. Nodes with shadow will expand on click. </span><!-- / press <strong>x</strong> for hierarchical layout</span>-->
                 </div>
