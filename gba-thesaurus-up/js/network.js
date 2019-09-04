@@ -175,9 +175,9 @@ var visNet = {
             n1.shadow = visNet.edgesArr.some(e => e.from == n1.id && !visNet.nodesArr.some(n2 => n2.id == e.to));
         });
 
-
-        let nodes = new vis.DataSet(visNet.extConcepts ? visNet.nodesArr : visNet.nodesArr.find(e => !e.extern));
-        let edges = new vis.DataSet(visNet.edgesArr);
+        let ns = visNet.extConcepts ? visNet.nodesArr : visNet.nodesArr.find(e => !e.extern);
+        let nodes = new vis.DataSet(ns);
+        let edges = new vis.DataSet(visNet.edgesArr.filter(e => ns.some(n1 => n1.id == e.from) || ns.some(n2 => n2.id == e.to)));
 
         // create a network
         let container = document.getElementById('mynetwork');
@@ -215,15 +215,6 @@ var visNet = {
                 },
                 physics: {
                     enabled: false
-                },
-                configure: {
-                    filter: function (option, path) {
-                        if (path.indexOf('hierarchical') !== -1) {
-                            return true;
-                        }
-                        return false;
-                    },
-                    showButton: false
                 }
             } :
             {
@@ -305,11 +296,16 @@ var visNet = {
         var btnHierarchy = $("#btnHierarchy");
         if (visNet._isHierarchy) {
             btnHierarchy.removeClass("btn-primary");
-            btnHierarchy.addClass("btn-warn");
+            btnHierarchy.addClass("btn-warning");
         } else {
-            btnHierarchy.removeClass("btn-warn");
+            btnHierarchy.removeClass("btn-warning");
             btnHierarchy.addClass("btn-primary");
         }
         visNet.drawNetwork();
+    },
+    onResize: function () {
+        var h = $('#mynetworkContainer').height();
+        var dh = $('#mynetworkToolbar').height();
+        $('#mynetwork').height(h - dh - 60);
     }
 };
