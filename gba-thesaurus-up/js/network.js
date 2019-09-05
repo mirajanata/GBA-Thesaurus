@@ -98,9 +98,13 @@ var visNet = {
 
         }
         if (visID) {
-            document.getElementById("itopic").src = visNet.isExternal(visID) ?
-                visID :
-                "index.html?noright=1&uri=" + visID;
+            if (visNet.isExternalTab(visID)) {
+                $("#externalUri").val(visID);
+                document.getElementById("itopic").src = "network_desc.html";
+            } else {
+                var src = visNet.isExternal(visID) ? visID : "index.html?noright=1&uri=" + visID;
+                document.getElementById("itopic").src = src;
+            }
         }
 
         return visNet.nodesArr.length != cnt;
@@ -117,6 +121,10 @@ var visNet = {
     },
     isExternal: function (uri) {
         return !uri.includes(visNet.abbrev.GBA);
+    },
+    isExternalTab: function (uri) {
+        // resolve X-Frame-Options: SAMEORIGIN security
+        return uri.includes(visNet.abbrev.INSPIRE) || uri.includes(visNet.abbrev.GEMET);
     },
     createNode: function (id, nodeText, color) {
         if (!visNet.nodesArr.some(a => a.id === id)) {

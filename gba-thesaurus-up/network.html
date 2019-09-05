@@ -73,9 +73,12 @@
                 <a href="https://www.geologie.ac.at"><img alt="GBA Thesaurus" id="IMG_GBALOGO" src="img/gbaLogo50.png" height="35"></a>
                 <div class="card-header" style="height:70px;"><h2>GBA - Visual Network</h2></div>
                 <div id="mynetworkContainer" class="card-body">
-                    <div id="mynetworkToolbar" style="margin-bottom:5px;">
-                        <button id="btnHierarchy" type="button" class="btn btn-outline-warning" style="margin-right:1px;" onclick="visNet.clickHierarchy();">Show hierarchy</button>
-                        <button id="btnExtConcepts" type="button" class="btn btn-warning" style="margin-right:1px;" onclick="visNet.clickExtConcepts();">Show external concepts</button>
+                    <div id="mynetworkToolbar" style="margin-bottom:5px;" class="input-group bg-default input-group-text">
+                        <div class="input-group-prepend">
+                            <div class="border-0 text-primary" id="btnGroupAddon" style="min-width:105px;">Display</div>
+                        </div>
+                        <button id="btnHierarchy" type="button" class="btn btn-outline-warning" style="margin-right:1px;" onclick="this.blur();visNet.clickHierarchy();">Hierarchy</button>
+                        <button id="btnExtConcepts" type="button" class="btn btn-warning" style="margin-right:1px;" onclick="this.blur();visNet.clickExtConcepts();">External concepts</button>
                     </div>
                     <div id="mynetwork"></div>
                     <span id="help">Tip: <strong>click node</strong> to show Thesaurus page. Nodes with shadow will expand on click. </span><!-- / press <strong>x</strong> for hierarchical layout</span>-->
@@ -84,6 +87,7 @@
             <div id="two" class="card col" style="display:block;height:100%;">
                 <iframe id="itopic" style="width:100%;height:100%;padding-bottom:20px;" frameBorder='0'></iframe>
             </div>
+            <input type="hidden" id="externalUri" />
         </div>
         <script>
             var splitobj = Split(["#one", "#two"], {
