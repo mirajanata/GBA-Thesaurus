@@ -15,6 +15,70 @@ var visNet = {
         let project = uri.split('/')[3];
         let lang = urlParams.get('lang');
 
+        visNet.h_layout =
+            {
+                edges: {
+                    font: {
+                        size: 12
+                    },
+                    widthConstraint: {
+                        maximum: 90
+                    }
+                },
+                nodes: {
+                    shape: 'box',
+                    margin: 10,
+                    widthConstraint: {
+                        maximum: 200
+                    }
+                },
+                layout: {
+                    hierarchical: {
+                        enabled: true,
+                        direction: 'LR',
+                        sortMethod: "directed"
+                    }
+                },
+                interaction: {
+                    dragNodes: false
+            },
+            physics: {
+                enabled: true,
+                stabilization: {
+                    enabled: true,
+                    iterations: 100,
+                    updateInterval: 10
+                }
+            }
+            };
+        visNet.g_layout =
+            {
+                edges: {
+                    font: {
+                        size: 12
+                    },
+                    widthConstraint: {
+                        maximum: 90
+                    }
+                },
+                nodes: {
+                    shape: 'box',
+                    margin: 10,
+                    widthConstraint: {
+                        maximum: 200
+                    }
+                },
+                interaction: {
+                    dragNodes: false,
+                    hover: true
+                },
+                physics: {
+                    enabled: true,
+                }
+
+            };
+
+
         this.createNetwork(uri, lang, ws.endpoint, project);
     },
     createNetwork: function (uri, lang, endpoint, project) {
@@ -196,66 +260,29 @@ var visNet = {
         };
 
 
-        visNet.layout = visNet._isHierarchy ?
-            {
-                edges: {
-                    font: {
-                        size: 12
-                    },
-                    widthConstraint: {
-                        maximum: 90
-                    }
-                },
-                nodes: {
-                    shape: 'box',
-                    margin: 10,
-                    widthConstraint: {
-                        maximum: 200
-                    }
-                },
-                layout: {
-                    hierarchical: {
-                        direction: 'LR',
-                        sortMethod: "directed"
-                    }
-                },
-                interaction: {
-                    dragNodes: false
-                },
-                physics: {
-                    enabled: false
-                }
-            } :
-            {
-                edges: {
-                    font: {
-                        size: 12
-                    },
-                    widthConstraint: {
-                        maximum: 90
-                    }
-                },
-                nodes: {
-                    shape: 'box',
-                    margin: 10,
-                    widthConstraint: {
-                        maximum: 200
-                    }
-                },
-                interaction: {
-                    dragNodes: false,
-                    hover: true
-                },
-                physics: {
-                    enabled: true
-                }
-
-            };
 
 
-        let options = visNet.layout;
+        let network = new vis.Network(container, data, visNet._isHierarchy ? visNet.h_layout : visNet.g_layout);
+        visNet.network = network;
+        network.on("stabilizationProgress", function (params) {
+            var progress = 100 * params.iterations / params.total;
+            console.log(progress + "," + params.iterations + "," + params.total);
+            var ec = document.getElementById('mynetworkProgressCont');
+            var e = document.getElementById('mynetworkProgress');
+            e.setAttribute("aria-valuenow", progress);
+            e.style.width = progress + "%";
+            ec.style.visibility = "visible";
+        });
+        network.once("stabilizationIterationsDone", function () {
+            var e = document.getElementById('mynetworkProgress');
+            var ec = document.getElementById('mynetworkProgressCont');
 
-        let network = new vis.Network(container, data, options);
+            var progress = 100;
+            e.setAttribute("aria-valuenow", progress);
+            e.style.width = progress + "%";
+
+            setTimeout(function () { ec.style.visibility = "hidden"; e.style.width = "0%"; e.setAttribute("aria-valuenow", "0"); }, 500);
+        });
 
         /*network.on("doubleClick", function (params) {
             //console.log('doubleClick Event:', params);
