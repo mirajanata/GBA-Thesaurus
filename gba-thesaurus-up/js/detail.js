@@ -48,7 +48,7 @@ var detail = {
             var div = $('#pageContent');
             div.append(`<hr>
                                 <div style="cursor: pointer; color: #404040;" id="detailsBtn" 
-                                    onclick="javascript: page.toggleRead(\'detailsBtn\', \'detailsToggle\', \'read more\');"> &#9654; <em>read more ..</em>
+                                    onclick="javascript: page.toggleRead(\'detailsBtn\', \'detailsToggle\', \'read more\');"> <span class="fa fa-caret-down"></span> <em>read more ..</em>
                                 </div>
                                 <div style="display:none;" id="detailsToggle">
                                 <br>

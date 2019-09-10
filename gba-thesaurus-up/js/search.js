@@ -237,6 +237,20 @@ var search = {
         });
     },
 
+    sparqlEncode: function (str) {
+        var hex, i;
+        str = str.toLowerCase();
+        var result = "";
+        for (i = 0; i < str.length; i++) {
+            hex = str.charCodeAt(i);
+            if (hex < 32 || hex > 128)
+                result += "\\u" + ("000" + hex.toString(16)).slice(-4);
+            else
+                result += str.charAt(i);
+        }
+
+        return result
+    },
     insertSearch: function (searchText) {
         var gbaStatusStyle = ['bold', 'success', 'danger', 'primary'];
         var pageContent = $('#pageContent');
@@ -249,8 +263,8 @@ var search = {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
                                         SELECT DISTINCT ?s (MIN(?pL) AS ?title) (GROUP_CONCAT(DISTINCT ?label; separator = "$") as ?text) (MIN(?so) AS ?sort) 
                                         (MIN(?stat) AS ?Status) 
-                                        WHERE { 
-                                        VALUES ?n {"${searchText.toLowerCase()}"} 
+                                        WHERE {
+                                        VALUES ?n {"${search.sparqlEncode(searchText)}"} 
                                         VALUES ?p {skos:prefLabel skos:altLabel skos:definition skos:scopeNote <http://purl.org/dc/terms/description>} 
                                         ?s a skos:Concept; ?p ?L . FILTER((lang(?L)="${lang.ID}")) . 
                                         BIND(CONCAT(STR(?p),"|",STR(?L)) AS ?label) . FILTER(regex(?L,?n,"i")) 

@@ -111,7 +111,7 @@ var page = {
         window.open(this.BASE + '?' + queryString + '&lang=' + lang.ID, '_self', '', 'false');
     },
     toggleRead: function (divBtn, divTxt, text) {
-        let txt = $('#' + divTxt).is(':visible') ? '&#9654; <em>' + text + ' ..</em>' : '&#9660; <em>' + text + ' ..</em>';
+        let txt = $('#' + divTxt).is(':visible') ? '<span class="fa fa-caret-down"></span> <em>' + text + ' ..</em>' : '<span class="fa fa-caret-up"></span> <em>' + text + ' ..</em>';
         $('#' + divBtn).html(txt);
         $('#' + divTxt).slideToggle();
     },
@@ -182,7 +182,7 @@ var page = {
                             <div style="cursor: pointer;" id="${project.id}rmBtn"
                             onclick="javascript: page.toggleRead(\'${project.id}rmBtn\', \'${project.id}ReadMore\', \'read more\');"
                             class="text-muted">
-                                &#9654; <em>read more ..</em>
+                                <span class="fa fa-caret-down"></span> <em>read more ..</em>
                             </div>
                             <div style="display:none;" id="${project.id}ReadMore">
                                 <br>
