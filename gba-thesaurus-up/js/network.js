@@ -41,15 +41,15 @@ var visNet = {
                 },
                 interaction: {
                     dragNodes: false
-            },
-            physics: {
-                enabled: true,
-                stabilization: {
+                },
+                physics: {
                     enabled: true,
-                    iterations: 100,
-                    updateInterval: 10
+                    stabilization: {
+                        enabled: true,
+                        iterations: 100,
+                        updateInterval: 10
+                    }
                 }
-            }
             };
         visNet.g_layout =
             {
@@ -194,8 +194,28 @@ var visNet = {
         if (!visNet.nodesArr.some(a => a.id === id)) {
             let Label = nodeText;
             let Extern = false;
+
+            let f = "#000000";
+            if (color != null) {
+                let co = color;
+                if (co.indexOf('#') == 0)
+                    co = co.substr(1, 6);
+                let m = co.match(/^([0-9a-f]{6})$/i);
+                let r = 255, g = 255, b = 255;
+                if (m) {
+                    m = m[0];
+                    r = parseInt(m.substr(0, 2), 16);
+                    g = parseInt(m.substr(2, 2), 16);
+                    b = parseInt(m.substr(4, 2), 16);
+                    if (0.28 * r + 0.5 * g + 0.11 * b <= 128)
+                        f = "#ffffff";
+                }
+            }
+
             let font = {
-                face: 'Open Sans'
+                face: 'Open Sans',
+                size: 13,
+                color: f
             };
             let widthConstraint = {
                 maximum: 150
@@ -210,8 +230,8 @@ var visNet = {
                 }
                 color = 'lightgrey';
                 font = {
-                    size: 12,
-                    background: 'lightgrey'
+                    size: 13,
+                    color:'black'
                 };
                 Extern = true;
             } else if (color == '') {
@@ -266,7 +286,6 @@ var visNet = {
         visNet.network = network;
         network.on("stabilizationProgress", function (params) {
             var progress = 100 * params.iterations / params.total;
-            console.log(progress + "," + params.iterations + "," + params.total);
             var ec = document.getElementById('mynetworkProgressCont');
             var e = document.getElementById('mynetworkProgress');
             e.setAttribute("aria-valuenow", progress);
