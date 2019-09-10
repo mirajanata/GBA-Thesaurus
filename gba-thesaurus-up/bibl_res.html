@@ -25,6 +25,17 @@
         .capHeader {
             font-size: 48px;
         }
+        .list-group {
+            border: 1px solid #eeeeee;
+            -webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+            -moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+            box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+            margin:10px;
+        }
+        .list-group-item {
+            margin-bottom: 5px;
+            border: none !important;
+        }
     </style>
     <script>
         $(document).ready(function () {
@@ -103,7 +114,7 @@
                             if (done.indexOf(firstChar) < 0) {
                                 done += firstChar;
                                 toolBar.append(`<div class="panel-heading" role="tab" id="refHeading${firstChar}">
-                                                            <button id="btn${firstChar}" type="button" class="btn btn-outline-warning btexpand"  style="font-size:18px;margin:10px;" onclick="expand('${firstChar}');">
+                                                            <button id="btn${firstChar}" type="button" class="btn btn-outline-info btexpand"  style="font-size:18px;margin:10px;" onclick="expand('${firstChar}');">
                                                                     ${firstChar}
                                                                 </button>
                                                             </div>
@@ -121,6 +132,7 @@
                         }
                     }
                 }
+                onResize();
                 if (count < 10) {
                     expandAll();
                 } else if (c1 != "")
@@ -135,14 +147,14 @@
             if (vis) {
                 e.attr("aria-expanded", "false");
                 e.attr("class", "panel-collapse collapse hide");
-                btn.removeClass("btn-warning");
-                btn.addClass("btn-outline-warning");
+                btn.removeClass("btn-info");
+                btn.addClass("btn-outline-info");
             } else {
                 e.attr("aria-expanded", "true");
                 e.attr("class", "panel-collapse collapse show");
                 e.attr("class", "panel-collapse collapse show");
-                btn.removeClass("btn-outline-warning");
-                btn.addClass("btn-warning");
+                btn.removeClass("btn-outline-info");
+                btn.addClass("btn-info");
             }
             //$('#expBut').hide();
         }
@@ -152,21 +164,22 @@
                 $('.collapsed').attr("aria-expanded", "true");
                 $('.panel-collapse').attr("class", "panel-collapse collapse show");
                 $('#expBut').text("Collapse All");
-                $(".btexpand").removeClass("btn-outline-warning");
-                $(".btexpand").addClass("btn-warning");
+                $(".btexpand").removeClass("btn-outline-info");
+                $(".btexpand").addClass("btn-info");
             } else {
                 $('.collapsed').attr("aria-expanded", "false");
                 $('.panel-collapse').attr("class", "panel-collapse collapse hide");
                 $('#expBut').text("Expand All");
-                $(".btexpand").removeClass("btn-warning");
-                $(".btexpand").addClass("btn-outline-warning");
+                $(".btexpand").removeClass("btn-info");
+                $(".btexpand").addClass("btn-outline-info");
             }
             //$('#expBut').hide();
         }
         function onResize() {
             var h = $('#biblrefContainer').height();
             var dh = $('#biblrefToolbar').height();
-            $('#tabList').height(h - dh - 60);
+            console.log(dh);
+            $('#tabList').height(h - dh - (dh/2));
         }
     </script>
 </head>
@@ -176,10 +189,10 @@
         <div class="row no-gutters" style="height:100%;">
             <div id="one" class="card" style="width:100%;">
                 <a href="https://www.geologie.ac.at"><img alt="GBA Thesaurus" id="IMG_GBALOGO" src="img/gbaLogo50.png" height="35"></a>
-                <div class="card-header" style="height:70px;"><h2>GBA - Bibliographic reference</h2></div>
+                <div class="card-header" style="height:70px;"><h1>GBA - Bibliographic reference</h1></div>
                 <div id="biblrefContainer" class="card-body">
-                    <div id="biblrefToolbar" style="margin-bottom:5px;" class="input-group bg-default input-group-text">
-                        <button type="button" id="expBut" class="btn btn-outline-primary" onclick="expandAll()" style="margin-right:20px;">Expand All</button>
+                    <div id="biblrefToolbar" style="margin-bottom:5px;" class="input-group bg-dark input-group-text">
+                        <button type="button" id="expBut" class="btn btn-primary" onclick="expandAll()" style="margin-right:20px;">Expand All</button>
                     </div>
                     <div id="tabList" class="panel-group" role="tablist" style="overflow-y:auto">
                         <div class="panel panel-default" id="refList"> </div>
