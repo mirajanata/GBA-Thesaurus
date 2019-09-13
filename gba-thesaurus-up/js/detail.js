@@ -41,10 +41,11 @@ var detail = {
                     OPTIONAL {?o a skos:Concept; skos:prefLabel ?L}
                     } 
                     GROUP BY ?p ?o 
-            `; 
+            `;
 
-        ws.json(uri.split("/")[3], query, function (data) { 
-            for (var key in detail.FRONT_LIST) detail.insertFrontPart(key, uri, data, Array.from(detail.FRONT_LIST[key].values()));
+        ws.json(uri.split("/")[3], query, function (data) {
+            var F = page.isEmbedded ? detail.FRONT_LIST_EMBEDDED : detail.FRONT_LIST;
+            for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()));
             var div = $('#pageContent');
             div.append(`<hr>
                                 <div style="cursor: pointer; color: #404040;" id="detailsBtn" 
@@ -122,7 +123,7 @@ var detail = {
                         this.getCitation(a);
                         break;
                     case 'relatedConcepts':
-                        
+
                         if (html.search('<h4') == -1) {
                             html += '<hr><h4 style="margin-bottom: 1rem;">' + lang.SEM_REL + '</h4>';
                         }
@@ -151,7 +152,7 @@ var detail = {
 
         for (let i in shorten) {
             if (text.search(shorten[i]) != -1) {
-                
+
                 text = text.split('>' + shorten[i])[0] + '>' + text.split('>' + shorten[i])[1].replace('<', ' (' + i + ')<');
             }
         }
@@ -166,7 +167,7 @@ var detail = {
         props.forEach((i) => {
             let ul = this.getObj(data, i);
             if (ul.size > 0) {
-                html += '<tr><td headers="th1' + key + '" class="propTech">' + this.createHref(i) + '</td><td headers="th2' + key +'"><ul><li>' + Array.from(ul).join('</li><li>') + '</li></ul></td></tr>';
+                html += '<tr><td headers="th1' + key + '" class="propTech">' + this.createHref(i) + '</td><td headers="th2' + key + '"><ul><li>' + Array.from(ul).join('</li><li>') + '</li></ul></td></tr>';
 
                 if (i == geoPath + 'lat') {
                     coord.lat = Number(ul.values().next().value);
@@ -200,18 +201,21 @@ var detail = {
     },
 
     getObj: function (data, i) {
-        return new Set($.map(data.results.bindings.filter(item => item.p.value === i), (a => (a.Label.value !== '' ? '<a href="' + page.BASE +
+        let AT = page.isEmbedded ? "target='_blank' " : "";
+
+        return new Set($.map(data.results.bindings.filter(item => item.p.value === i), (a => (a.Label.value !== '' ? '<a ' + AT + 'href="' + page.BASE +
             '?uri=' + a.o.value + '&lang=' + lang.ID + '">' + this.setUserLang(a.Label.value) + '</a> ' : this.createHref(a.o.value) + ' ' +
             this.createDTLink(a.o.datatype) + ' ' + this.langTag(a.o['xml:lang'])))));
     },
 
     createHref: function (x) { //PROVIDE_REDIRECT?
+        let AT = page.isEmbedded ? "target='_blank' " : "";
         if (x.substring(0, 22) == 'http://resource.geolba') { //vocabulary base URI
-            x = '<a href="' + page.BASE + '?uri=' + x + '">' + x + '</a>';
+            x = '<a ' + AT + 'href="' + page.BASE + '?uri=' + x + '">' + x + '</a>';
         } else if (x.substring(0, 4) == 'http') {
             let a = x;
             for (const [key, value] of Object.entries(BaseUri)) a = a.replace(value, key + ':');
-            x = '<a href="' + x + '">' + this.createPdfRef(a.replace(/_/g, ' ')) + '</a>';
+            x = '<a ' + AT + 'href="' + x + '">' + this.createPdfRef(a.replace(/_/g, ' ')) + '</a>';
         }
         return x;
     },
@@ -227,8 +231,9 @@ var detail = {
 
     createDTLink: function (x) {
         if (typeof x !== 'undefined') {
+            let AT = page.isEmbedded ? "target=\"_blank\" " : "";
             if (x.indexOf('XMLSchema') > 0) {
-                x = '<a class="datatype" href="' + x + '">' + x.replace('http://www.w3.org/2001/XMLSchema#', 'xsd:') + '</a>';
+                x = '<a ' + AT + 'class="datatype" href="' + x + '">' + x.replace('http://www.w3.org/2001/XMLSchema#', 'xsd:') + '</a>';
             }
         } else {
             x = '';
@@ -250,6 +255,7 @@ var detail = {
 
     getCitation: function (refArr) {
         refArr = '<' + refArr.join('> <') + '>';
+        let AT = page.isEmbedded ? "target=\"_blank\" " : "";
 
         let query = `SELECT DISTINCT ?Citation ?DSN ?PDF
                                     WHERE {
@@ -267,12 +273,12 @@ var detail = {
 
                 html += '<footer class="blockquote-footer">' + i.Citation.value.replace(/\:/g, ': <cite title="">') + '</cite>';
                 if (i.PDF.value !== '' && i.PDF.value.substring(0, 4) == 'http') {
-                    html += '&nbsp;-&nbsp;<a href="' + i.PDF.value + '" style="font-style: normal;">[PDF]</a>';
+                    html += '&nbsp;-&nbsp;<a ' + AT + 'href="' + i.PDF.value + '" style="font-style: normal;">[PDF]</a>';
                 } else if (i.PDF.value !== '') {
-                    html += '&nbsp;-&nbsp;<a href="http://opac.geologie.ac.at/wwwopacx/wwwopac.ashx?command=getcontent&server=images&value=' + i.PDF.value + '" style="font-style: normal;">[PDF]</a>';
+                    html += '&nbsp;-&nbsp;<a ' + AT + 'href="http://opac.geologie.ac.at/wwwopacx/wwwopac.ashx?command=getcontent&server=images&value=' + i.PDF.value + '" style="font-style: normal;">[PDF]</a>';
                 }
                 if (i.DSN.value !== '') {
-                    html += '&nbsp;-&nbsp;<a href="http://opac.geologie.ac.at/document/' + i.DSN.value + '" style="font-style: normal;">[Catalog]</a>';
+                    html += '&nbsp;-&nbsp;<a ' + AT + 'href="http://opac.geologie.ac.at/document/' + i.DSN.value + '" style="font-style: normal;">[Catalog]</a>';
                 }
                 html += '</footer>';
 
@@ -282,6 +288,7 @@ var detail = {
     },
 
     provideAll: function (divID, uri, offset) { //provide all available concepts for navigation
+        let AT = page.isEmbedded ? "target=\"_blank\" " : "";
         //query Sparql endpoint
         var query = `PREFIX dcterms:<http://purl.org/dc/terms/> 
                     PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
@@ -305,9 +312,9 @@ var detail = {
 
             data.results.bindings.forEach((i) => {
                 if (i.s.value == i.tc.value) {
-                    a.push('<a data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)');
+                    a.push('<a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)');
                 } else {
-                    a.push('<a data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a>');
+                    a.push('<a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a>');
                 }
 
             });
@@ -434,6 +441,16 @@ var detail = {
         abstract: Uri.DESCRIPTION_1,
         citation: Uri.REF_LINKS,
         relatedConcepts: [...Uri.RELATIONS_1, ...Uri.RELATIONS_2],
+        dataViewer: Uri.GBA_DATAVIEWER
+    },
+    FRONT_LIST_EMBEDDED: {/*FOR EMBEDDED PAGE VERSION*/
+        prefLabel: Uri.PREF_LABEL,
+        picture: Uri.PICTURE,
+        altLabel: [...Uri.PREF_LABEL, ...Uri.SYNONYMS],
+        notation: Uri.NOTATION,
+        gbaStatus: Uri.GBA_STATUS,
+        abstract: Uri.DESCRIPTION_1,
+        citation: Uri.REF_LINKS,
         dataViewer: Uri.GBA_DATAVIEWER
     }
 };

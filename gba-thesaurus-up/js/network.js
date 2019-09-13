@@ -8,6 +8,7 @@ var visNet = {
     currentUri: null,
     _extConcepts: true,
     _isHierarchy: false,
+    _isColorize: false,
 
     init: function () {
         let urlParams = new URLSearchParams(window.location.search);
@@ -166,7 +167,7 @@ var visNet = {
                 $("#externalUri").val(visID);
                 document.getElementById("itopic").src = "network_desc.html";
             } else {
-                var src = visNet.isExternal(visID) ? visID : "index.html?noright=1&uri=" + visID;
+                var src = visNet.isExternal(visID) ? visID : "index.html?embedded=1&uri=" + visID;
                 document.getElementById("itopic").src = src;
             }
         }
@@ -231,7 +232,7 @@ var visNet = {
                 color = 'lightgrey';
                 font = {
                     size: 13,
-                    color:'black'
+                    color: 'black'
                 };
                 Extern = true;
             } else if (color == '') {
@@ -247,6 +248,7 @@ var visNet = {
                 extern: Extern,
                 label: Label,
                 color: color,
+                _c: color,
                 font: font,
                 /*shadow: true,*/
                 widthConstraint: widthConstraint,
@@ -261,6 +263,12 @@ var visNet = {
             });
         }
     },
+    __colSetNode: function (n) {
+        n.color = n._c;
+    },
+    __colUnsetNode: function (n) {
+        n.color = '#6AAFFF';
+    },
     drawNetwork: function () {
         // create array with nodes and edges
 
@@ -268,7 +276,14 @@ var visNet = {
             n1.shadow = visNet.edgesArr.some(e => e.from == n1.id && !visNet.nodesArr.some(n2 => n2.id == e.to));
         });
 
-        let ns = visNet._extConcepts ? visNet.nodesArr : visNet.nodesArr.filter(e => !e.extern);
+        var notExt = visNet.nodesArr.filter(e => !e.extern);
+
+        if (visNet._isColorize)
+            notExt.forEach(visNet.__colSetNode);
+        else
+            notExt.forEach(visNet.__colUnsetNode);
+
+        let ns = visNet._extConcepts ? visNet.nodesArr : notExt;
         let nodes = new vis.DataSet(ns);
         let edges = new vis.DataSet(visNet.edgesArr.filter(e => ns.some(n1 => n1.id == e.from) || ns.some(n2 => n2.id == e.to)));
 
@@ -364,6 +379,11 @@ var visNet = {
         visNet._extConcepts = !visNet._extConcepts;
         var btn = $("#btnExtConcepts");
         visNet.toggleButton(btn, visNet._extConcepts);
+    },
+    clickColorize: function () {
+        visNet._isColorize = !visNet._isColorize;
+        var btn = $("#btnColorize");
+        visNet.toggleButton(btn, visNet._isColorize);
     },
     onResize: function () {
         var h = $('#mynetworkContainer').height();

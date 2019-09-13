@@ -3,6 +3,7 @@
 var page = {
     BASE: location.protocol + '//' + location.host + location.pathname,
     urlParams: new URLSearchParams(window.location.search),
+    isEmbedded: false,
 
     // called on page loaded
     init: function () {
@@ -60,20 +61,28 @@ var page = {
         this.updateSharingUrl($('#twShare'));
         this.updateSharingUrl($('#liShare'));
 
-        var nr = urlParams.has('noright');
-        if (nr||((screen.width < 1000) && (window.location.search == null || window.location.search == "" || urlParams.has('search')))) {
+        this.isEmbedded = urlParams.has('embedded');
+        if (this.isEmbedded || ((screen.width < 1000) && (window.location.search == null || window.location.search == "" || urlParams.has('search')))) {
             var r = $("#rightSidebar");
             r.detach();
-            if (!nr)
+            if (!this.isEmbedded)
                 r.prependTo("#contentRow1");
             r.removeClass("col-lg-4");
             r.addClass("col-lg-8");
             $("#appsCard").css('visibility', 'collapse');
             $("#proj_links").css('display', 'none');
-            if (!nr)
+            if (!this.isEmbedded)
                 $("#search_widget").css('visibility', 'inherit');
-            else
+            else {
                 $("#search_widget").css('visibility', 'collapse');
+                $("#navbarToggler").css('visibility', 'collapse');
+                $("#navbarResponsive").css('visibility', 'collapse');
+                $("#proj_desc").css('visibility', 'collapse');
+                $("#other_desc").css('visibility', 'collapse');
+                $("#pageFooter").css('visibility', 'collapse');
+
+                $("a:not([target])").attr("target", "_blank");
+            }
         }
     },
     updateSharingUrl: function (e) {
