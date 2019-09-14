@@ -120,6 +120,7 @@ var biblRes = {
             e.attr("class", "panel-collapse collapse show");
             btn.removeClass("btn-outline-info");
             btn.addClass("btn-info");
+            document.getElementById("ref" + id).scrollIntoView();
         }
     },
     expandAll: function () {
