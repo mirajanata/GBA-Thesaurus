@@ -80,6 +80,7 @@ var page = {
                 $("#proj_desc").css('visibility', 'collapse');
                 $("#other_desc").css('visibility', 'collapse');
                 $("#pageFooter").css('visibility', 'collapse');
+                $("#navBar").css('visibility', 'collapse');
 
                 $("a:not([target])").attr("target", "_blank");
             }

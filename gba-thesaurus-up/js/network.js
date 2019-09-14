@@ -9,12 +9,17 @@ var visNet = {
     _extConcepts: true,
     _isHierarchy: false,
     _isColorize: false,
+    _uri: null,
+    _lang: null,
 
     init: function () {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         let project = uri.split('/')[3];
         let lang = urlParams.get('lang');
+
+        visNet._uri = uri;
+        visNet._lang = lang;
 
         visNet.h_layout =
             {
@@ -389,5 +394,11 @@ var visNet = {
         var h = $('#mynetworkContainer').height();
         var dh = $('#mynetworkToolbar').height();
         $('#mynetwork').height(h - dh - 60);
+    },
+    openThesaurus: function () {
+        var s = "index.html?uri=" + encodeURIComponent(visNet.currentUri ? visNet.currentUri : visNet._uri);
+        if (visNet._lang)
+            s += "&lang=" + visNet._lang;
+        window.open(s, "_blank");
     }
 };
