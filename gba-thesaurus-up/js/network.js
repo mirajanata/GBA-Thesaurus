@@ -168,6 +168,7 @@ var visNet = {
 
         }
         if (visID) {
+            $('#itopic').hide();
             if (visNet.isExternalTab(visID)) {
                 $("#externalUri").val(visID);
                 document.getElementById("itopic").src = "network_desc.html";
