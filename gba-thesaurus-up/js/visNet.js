@@ -88,7 +88,7 @@ var visNet = {
         this.createNetwork(uri, lang, ws.endpoint, project);
     },
     createNetwork: function (uri, lang, endpoint, project) {
-        let query = encodeURIComponent(`PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
+        let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
                                                 (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor)
@@ -103,42 +103,39 @@ var visNet = {
                                                 OPTIONAL {?s dbpo:colourHexCode ?sC}
                                                 OPTIONAL {?o dbpo:colourHexCode ?oC}
                                                 }
-                                                ORDER BY ?sL`);
+                                                ORDER BY ?sL`;
 
-        fetch(`${endpoint}${project}?query=${query}&format=application/json`)
-
-            .then(res => res.json())
-            .then(jsonData => {
-                visNet.visData = jsonData.results.bindings;
-                //console.log(visNet.visData);
+        ws.projectJson(project, query, function (jsonData) {
+            visNet.visData = jsonData.results.bindings;
+            //console.log(visNet.visData);
 
 
-                visNet.visData.forEach((i) => {
-                    if (!visNet.edgesArr.some(n => n.from + n.to === i.s.value + i.o.value) && !visNet.edgesArr.some(n => n.to + n.from === i.s.value + i.o.value)) {
-                        switch (i.x.value.split('#')[1]) {
-                            case 'exactMatch':
-                                visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'none', false, 'grey'));
-                                break;
-                            case 'closeMatch':
-                                visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'none', true, 'grey'));
-                                break;
-                            case 'narrowMatch':
-                                visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'to', false, 'grey'));
-                                break;
-                            case 'broadMatch':
-                                visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'to', false, 'grey'));
-                                break;
-                            case 'related':
-                                visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'none', true));
-                                break;
-                            default:
-                                visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'to', false));
-                        }
+            visNet.visData.forEach((i) => {
+                if (!visNet.edgesArr.some(n => n.from + n.to === i.s.value + i.o.value) && !visNet.edgesArr.some(n => n.to + n.from === i.s.value + i.o.value)) {
+                    switch (i.x.value.split('#')[1]) {
+                        case 'exactMatch':
+                            visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'none', false, 'grey'));
+                            break;
+                        case 'closeMatch':
+                            visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'none', true, 'grey'));
+                            break;
+                        case 'narrowMatch':
+                            visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'to', false, 'grey'));
+                            break;
+                        case 'broadMatch':
+                            visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'to', false, 'grey'));
+                            break;
+                        case 'related':
+                            visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'none', true));
+                            break;
+                        default:
+                            visNet.edgesArr.push(visNet.createEdge(i.s.value, i.o.value, 'to', false));
                     }
-                });
-                visNet.extGraph(uri, true);
-                visNet.drawNetwork();
+                }
             });
+            visNet.extGraph(uri, true);
+            visNet.drawNetwork();
+        });
     },
 
     createEdge: function (from, to, arrows, dashes, color) {
