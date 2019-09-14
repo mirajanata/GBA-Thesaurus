@@ -4,6 +4,7 @@ var page = {
     BASE: location.protocol + '//' + location.host + location.pathname,
     urlParams: new URLSearchParams(window.location.search),
     isEmbedded: false,
+    hideOnEmbed: ["#search_widget", "#navbarToggler", "#navbarResponsive", "#proj_desc", "#other_desc", "#pageFooter", "#navBar"],
 
     // called on page loaded
     init: function () {
@@ -74,14 +75,9 @@ var page = {
             if (!this.isEmbedded)
                 $("#search_widget").css('visibility', 'inherit');
             else {
-                $("#search_widget").css('visibility', 'collapse');
-                $("#navbarToggler").css('visibility', 'collapse');
-                $("#navbarResponsive").css('visibility', 'collapse');
-                $("#proj_desc").css('visibility', 'collapse');
-                $("#other_desc").css('visibility', 'collapse');
-                $("#pageFooter").css('visibility', 'collapse');
-                $("#navBar").css('visibility', 'collapse');
-
+                page.hideOnEmbed.forEach(function (s) {
+                    $(s).css('visibility', 'collapse');
+                });
                 $("a:not([target])").attr("target", "_blank");
             }
         }
@@ -153,8 +149,6 @@ var page = {
         var div = $('#page_desc');
         div.empty().append('<br>' + lang['DESC_' + topic.toUpperCase()]);
     },
-
-
 
     setNavbarFooter: function () {
         $('#LABEL_CONTACT').html(lang.LABEL_CONTACT);
