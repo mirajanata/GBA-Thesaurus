@@ -5,6 +5,7 @@ var page = {
     urlParams: new URLSearchParams(window.location.search),
     isEmbedded: false,
     hideOnEmbed: ["#search_widget", "#navbarToggler", "#navbarResponsive", "#proj_desc", "#other_desc", "#pageFooter", "#navBar"],
+    uriParameter: null,
 
     // called on page loaded
     init: function () {
@@ -38,6 +39,7 @@ var page = {
             let label = '§';
             if (urlParams.has('uri')) {
                 uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
+                this.uriParameter = uri;
                 label = decodeURI(urlParams.get('list').replace(/["';><]/gi, '')); //avoid injection
             }
             search.insertSparql(uri, label);
@@ -83,7 +85,7 @@ var page = {
         }
     },
     updateSharingUrl: function (e) {
-        var v = encodeURIComponent(window.location.href);
+        var v = encodeURIComponent(this.uriParameter != null ? this.uriParameter : window.location.href);
         var s = e.attr("href").replace("wwwgeolbanet", v).replace("wwwgeolbanet", v);
         e.attr("href", s);
     },
