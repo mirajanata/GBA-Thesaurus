@@ -22,12 +22,19 @@
         function redir() {
             window.open(parent.document.getElementById("externalUri").value, "visnet_desc");
         }
+        function onload() {
+            document.getElementById("uri").innerText = parent.document.getElementById("externalUri").value;
+        }
     </script>
 </head>
-<body>
+<body onload="onload();">
     <div class="container-fluid" style="height:100%;vertical-align:central;text-align:center;">
-        <h3 style="position:absolute;top: 50%;width:90%;text-align:center;"
-            ><a href="#" onclick="redir();">Show node description in new tab</a></h3>
+        <div style="position:absolute;top: 50%;width:90%;text-align:center;">
+            <h3>
+                <a href="#" onclick="redir();">Show node description in new tab</a>
+            </h3>
+            <h5 id="uri"></h5>
+        </div>
     </div>
 </body>
 

@@ -192,7 +192,7 @@ var visNet = {
     },
     isExternalTab: function (uri) {
         // resolve X-Frame-Options: SAMEORIGIN security
-        return uri.includes(visNet.abbrev.INSPIRE) || uri.includes(visNet.abbrev.GEMET);
+        return uri.includes(visNet.abbrev.INSPIRE) || uri.includes(visNet.abbrev.GEMET) || (uri.startsWith("http:") && window.location.protocol.startsWith("https"));
     },
     createNode: function (id, nodeText, color) {
         if (!visNet.nodesArr.some(a => a.id === id)) {
