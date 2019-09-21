@@ -189,14 +189,14 @@ var visNet = {
         return visNet.nodesArr.length != cnt;
     },
     abbrev: {
-        INSPIRE: 'http://inspire.ec.europa.eu/codelist/',
+        INSPIRE: 'https://inspire.ec.europa.eu/codelist/',
         CGI: 'http://resource.geosciml.org/classifier/cgi/',
         ICS: 'http://resource.geosciml.org/classifier/ics/',
         DBpedia: 'dbpedia.org/resource/',
         BGS: 'http://data.bgs.ac.uk/id/EarthMaterialClass/',
-        WIKIDATA: 'http://www.wikidata.org/entity/',
-        GEMET: 'http://www.eionet.europa.eu/gemet/',
-        GBA: 'resource.geolba.ac.at'
+        WIKIDATA: 'https://www.wikidata.org/entity/',
+        GEMET: 'https://www.eionet.europa.eu/gemet/',
+        GBA: 'https://resource.geolba.ac.at'
     },
     isExternal: function (uri) {
         return !uri.includes(visNet.abbrev.GBA);
