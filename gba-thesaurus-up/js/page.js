@@ -207,19 +207,17 @@ var page = {
 
                 $('#' + project.id + 'ReadMore').append(`
                         <p class="">
-                            <a href="http://resource.geolba.ac.at/GeologicUnit/export/${project.id}.rdf" type="button" class="btn btn-outline-info btn-sm">
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='rdf/${project.id}.rdf'">
                                 RDF/XML download
-                            </a>
-                                &nbsp;
-                            <a href="${ws.endpoint}${project.id}" type="button" class="btn btn-outline-info btn-sm">
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='${ws.endpoint}${project.id}'">
                                 SparQL endpoint
-                            </a>
-                                &nbsp;
-                            <a href="bibl_res.html?proj=${project.id}" type="button" class="btn btn-outline-info btn-sm">
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='bibl_res.html?proj=${project.id}';">
                                 ${lang.LABEL_BIBLREF}
-                            </a>
+                            </button>
                         </p>
-                        <hr>`);  //http://www.geolba.net/thesaurus/bibl_res.html?proj=GeologicUnit
+                        <hr>`); 
             });
         });
     },

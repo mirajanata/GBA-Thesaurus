@@ -8,34 +8,35 @@ var biblRes = {
         let thesProjName = urlParams.get('proj');
         //$('#headRef').text(`Bibliographic references used for ${thesProjName}`);
         //console.log(urlParams.get('uri')); // "http.."
-        let query1 = encodeURIComponent(`PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
-                                                        PREFIX dcterms:<http://purl.org/dc/terms/>
-                                                        SELECT DISTINCT ?o
-                                                        WHERE {
-                                                        ?s dcterms:references ?o
-                                                        }`);
-        let query2 = encodeURIComponent(`PREFIX dcterms:<http://purl.org/dc/terms/>
-                                                        SELECT DISTINCT *
-                                                        WHERE {
-                                                        ?s dcterms:bibliographicCitation ?C
-                                                        OPTIONAL {?s dcterms:source ?pdf}
-                                                        OPTIONAL {?s dcterms:identifier ?id}
-                                                        }
-                                                        ORDER BY ?C`);
+        let query1 = encodeURIComponent(`   PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
+                                            PREFIX dcterms:<http://purl.org/dc/terms/>
+                                            SELECT DISTINCT ?o
+                                            WHERE {
+                                            ?s dcterms:references ?o
+                                            }`);
+        
+        let query2 = encodeURIComponent(`   PREFIX dcterms:<http://purl.org/dc/terms/>
+                                            SELECT DISTINCT *
+                                            WHERE {
+                                            ?s dcterms:bibliographicCitation ?C
+                                            OPTIONAL {?s dcterms:source ?pdf}
+                                            OPTIONAL {?s dcterms:identifier ?id}
+                                            }
+                                            ORDER BY ?C`);
 
         let url = `${ws.endpoint}${thesProjName}?query=${query1}&format=application/json`;
         let refs = [];
 
 
         let result = fetch(url, {
-            method: 'get',
-        }).then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            refs = Array.from(data.results.bindings, a => (a.o.value));
-            //console.log(refs);
-            return fetch(`${ws.endpoint}ref?query=${query2}&format=application/json`);
-        })
+                method: 'get',
+            }).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                refs = Array.from(data.results.bindings, a => (a.o.value));
+                //console.log(refs);
+                return fetch(`${ws.endpoint}ref?query=${query2}&format=application/json`);
+            })
             .then(function (response) {
                 return response.json();
             })
@@ -50,7 +51,8 @@ var biblRes = {
             let count = 0;
             let toolBar = $("#biblrefToolbar");
             let refList = $("#refList");
-            let done = "", c1 = "";
+            let done = "",
+                c1 = "";
 
             for (let i of r.results.bindings) {
                 if (refs.includes(i.s.value)) {
@@ -66,9 +68,9 @@ var biblRes = {
                     }
                     let citArr = i.C.value.split(':');
                     let listGroupItem = `<li class="list-group-item">
-                                                            <strong>${citArr[0]}:</strong>
-                                                            ${citArr.slice(1).join()} ${pdfx}${idx}
-                                                    </li>`;
+                                            <strong>${citArr[0]}:</strong>
+                                            ${citArr.slice(1).join()} ${pdfx}${idx}
+                                         </li>`;
 
                     if (i.C.value.charAt(0).toUpperCase() == firstChar) {
                         $(`#ref${firstChar} ul`).append(listGroupItem);
@@ -79,24 +81,29 @@ var biblRes = {
                         if (done.indexOf(firstChar) < 0) {
                             done += firstChar;
                             toolBar.append(`<div class="panel-heading" role="tab" id="refHeading${firstChar}">
-                                                            <button id="btn${firstChar}" type="button" class="btn btn-outline-info btexpand"  style="font-size:18px;margin:10px;" onclick="biblRes.expand('${firstChar}');">
-                                                                    ${firstChar}
-                                                                </button>
-                                                            </div>
-                                                        </div>`);
+                                                <button id="btn${firstChar}" type="button" class="btn btn-outline-info btexpand"  style="font-size:12px;margin:5px;" onclick="biblRes.expand('${firstChar}');">
+                                                    ${firstChar}
+                                                </button>
+                                            </div>
+                                        </div>`);
                             refList.append(`<div id="ref${firstChar}" class="panel-collapse collapse${collapse}" role="tabpanel" aria-labelledby="refHeading${firstChar}">
-                                                            <ul class="list-group">
-<li class="list-group-item">
-                            <h1 class="text-danger capHeader" >${firstChar}</h1>
-</li>
-                                                                ${listGroupItem}
-                                                            </ul>
-                                                        </div>`);
+                                                <ul class="list-group">
+                                                    <li class="list-group-item">
+                                                        <span class="badge badge-info badge-pill" ><strong>${firstChar}</strong></span>
+                                                    </li>
+                                                        ${listGroupItem}
+                                                </ul>
+                                            </div>`);
                             ariaExp = false;
                         }
                     }
                 }
+
             }
+            toolBar.append(`<button type="button" id="expBut" class="btn btn-outline-info btn-sm" onclick="biblRes.expandAll()" style="margin:5px;">
+                    Expand All
+            </button>`);
+
             biblRes.onResize();
             if (count < 10) {
                 biblRes.expandAll();

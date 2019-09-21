@@ -69,7 +69,7 @@ var detail = {
     },
     insertFrontPart: function (key, uri, data, props) {
         var div = $('#pageContent');
-        let html = '<form id="irdfForm" target="_blank" style="display:none;" method="post" action="https://resource.geolba.ac.at/PoolParty/sparql/GeologicTimeScale"><input type="hidden" name="query" id="irdfQuery"/></form>';
+        let html = `<form id="irdfForm" target="_blank" style="display:none;" method="post" action="${ws.endpoint}${uri.split("/")[3]}"><input type="hidden" name="query" id="irdfQuery"/></form>`;
         props.forEach((i) => {
             let ul = this.getObj(data, i);
             if (ul.size > 0) {
@@ -360,12 +360,12 @@ var detail = {
             <ul id="coBr" class="pagination mb-4 cardHeaderRight">
                 <li>
                     <button type="button" id="leftBtn" class="btn btn-outline-secondary btn-sm" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)-50)">
-                        &#9664;
+                        <span class="fa fa-chevron-left"></span>
                     </button>
                 </li>
                 <li>
                     <button type="button" id="rightBtn" class="btn btn-outline-secondary btn-sm" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+50)">
-                        &#9654;
+                        <span class="fa fa-chevron-right"></span>
                     </button>
                 </li>
             </ul>

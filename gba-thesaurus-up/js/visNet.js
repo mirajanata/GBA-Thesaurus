@@ -21,68 +21,79 @@ var visNet = {
         visNet._uri = uri;
         visNet._lang = lang;
 
-        visNet.h_layout =
-            {
-                edges: {
-                    font: {
-                        size: 12
-                    },
-                    widthConstraint: {
-                        maximum: 90
-                    }
+        visNet.h_layout = {
+            edges: {
+                font: {
+                    size: 12
                 },
-                nodes: {
-                    shape: 'box',
-                    margin: 10,
-                    widthConstraint: {
-                        maximum: 200
-                    }
-                },
-                layout: {
-                    hierarchical: {
-                        enabled: true,
-                        direction: 'LR',
-                        sortMethod: "directed"
-                    }
-                },
-                interaction: {
-                    dragNodes: false
-                },
-                physics: {
-                    enabled: true,
-                    stabilization: {
-                        enabled: true,
-                        iterations: 100,
-                        updateInterval: 10
-                    }
+                widthConstraint: {
+                    maximum: 90
                 }
-            };
-        visNet.g_layout =
-            {
-                edges: {
-                    font: {
-                        size: 12
-                    },
-                    widthConstraint: {
-                        maximum: 90
-                    }
+            },
+            nodes: {
+                shape: 'box',
+                margin: 10,
+                widthConstraint: {
+                    maximum: 200
                 },
-                nodes: {
-                    shape: 'box',
-                    margin: 10,
-                    widthConstraint: {
-                        maximum: 200
-                    }
-                },
-                interaction: {
-                    dragNodes: false,
-                    hover: true
-                },
-                physics: {
-                    enabled: true,
+                font: {
+                    face: 'Open Sans'
                 }
 
-            };
+            },
+            layout: {
+                hierarchical: {
+                    enabled: true,
+                    levelSeparation: 170,
+                    nodeSpacing: 60,
+                    treeSpacing: 220,
+                    blockShifting: true,
+                    edgeMinimization: true,
+                    parentCentralization: false,
+                    direction: 'LR', // UD, DU, LR, RL
+                    sortMethod: 'directed' // hubsize, directed
+                }
+            },
+            interaction: {
+                dragNodes: true
+            },
+            physics: {
+                enabled: false,
+                stabilization: {
+                    enabled: true,
+                    iterations: 100,
+                    updateInterval: 1
+                }
+            }
+        };
+        visNet.g_layout = {
+            edges: {
+                font: {
+                    size: 12
+                },
+                widthConstraint: {
+                    maximum: 90
+                }
+            },
+            nodes: {
+                shape: 'box',
+                margin: 10,
+                widthConstraint: {
+                    maximum: 200
+                },
+                font: {
+                    face: 'Open Sans'
+                }
+            },
+            interaction: {
+                dragNodes: true,
+                hover: true
+            },
+            physics: {
+                enabled: true,
+            }
+
+        };
 
 
         this.createNetwork(uri, lang, ws.endpoint, project);
@@ -205,20 +216,21 @@ var visNet = {
                 if (co.indexOf('#') == 0)
                     co = co.substr(1, 6);
                 let m = co.match(/^([0-9a-f]{6})$/i);
-                let r = 255, g = 255, b = 255;
+                let r = 255,
+                    g = 255,
+                    b = 255;
                 if (m) {
                     m = m[0];
                     r = parseInt(m.substr(0, 2), 16);
                     g = parseInt(m.substr(2, 2), 16);
                     b = parseInt(m.substr(4, 2), 16);
-                    if (0.28 * r + 0.5 * g + 0.11 * b <= 128)
+                    if (0.28 * r + 0.5 * g + 0.11 * b <= 60)
                         f = "#ffffff";
                 }
             }
 
             let font = {
-                face: 'Open Sans',
-                size: 13,
+
                 color: f
             };
             let widthConstraint = {
@@ -232,7 +244,14 @@ var visNet = {
                         Label = (Label.charAt(0).toUpperCase() + Label.slice(1)).replace(/_/g, ' ');
                     }
                 }
-                color = 'lightgrey';
+                color = {
+                    border: '#e6e6e6',
+                    background: '#e6e6e6',
+                    highlight: {
+                        border: '#e6e6e6',
+                        background: '#e6e6e6'
+                    }
+                };
                 font = {
                     size: 13,
                     color: 'black'
@@ -241,7 +260,7 @@ var visNet = {
             } else if (color == '') {
                 color = {
                     border: '#406897',
-                    background: '#6AAFFF'
+                    background: '#e6e6e6'
                 };
 
             }
@@ -318,7 +337,11 @@ var visNet = {
             e.setAttribute("aria-valuenow", progress);
             e.style.width = progress + "%";
 
-            setTimeout(function () { ec.style.visibility = "hidden"; e.style.width = "0%"; e.setAttribute("aria-valuenow", "0"); }, 500);
+            setTimeout(function () {
+                ec.style.visibility = "hidden";
+                e.style.width = "0%";
+                e.setAttribute("aria-valuenow", "0");
+            }, 500);
         });
 
         /*network.on("doubleClick", function (params) {
@@ -331,7 +354,7 @@ var visNet = {
         });*/
         network.on("click", function (params) {
             //console.log('doubleClick Event:', params);
-            var uri = params.nodes[0];
+            var uri = params.nodes[0].replace('http://', 'https://');
             if (visNet.currentUri != uri) {
                 //visNet.nodesArr = [];
                 if (visNet.extGraph(params.nodes[0]))
@@ -394,9 +417,13 @@ var visNet = {
         $('#mynetwork').height(h - dh - 60);
     },
     openThesaurus: function () {
-        var s = "index.html?uri=" + encodeURIComponent(visNet.currentUri ? visNet.currentUri : visNet._uri);
-        if (visNet._lang)
-            s += "&lang=" + visNet._lang;
-        window.open(s, "_blank");
+        if (visNet.currentUri.includes('resource.geolba.ac.at')) {
+            var s = "index.html?uri=" + encodeURIComponent(visNet.currentUri ? visNet.currentUri : visNet._uri);
+            if (visNet._lang)
+                s += "&lang=" + visNet._lang;
+        } else {
+            var s = "index.html";
+        }
+        window.open(s, "_top");
     }
 };

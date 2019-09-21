@@ -15,55 +15,51 @@
     <style type="text/css">
         html {
             height: 100%;
-            margin: 0px;
         }
 
         body {
             height: 90%;
-            margin: 0px;
-        }
-
-        .capHeader {
-            font-size: 48px;
+            margin-top: 15px;
         }
 
         .list-group {
-            border: 1px solid #eeeeee;
+            /* border: 1px solid #eeeeee;
             -webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
             -moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-            box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
-            margin: 10px;
+            box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);*/
+            margin: 0px;
         }
 
         .list-group-item {
-            margin-bottom: 5px;
+            /*margin-bottom: 0px;*/
             border: none !important;
         }
     </style>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             biblRes.init();
         });
     </script>
 </head>
 
-<body onload="biblRes.onResize();" onresize="biblRes.onResize();">
+<body onload="biblRes.onResize();" onresize="biblRes.onResize();">            
     <div class="container-fluid" style="height:100%;">
         <div class="row no-gutters" style="height:100%;">
-            <div id="one" class="card" style="width:100%;">
-                <a href="https://www.geologie.ac.at"><img alt="GBA Thesaurus" id="IMG_GBALOGO" src="img/gbaLogo50.png" height="35"></a>
-                <div class="card-header" style="height:70px;"><h1>GBA - Bibliographic reference</h1></div>
+
+            <div id="one" class="card bg-secondary">
+                
+                <!--<a href="https://www.geologie.ac.at"><img alt="GBA Thesaurus" id="IMG_GBALOGO" src="img/gbaLogo50.png" height="35"></a>-->
+                <div class="card-header">
+                    <h3>Bibliographic references<button id="" title="GBA Thesaurus" type="button" class="close" style="float: right;" onclick="location.href = 'index.html';">close x</button></h3>
+
+                </div>
                 <div id="biblrefContainer" class="card-body">
-                    <div id="biblrefToolbar" style="margin-bottom:5px;" class="input-group bg-dark input-group-text">
-                        <button type="button" id="expBut" class="btn btn-primary" onclick="biblRes.expandAll()" style="margin-right:20px;">Expand All</button>
-                    </div>
+                    <div id="biblrefToolbar" class="input-group "></div>
                     <div id="tabList" class="panel-group" role="tablist" style="overflow-y:auto">
-                        <div class="panel panel-default" id="refList"> </div>
+                        <div class="" id="refList"> </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</body>
-
-</html>
+</body></html>
