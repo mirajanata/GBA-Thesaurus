@@ -350,7 +350,8 @@ var visNet = {
 
         if (!visNet._itopic) {
             var holdId = $("#holdId");
-            if (screen.width < 1000) {
+            var supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
+            if (supportsTouch) {
                 network.on("hold", function (params) {
                     if (params.nodes[0].indexOf('resource.geolba') == -1) {
                         window.location.href = params.nodes;
