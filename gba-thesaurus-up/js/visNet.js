@@ -11,7 +11,7 @@ var visNet = {
     _isColorize: false,
     _uri: null,
     _lang: null,
-    _itopic:false,
+    _itopic: false,
 
     init: function () {
         let urlParams = new URLSearchParams(window.location.search);
@@ -350,9 +350,10 @@ var visNet = {
 
         if (!visNet._itopic) {
             var holdId = $("#holdId");
-            var supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
+            var supportsTouch = typeof (window.ontouchstart) !== 'undefined' || navigator.msMaxTouchPoints;
             if (supportsTouch) {
                 network.on("hold", function (params) {
+                    visNet._click = false;
                     if (params.nodes[0].indexOf('resource.geolba') == -1) {
                         window.location.href = params.nodes;
                     } else {
@@ -362,6 +363,7 @@ var visNet = {
                 holdId.html("hold node");
             } else {
                 network.on("doubleClick", function (params) {
+                    visNet._click = false;
                     if (params.nodes[0].indexOf('resource.geolba') == -1) {
                         window.location.href = params.nodes;
                     } else {
@@ -373,12 +375,17 @@ var visNet = {
         }
         network.on("click", function (params) {
             //console.log('doubleClick Event:', params);
-            var uri = params.nodes[0].replace('http://', 'https://');
-            if (visNet.currentUri != uri) {
-                //visNet.nodesArr = [];
-                if (visNet.extGraph(params.nodes[0]))
-                    visNet.drawNetwork();
-            }
+            visNet._click = true;
+            setTimeout(function () {
+                if (visNet._click) {
+                    var uri = params.nodes[0].replace('http://', 'https://');
+                    if (visNet.currentUri != uri) {
+                        //visNet.nodesArr = [];
+                        if (visNet.extGraph(params.nodes[0]))
+                            visNet.drawNetwork();
+                    }
+                }
+            }, 550);
         });
 
         document.body.addEventListener('keydown', function (e) {

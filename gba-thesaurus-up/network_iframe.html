@@ -77,9 +77,16 @@
         }
     </style>
     <script>
-        $(document).ready(function() {
-            visNet.init();
-        });
+        var supportsTouch = typeof (window.ontouchstart) !== 'undefined' || navigator.msMaxTouchPoints;
+        if (supportsTouch) {
+            var s = document.location.href;
+            s = s.replace("network_iframe.html", "network.html");
+            document.location.replace(s);
+        } else {
+            $(document).ready(function () {
+                visNet.init();
+            });
+        }
     </script>
 </head>
 
