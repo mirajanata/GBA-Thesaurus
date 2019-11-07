@@ -65,7 +65,7 @@ var micka = {
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         $('#dropdown').append(` <tr>
                                                 <td class="searchLink dropdown-item" 
-                                                    onclick="semanticSearch('${value.URIs.value}','${value.L.value}');">
+                                                    onclick="micka.semanticSearch('${value.URIs.value}','${value.L.value}');">
                                                     ${value.L.value}
                                                 </td>
                                             </tr>`);
@@ -119,14 +119,15 @@ var micka = {
             for (let i = 1; i <= 4; i++) {
                 rankedTerms.push($.map(data.results.bindings.filter(item => item.rank.value == i), (a => (a.L.value.replace(' (theme)', '')))));
             }
-            clearPage();
-            queryCSW(allTerms, rankedTerms);
+            micka.clearPage();
+            micka.queryCSW(allTerms, rankedTerms);
         });
     },
 
     //******************************************************************************************************
     clearPage: function () {
-        for (a of document.getElementById('pageContent').childNodes) {
+        let content = document.getElementById('pageContent').childNodes;
+        for (var a of content) {
             a.innerHTML = '';
         }
     },
@@ -139,7 +140,7 @@ var micka = {
         let results = [];
         let rankedTerms = [[], [], [], []];
         rankedTerms[0].push(searchTerm.toLowerCase());
-        clearPage();
+        micka.clearPage();
 
         fetch(`${prefix}Anytext like '* ${searchTerm}*'${suffix}`)
             .then(res => res.json())
