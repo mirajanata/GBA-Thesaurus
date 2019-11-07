@@ -24,7 +24,7 @@ var page = {
         lang.load(USER_LANG);
 
         this.setNavbarFooter();
-        search.insertSearchCard(); //inserts search widget only
+        search.insertSearchCard(); //inserts search widget only  
 
         var urlParams = this.urlParams;
         if (urlParams.has('search')) { //need lang parameter only for sparql requests
