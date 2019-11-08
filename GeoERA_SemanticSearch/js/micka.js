@@ -32,11 +32,21 @@ var micka = {
 
 
         $('#searchInput').keydown(function (e) {
-            if (e.which == 13 && Object.keys(micka.upperConcept).length !== 0) {
-                micka.semanticSearch(micka.upperConcept.uri, micka.upperConcept.label);
-                $('#dropdown').empty();
-                micka.upperConcept = {};
-            }
+            switch (e.which) {
+                case 13:
+                    if (Object.keys(micka.upperConcept).length !== 0) {
+                        micka.semanticSearch(micka.upperConcept.uri, micka.upperConcept.label);
+                        $('#dropdown').empty();
+                        micka.upperConcept = {};
+                    }
+                    break;
+                case 38: // up
+                    micka.__selectSearchLink(1);
+                    break;
+                case 40: // down
+                    micka.__selectSearchLink(0);
+                    break;
+            };
         });
 
         $('#searchBtn').click(function (e) {
@@ -65,7 +75,7 @@ var micka = {
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         $('#dropdown').append(` <tr>
                                                 <td class="searchLink dropdown-item" 
-                                                    onclick="micka.semanticSearch('${value.URIs.value}','${value.L.value}');">
+                                                    onclick="micka.semanticSearch('${value.URIs.value}','${value.L.value}');" data-uri="${value.URIs.value}", data-label="${value.L.value}">
                                                     ${value.L.value}
                                                 </td>
                                             </tr>`);
@@ -73,6 +83,37 @@ var micka = {
                 }
             }, 200);
         });
+    },
+    __selectSearchLink: function (up, click) {
+        var options = $(".searchLink");
+        if (options.length == 0)
+            return;
+        for (var c = 0; c < options.length; c++) {
+            if ($(options[c]).hasClass("selected"))
+                break;
+        }
+        if (click) {
+            return c >= options.length ? null : $(options[c]);
+        }
+        if (c >= options.length)
+            c = -1;
+        if (up)
+            c = c < 1 ? options.length - 1 : c - 1;
+        else
+            c = c == -1 || c == options.length - 1 ? 0 : c + 1;
+        options.removeClass("active");
+        options.removeClass("selected");
+        if (c >= 0) {
+            var o = $(options[c]);
+            o.addClass("selected");
+            o.addClass("active");
+            var searchInput = $('#searchInput');
+            searchInput.val(o.text().trim());
+            micka.upperConcept = {
+                label: o.attr("data-label"),
+                uri: o.attr("data-uri")
+            };
+        }
     },
 
     //**********************the initial sparql query to build the fuse (trie) object - stored in window****         
@@ -209,7 +250,7 @@ var micka = {
     //******************************************************************************************************
     addResults: function (results, jsonData, rankedTerms) {
 
-        for (a of jsonData.records) {
+        for (var a of jsonData.records) {
             let k = [];
             if (a.keywords !== undefined) {
                 a.keywords.forEach(x => {
