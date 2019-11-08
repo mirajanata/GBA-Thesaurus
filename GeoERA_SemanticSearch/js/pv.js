@@ -125,7 +125,7 @@ var pv = {
 
     //******************************************************************************************************
     clearPage: function () {
-        for (a of document.getElementById('pageContent').childNodes) {
+        for (let a of document.getElementById('pageContent').childNodes) {
             a.innerHTML = '';
         }
     },

@@ -23,21 +23,18 @@ var micka = {
         }
         micka.initSearch(); //provides js for fuse search 
         document.getElementById('lang').innerHTML = '[' + micka.USER_LANG + ']';
-
     },
 
-    upperConcept: {},
-
     insertSearchCard: function (widgetID) {
-
-
         $('#searchInput').keydown(function (e) {
             switch (e.which) {
                 case 13:
-                    if (Object.keys(micka.upperConcept).length !== 0) {
-                        micka.semanticSearch(micka.upperConcept.uri, micka.upperConcept.label);
+                    if (Object.keys(micka.__upperConcept).length !== 0) {
+                        micka.semanticSearch(micka.__upperConcept.uri, micka.__upperConcept.label);
                         $('#dropdown').empty();
-                        micka.upperConcept = {};
+                        micka.__upperConcept = {};
+                    } else {
+                        micka.fullTextSearch($('#searchInput').val());
                     }
                     break;
                 case 38: // up
@@ -68,7 +65,7 @@ var micka = {
                 if ($('#searchInput').val().length > 0) {
                     $('#dropdown').show();
                     let autoSuggest = window.fuse.search($('#searchInput').val());
-                    micka.upperConcept = {
+                    micka.__upperConcept = {
                         label: autoSuggest.slice(0, 1)[0].L.value,
                         uri: autoSuggest.slice(0, 1)[0].URIs.value
                     };
@@ -83,37 +80,6 @@ var micka = {
                 }
             }, 200);
         });
-    },
-    __selectSearchLink: function (up, click) {
-        var options = $(".searchLink");
-        if (options.length == 0)
-            return;
-        for (var c = 0; c < options.length; c++) {
-            if ($(options[c]).hasClass("selected"))
-                break;
-        }
-        if (click) {
-            return c >= options.length ? null : $(options[c]);
-        }
-        if (c >= options.length)
-            c = -1;
-        if (up)
-            c = c < 1 ? options.length - 1 : c - 1;
-        else
-            c = c == -1 || c == options.length - 1 ? 0 : c + 1;
-        options.removeClass("active");
-        options.removeClass("selected");
-        if (c >= 0) {
-            var o = $(options[c]);
-            o.addClass("selected");
-            o.addClass("active");
-            var searchInput = $('#searchInput');
-            searchInput.val(o.text().trim());
-            micka.upperConcept = {
-                label: o.attr("data-label"),
-                uri: o.attr("data-uri")
-            };
-        }
     },
 
     //**********************the initial sparql query to build the fuse (trie) object - stored in window****         
@@ -168,7 +134,7 @@ var micka = {
     //******************************************************************************************************
     clearPage: function () {
         let content = document.getElementById('pageContent').childNodes;
-        for (var a of content) {
+        for (let a of content) {
             a.innerHTML = '';
         }
     },
@@ -250,7 +216,7 @@ var micka = {
     //******************************************************************************************************
     addResults: function (results, jsonData, rankedTerms) {
 
-        for (var a of jsonData.records) {
+        for (let a of jsonData.records) {
             let k = [];
             if (a.keywords !== undefined) {
                 a.keywords.forEach(x => {
@@ -261,7 +227,7 @@ var micka = {
             }
             let rank = 1;
             let keywords = [];
-            for (b of k) {
+            for (let b of k) {
                 if (rankedTerms[0].includes(b.toLowerCase())) {
                     keywords.push('<span class="keywords1">' + b + '</span>');
                     rank += 10;
@@ -296,7 +262,6 @@ var micka = {
     },
 
     //******************************************************************************************************
-
     printResults: function (results, rankedTerms) {
 
         if (results.length == 19) {
@@ -326,7 +291,7 @@ var micka = {
         document.getElementById('1').innerHTML += `in keywords, title and abstracts texts<hr>`;
 
         let mickaViewer = 'https://egdi.geology.cz/records/';
-        for (record of results) {
+        for (let record of results) {
             document.getElementById('1').innerHTML += `
                         <div>
                             <a href="${mickaViewer + record.id}">
@@ -349,7 +314,40 @@ var micka = {
                         </p>
                         <hr>`;
         }
-    }
+    },
+
+    __upperConcept: {},
+    __selectSearchLink: function (up, click) {
+        var options = $(".searchLink");
+        if (options.length == 0)
+            return;
+        for (var c = 0; c < options.length; c++) {
+            if ($(options[c]).hasClass("selected"))
+                break;
+        }
+        if (click) {
+            return c >= options.length ? null : $(options[c]);
+        }
+        if (c >= options.length)
+            c = -1;
+        if (up)
+            c = c < 1 ? options.length - 1 : c - 1;
+        else
+            c = c == -1 || c == options.length - 1 ? 0 : c + 1;
+        options.removeClass("active");
+        options.removeClass("selected");
+        if (c >= 0) {
+            var o = $(options[c]);
+            o.addClass("selected");
+            o.addClass("active");
+            var searchInput = $('#searchInput');
+            searchInput.val(o.text().trim());
+            micka.__upperConcept = {
+                label: o.attr("data-label"),
+                uri: o.attr("data-uri")
+            };
+        }
+    },
 };
 
 /* MICKA query examples
