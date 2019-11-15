@@ -150,8 +150,8 @@ var pv = {
             for (let [key, value] of vocProjects.entries()) {
                 let uri_path = new RegExp(key);
                 jsonData.results.bindings.filter(item => uri_path.test(item.cs.value)).forEach(function (item) {
-                    let uris = item.topConcepts.value.split('$').join(`&lang=${pv.USER_LANG}">`).split('|').join(`</a>, <a href="${BASE}?uri=`);
-                    let topConcepts = `<a href="${BASE}?uri=${uris}</a>`;
+                    let uris = item.topConcepts.value.split('$').join(`&lang=${pv.USER_LANG}">`).split('|').join(`</a>, <a href="${pv.BASE}?uri=`);
+                    let topConcepts = `<a href="${pv.BASE}?uri=${uris}</a>`;
                     $('#' + divID).append(`
                                 <div class="media mb-4">
                                     <img class="d-flex mr-3 rounded-circle" src="img/${value.image}">
@@ -215,7 +215,7 @@ var pv = {
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
                             entry = entry + ' <span class="addVoc">(' + value.s.value.split('\/')[3] + ')</span>';
                         }
-                        $('#dropdown').append('<tr><td class="searchLink dropdown-item" onclick="document.location.href = \'' + BASE + '?uri=' + value.s.value + '&lang=' + pv.USER_LANG + '\';">' + entry + '</td></tr>');
+                        $('#dropdown').append('<tr><td class="searchLink dropdown-item" onclick="document.location.href = \'' + pv.BASE + '?uri=' + value.s.value + '&lang=' + pv.USER_LANG + '\';">' + entry + '</td></tr>');
                     });
                 }
             }, 200);
@@ -244,7 +244,7 @@ var pv = {
 
     //********************set the page for search results************************************************
     openSearchList: function (queryString) { //zB 'info=disclaimer'
-        window.open(BASE + '?' + queryString + '&lang=' + pv.USER_LANG, '_self', '', 'false');
+        window.open(pv.BASE + '?' + queryString + '&lang=' + pv.USER_LANG, '_self', '', 'false');
     },
 
     //************************perform the search for a term typed in the inputbox************************         
@@ -278,7 +278,7 @@ var pv = {
             jsonData.results.bindings.forEach(function (a) {
                 $('#searchresults').append(`
                                         <li>
-                                        <a href="${BASE}?uri=${a.s.value}&lang=${pv.USER_LANG}">
+                                        <a href="${pv.BASE}?uri=${a.s.value}&lang=${pv.USER_LANG}">
                                             <strong>${a.title.value}</strong> (project)
                                         </a>
                                         <br>
@@ -330,7 +330,8 @@ var pv = {
                     OPTIONAL {?o skos:prefLabel ?L}
                     } 
                     GROUP BY ?p ?o`, jsonData => {
-            for (key in FRONT_LIST) pv.createFrontPart(divID, uri, jsonData, Array.from(FRONT_LIST[key].values()));
+            for (let key in FRONT_LIST)
+                pv.createFrontPart(divID, uri, jsonData, Array.from(FRONT_LIST[key].values()), key);
 
             $('#' + divID).append(`<hr>
                                 <div style="cursor: pointer; color: #777;" id="detailsBtn" 
@@ -342,7 +343,8 @@ var pv = {
                                 </div>
                                 `);
 
-            for (key in TECHNICAL_LIST) pv.createTechnicalPart('details', jsonData, Array.from(TECHNICAL_LIST[key].values()));
+            for (let key in TECHNICAL_LIST)
+                pv.createTechnicalPart('details', jsonData, Array.from(TECHNICAL_LIST[key].values()), key);
             $('#' + divID).append('');
 
             pv.insertConceptBrowser(divID, uri, 50);
@@ -357,7 +359,7 @@ var pv = {
     },
 
     //*************create the upper part of details page - always visible *********************************************************************   
-    createFrontPart: function (divID, uri, data, props) {
+    createFrontPart: function (divID, uri, data, props, key) {
 
         let html = '';
         props.forEach((i) => {
@@ -426,7 +428,7 @@ var pv = {
     },
 
     //******************create the hidden part of concept descriptions ***********************************************************************    
-    createTechnicalPart: function (divID, data, props) { //loop all single properties
+    createTechnicalPart: function (divID, data, props, key) { //loop all single properties
         let html = '';
         let geoPath = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
         let coord = {};
@@ -461,7 +463,7 @@ var pv = {
 
     //******************transform the sparql json query result into a set of HTML elements like <a> *************************************   
     getObj: function (data, i) {
-        return new Set($.map(data.results.bindings.filter(item => item.p.value === i), (a => (a.Label.value !== '' ? '<a href="' + BASE +
+        return new Set($.map(data.results.bindings.filter(item => item.p.value === i), (a => (a.Label.value !== '' ? '<a href="' + pv.BASE +
             '?uri=' + a.o.value + '&lang=' + pv.USER_LANG + '">' + pv.setUserLang(a.Label.value) + '</a> ' : pv.createHref(a.o.value) + ' ' +
             pv.createDTLink(a.o.datatype) + ' ' + pv.langTag(a.o['xml:lang'])))));
     },
@@ -591,9 +593,9 @@ var pv = {
 
             jsonData.results.bindings.forEach((i) => {
                 if (i.isTopConcept.value == 'true') {
-                    a.push('<a href="' + BASE + '?uri=' + i.c.value + '&lang=' + pv.USER_LANG + '"><strong>' + i.Label.value + '</strong></a> (top concept)');
+                    a.push('<a href="' + pv.BASE + '?uri=' + i.c.value + '&lang=' + pv.USER_LANG + '"><strong>' + i.Label.value + '</strong></a> (top concept)');
                 } else {
-                    a.push('<a href="' + BASE + '?uri=' + i.c.value + '&lang=' + pv.USER_LANG + '">' + i.Label.value + '</a>');
+                    a.push('<a href="' + pv.BASE + '?uri=' + i.c.value + '&lang=' + pv.USER_LANG + '">' + i.Label.value + '</a>');
                 }
             });
             if (offset !== 0) {
