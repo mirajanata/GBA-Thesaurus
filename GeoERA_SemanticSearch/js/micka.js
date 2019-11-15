@@ -347,7 +347,7 @@ var micka = {
                 uri: o.attr("data-uri")
             };
         }
-    },
+    }
 };
 
 /* MICKA query examples

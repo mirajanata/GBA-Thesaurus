@@ -178,10 +178,18 @@ var pv = {
     //***********************set the input box for concept search****************************************         
     insertSearchCard: function (widgetID) {
         $('#searchInput').keydown(function (e) {
-            if (e.which == 13) {
-                pv.openSearchList('search=' + encodeURI($('#searchInput').val()));
-                $('#dropdown').empty();
-                $('#searchInput').val('');
+            switch (e.which) {
+                case 13:
+                    pv.openSearchList('search=' + encodeURI($('#searchInput').val()));
+                    $('#dropdown').empty();
+                    $('#searchInput').val('');
+                    break;
+                case 38: // up
+                    pv.__selectSearchLink(1);
+                    break;
+                case 40: // down
+                    pv.__selectSearchLink(0);
+                    break;
             }
         });
 
@@ -288,7 +296,7 @@ var pv = {
                                         </span>
                                         <br>
                                         <p class="searchResultText">
-                                            ${createSearchResultsText(a.text.value, searchText)}
+                                            ${pv.createSearchResultsText(a.text.value, searchText)}
                                         </p>
                                         </li>`);
                 if ($('#searchresults li').length > 99) {
@@ -620,6 +628,33 @@ var pv = {
                 $('#allConcepts').append(' ...');
             }
         });
+    },
+    __selectSearchLink: function (up, click) {
+        var options = $(".searchLink");
+        if (options.length == 0)
+            return;
+        for (var c = 0; c < options.length; c++) {
+            if ($(options[c]).hasClass("selected"))
+                break;
+        }
+        if (click) {
+            return c >= options.length ? null : $(options[c]);
+        }
+        if (c >= options.length)
+            c = -1;
+        if (up)
+            c = c < 1 ? options.length - 1 : c - 1;
+        else
+            c = c == -1 || c == options.length - 1 ? 0 : c + 1;
+        options.removeClass("active");
+        options.removeClass("selected");
+        if (c >= 0) {
+            var o = $(options[c]);
+            o.addClass("selected");
+            o.addClass("active");
+            var searchInput = $('#searchInput');
+            searchInput.val(o.text().trim());
+        }
     }
 };
 
