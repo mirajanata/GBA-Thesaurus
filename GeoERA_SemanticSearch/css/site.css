@@ -458,45 +458,10 @@ figure {
 
 
 
-.dropdown-item:hover {
-    background-color: #ecf0f1 !important;
-}
-
 @media screen and (min-width: 1000px) {
     #title {
         font-size: 3vw;
     }
-}
-
-#dropdown {
-    background-color: white;
-    min-width: 200px;
-    position: relative;
-    z-index: 999;
-}
-
-    #dropdown a {
-        color: black;
-    }
-
-    #dropdown td {
-        padding: .1rem;
-        padding-left: .75rem;
-    }
-
-.searchLink {
-    color: black;
-    cursor: pointer;
-}
-
-.searchPropTyp {
-    color: #777;
-    font-size: small;
-    font-weight: 700;
-}
-
-.searchResultText {
-    font-size: small;
 }
 
 .keywords,
