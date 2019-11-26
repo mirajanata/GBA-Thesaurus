@@ -18,10 +18,6 @@ a:hover {
     color: red;
 }
 
-.dropdown-item:hover {
-    background-color: #ecf0f1 !important;
-}
-
 .bg-light {
     background-color: #f7f7f7 !important;
 }

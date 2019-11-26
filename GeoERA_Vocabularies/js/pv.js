@@ -182,7 +182,6 @@ var pv = {
                 case 13:
                     pv.openSearchList('search=' + encodeURI($('#searchInput').val()));
                     $('#dropdown').empty();
-                    $('#searchInput').val('');
                     break;
                 case 38: // up
                     pv.__selectSearchLink(1);
@@ -196,13 +195,11 @@ var pv = {
         $('#searchBtn').click(function (e) { //provide search results 
             pv.openSearchList('search=' + encodeURI($('#searchInput').val()));
             $('#dropdown').empty();
-            $('#searchInput').val('');
         });
 
         $('#searchInput').focusout(function () {
             $('#dropdown').delay(300).hide(0, function () {
                 $('#dropdown').empty();
-                $('#searchInput').val('');
             });
         });
 
