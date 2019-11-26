@@ -32,15 +32,23 @@ var pv = {
         pv.loadCSW($('#searchInput').val().split(' '), true, 'And', 1);
         pv.loadCSW($('#searchInput').val().split(' '), false, 'And', 2);
         $('#dropdown').empty();
-        $('#searchInput').val('');
+        //$('#searchInput').val('');
     },
 
     //***********************set the input box for concept search****************************************      
     insertSearchCard: function (widgetID) {
 
         $('#searchInput').keydown(function (e) {
-            if (e.which == 13) {
-                pv.searchTypedText();
+            switch (e.which) {
+                case 13:
+                    pv.searchTypedText();
+                    break;
+                case 38: // up
+                    pv.__selectSearchLink(1);
+                    break;
+                case 40: // down
+                    pv.__selectSearchLink(0);
+                    break;
             }
         });
 
@@ -51,7 +59,7 @@ var pv = {
         $('#searchInput').focusout(function () {
             $('#dropdown').delay(300).hide(0, function () {
                 $('#dropdown').empty();
-                $('#searchInput').val('');
+                //$('#searchInput').val('');
             });
         });
 
@@ -66,7 +74,7 @@ var pv = {
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         $('#dropdown').append(` <tr>
                                                 <td class="searchLink dropdown-item" 
-                                                    onclick="pv.semanticSearch('${value.URIs.value}');">
+                                                    onclick="pv.semanticSearch('${value.URIs.value}','${value.L.value}');">
                                                     ${value.L.value}
                                                 </td>
                                             </tr>`);
@@ -95,9 +103,37 @@ var pv = {
         });
     },
 
-    //************************perform the search for a selected term ************************************         
-    semanticSearch: function (URIs) {
+    __selectSearchLink: function (up, click) {
+        var options = $(".searchLink");
+        if (options.length == 0)
+            return;
+        for (var c = 0; c < options.length; c++) {
+            if ($(options[c]).hasClass("selected"))
+                break;
+        }
+        if (click) {
+            return c >= options.length ? null : $(options[c]);
+        }
+        if (c >= options.length)
+            c = -1;
+        if (up)
+            c = c < 1 ? options.length - 1 : c - 1;
+        else
+            c = c == -1 || c == options.length - 1 ? 0 : c + 1;
+        options.removeClass("active");
+        options.removeClass("selected");
+        if (c >= 0) {
+            var o = $(options[c]);
+            o.addClass("selected");
+            o.addClass("active");
+            var searchInput = $('#searchInput');
+            searchInput.val(o.text().trim());
+        }
+    },
 
+    //************************perform the search for a selected term ************************************         
+    semanticSearch: function (URIs, origLabel) {
+        $('#searchInput').val(origLabel);
         let data = '';
         ws_keywords.json(`PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                     SELECT DISTINCT (MIN(?sort) AS ?rank) ?L
@@ -156,9 +192,7 @@ var pv = {
                 let keywordFilter = ogcFilterKeywordPrefix + searchTerms.join(ogcFilterKeywordSuffix + ogcFilterKeywordPrefix) + ogcFilterKeywordSuffix;
                 cswRequest = encodeURI(`${cswRequest}
                                 <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
-                                    <ogc:${filterLogic}>
                                         ${keywordFilter}
-                                    </ogc:${filterLogic}>
                                 </ogc:Filter>`);
 
             } else { //ogc filter for search texts
@@ -168,9 +202,7 @@ var pv = {
                 let AnyTextFilter = ogcFilterAnyTextPrefix + searchTerms.join(ogcFilterAnyTextSuffix + ogcFilterAnyTextPrefix) + ogcFilterAnyTextSuffix;
                 cswRequest = encodeURI(`${cswRequest}
                                 <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
-                                    <ogc:${filterLogic}>
                                         ${AnyTextFilter}
-                                    </ogc:${filterLogic}>
                                 </ogc:Filter>`);
 
             }

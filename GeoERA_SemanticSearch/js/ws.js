@@ -11,7 +11,7 @@ var ws_micka = {
 };
 
 var ws_keywords = {
-    endpoint: 'http://resource.geolba.ac.at/PoolParty/sparql/keywords',
+    endpoint: ' https://resource.geolba.ac.at/PoolParty/sparql/geoera_keyword',
 
     json: function (query, thenFunc) {
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&format=application/json')
