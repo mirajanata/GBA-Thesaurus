@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>gj2shp</title>
+
+    <link rel="shortcut icon" type="image/png" href="img/favicon.png" />
+    <link rel="apple-touch-icon" href="img/icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="img/icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="img/icon.png" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://blackrockdigital.github.io/startbootstrap-blog-post/css/blog-post.css">
+
+    <link rel="stylesheet" href="css/FontAwesome/all.min.css" />
+    <link rel="stylesheet" href="css/site.css">
+
+    <script src="js/jszip.js"></script>
+    <script src="js/FileSaver.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+
+        });
+
+        function testZip() {
+            var zip = new JSZip();
+            zip.file("Hello.txt", "Hello world\n");
+            var b = new ArrayBuffer(64);
+            var d = new DataView(b);
+            d.setInt32(0,1,true);
+            d.setInt32(4,1,false);
+            d.setFloat64(8,1,true);
+            d.setFloat64(16,1,false);
+            zip.file("Hello.bin", b);
+
+            zip.generateAsync({ type: "blob" }).then(function (blob) { // 1) generate the zip file
+                saveAs(blob, "hello.zip");                          // 2) trigger the download
+            }, function (err) {
+                jQuery("#blob").text(err);
+            });
+        }
+
+        function testCSV_UTF8() {
+            var BOM = "\uFEFF";
+            var csvData = BOM + "1;2;3;4;\"alfa\"\n1;2;3;4;\"alfaěščřžýů\"";
+            var blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
+            saveAs(blob, "myFile.csv");
+        }
+
+        function writePolyLine(item) {
+            /*
+             PolyLine
+             */
+        }
+
+        function processJSONFeature(item) {
+            console.log(item);
+            switch (item.geometry.type) {
+                case "MultiLineString": writePolyLine(item);
+                    break;
+            }
+        }
+
+        function testParseGeoJSON() {
+
+            $.ajax({
+                url: "data/Mattersburg Fault_Geo.json",
+                success: function (data) {
+                    data.features.forEach(function (item, index) {
+                        processJSONFeature(item);
+                    }
+                    );
+                },
+                error: function (req, status) {
+                    alert("error " + status);
+                }
+            });
+
+
+        }
+
+    </script>
+</head>
+<body>
+
+    <button id="btnTestZip" class="btn btn-primary" onclick="testZip();">Test ZIP</button>
+    <button id="testCSV_UTF8" class="btn btn-primary" onclick="testCSV_UTF8();">Test csv/utf8</button>
+    <button id="testParseGeoJSON" class="btn btn-primary" onclick="testParseGeoJSON();">Test parse GeoJSON</button>
+
+</body>
+
+</html>
