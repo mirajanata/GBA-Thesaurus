@@ -21,6 +21,7 @@
 
     <script src="js/jszip.js"></script>
     <script src="js/FileSaver.js"></script>
+    <script src="js/GeoJSON_Shapefile.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
@@ -36,10 +37,10 @@
             zip.file("Hello.txt", "Hello world\n");
             var b = new ArrayBuffer(64);
             var d = new DataView(b);
-            d.setInt32(0,1,true);
-            d.setInt32(4,1,false);
-            d.setFloat64(8,1,true);
-            d.setFloat64(16,1,false);
+            d.setInt32(0, 1, true);
+            d.setInt32(4, 1, false);
+            d.setFloat64(8, 1, true);
+            d.setFloat64(16, 1, false);
             zip.file("Hello.bin", b);
 
             zip.generateAsync({ type: "blob" }).then(function (blob) { // 1) generate the zip file
@@ -47,6 +48,46 @@
             }, function (err) {
                 jQuery("#blob").text(err);
             });
+        }
+
+        function toUTF8Array(str) {
+            var utf8 = [];
+            for (var i = 0; i < str.length; i++) {
+                var charcode = str.charCodeAt(i);
+                if (charcode < 0x80) utf8.push(charcode);
+                else if (charcode < 0x800) {
+                    utf8.push(0xc0 | (charcode >> 6),
+                        0x80 | (charcode & 0x3f));
+                }
+                else if (charcode < 0xd800 || charcode >= 0xe000) {
+                    utf8.push(0xe0 | (charcode >> 12),
+                        0x80 | ((charcode >> 6) & 0x3f),
+                        0x80 | (charcode & 0x3f));
+                }
+                // surrogate pair
+                else {
+                    i++;
+                    // UTF-16 encodes 0x10000-0x10FFFF by
+                    // subtracting 0x10000 and splitting the
+                    // 20 bits of 0x0-0xFFFFF into two halves
+                    charcode = 0x10000 + (((charcode & 0x3ff) << 10)
+                        | (str.charCodeAt(i) & 0x3ff));
+                    utf8.push(0xf0 | (charcode >> 18),
+                        0x80 | ((charcode >> 12) & 0x3f),
+                        0x80 | ((charcode >> 6) & 0x3f),
+                        0x80 | (charcode & 0x3f));
+                }
+            }
+            return utf8;
+        }
+
+        function testDBFValue(str) {
+            var utf8 = unescape(encodeURIComponent(str));
+
+            var arr = [];
+            for (var i = 0; i < utf8.length; i++) {
+                arr.push(utf8.charCodeAt(i));
+            }
         }
 
         function testCSV_UTF8() {
