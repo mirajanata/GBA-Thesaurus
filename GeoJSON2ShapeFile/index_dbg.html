@@ -116,7 +116,7 @@
             $.ajax({
                 url: "data/Mattersburg Fault_Geo.json",
                 success: function (data) {
-                    gjsEsri.transform(data);
+                    gjsEsri.transformAndDownload(data);
                 },
                 error: function (req, status) {
                     alert("error " + status);

@@ -1,8 +1,18 @@
 ﻿"use strict"
-
+/**
+ * The singleton gjsEsri provides public transform() method for conversion of GeoJSON to zipped shapefile(s).
+ * The shapefile can contain only the records of same type of geometry, so the transform() method generates standalon shapefile
+ * 
+ * Usage: gjsEsri.transformAndDownload(parsedGeoJSONObject, "zippedShapeFile.zip");
+ * 
+ * */
 var gjsEsri = {
 
-    transform: function (jsonObject, resultZipFile) {
+    /**
+     * @param {any} jsonObject - input GeoJSON object
+     * @param {any} resultZipFile - desired filename of output zip file
+     */
+    transformAndDownload: function (jsonObject, resultZipFile) {
         this.files = [];
         this.files["Point"] = new PointFileGen();
         this.files["LineString"] = new LineStringFileGen();
@@ -12,7 +22,7 @@ var gjsEsri = {
         this.files["MultiPolygon"] = new MultiPolygonFileGen();
 
         jsonObject.features.forEach(function (item, index) {
-            gjsEsri.files[item.geometry.type].process(item);
+            this.files[item.geometry.type].process(item);
         }, this);
 
         var zip = new JSZip();
@@ -34,6 +44,9 @@ var gjsEsri = {
             jQuery("#blob").text(err);
         });
     },
+    /**
+     * Low level record writer - bounding box
+     */
     _recWriteBox: function (rec, shpView, offset) {
         var ofs = 8 + offset;
         shpView.setFloat64(4 + ofs, rec.X1, true);
@@ -41,6 +54,9 @@ var gjsEsri = {
         shpView.setFloat64(20 + ofs, rec.X2, true);
         shpView.setFloat64(28 + ofs, rec.Y2, true);
     },
+    /**
+     * Low level record writers - record length calculators
+     */
     _recGetPointContentLength(rec) {
         return 20;
     },
@@ -50,6 +66,9 @@ var gjsEsri = {
     _recGetPolygonContentLength(rec) {
         return 44 + (4 * rec.partCount) + (8 * rec.points.length);
     },
+    /**
+     * Low level record writers - geometries
+     */
     _recWritePointGeometry(rec, shpView, offset, id) {
         if (rec.points.length == 0)
             return;
@@ -102,6 +121,10 @@ var gjsEsri = {
     }
 };
 
+/**
+ * Shapefile generator base class
+ * 
+ * */
 class ESRIFileGen {
     constructor(geometry, shape) {
         this.geometry = geometry;
@@ -183,8 +206,6 @@ class ESRIFileGen {
 
         this._writeHeader(this.shxView, size);
     }
-
-
     _writeHeader(dataView, size) {
         dataView.setInt32(0, 9994, false); //big
         dataView.setInt32(24, size / 2, false); //filesize - big
@@ -197,6 +218,10 @@ class ESRIFileGen {
     }
 }
 
+/**
+ * Shapefile record class
+ *
+ * */
 class ShapeRecord {
     constructor(fileGen) {
         this.fileGen = fileGen;
@@ -218,6 +243,11 @@ class ShapeRecord {
         if (this.Y2 > Y) this.Y2 = Y;
     }
 }
+
+/**
+ * Shapefile generators implementing all GeoJSON geometries
+ *
+ * */
 
 class PointFileGen extends ESRIFileGen {
     constructor() {
