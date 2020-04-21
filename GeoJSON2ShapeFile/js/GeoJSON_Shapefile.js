@@ -122,6 +122,83 @@ var gjsEsri = {
 };
 
 /**
+ * Shapefile record class
+ *
+ * */
+class ShapeRecord {
+    constructor(fileGen, item) {
+        this.fileGen = fileGen;
+        this.points = [];
+        this.partIndices = [];
+        this.partCount = 0;
+
+        this.X1 = 9999;
+        this.X2 = -9999;
+        this.Y1 = -9999;
+        this.Y2 = 9999;
+
+        fileGen.records.push(this);
+
+        this.properties = [];
+        if (item.properties) {
+            for (var pname in item.properties) {
+                fileGen.propertyNames[pname] = pname;
+                var val = this.toUTF8Array(item.properties[pname]);
+                this.properties[pname] = val;
+                var len = val ? val.length : 0;
+                if (len > 250)
+                    fileGen.useCSV = true;
+                if (!fileGen.propertyLengths[pname] || fileGen.propertyLengths[pname] < len)
+                    fileGen.propertyLengths[pname] = len;
+            }
+        }
+    }
+    checkBounds(X, Y) {
+        if (this.X1 > X) this.X1 = X;
+        if (this.X2 < X) this.X2 = X;
+        if (this.Y1 < Y) this.Y1 = Y;
+        if (this.Y2 > Y) this.Y2 = Y;
+    }
+    toUTF8Array(str) {
+        if (!str) return null;
+        switch (typeof str) {
+            case "number": return str.toString();
+            case "boolean": return str ? "1" : "0";
+            case "object": return str.toString();
+        }
+        var utf8 = [];
+        for (var i = 0; i < str.length; i++) {
+            var charcode = str.charCodeAt(i);
+            if (charcode < 0x80) utf8.push(charcode);
+            else if (charcode < 0x800) {
+                utf8.push(0xc0 | (charcode >> 6),
+                    0x80 | (charcode & 0x3f));
+            }
+            else if (charcode < 0xd800 || charcode >= 0xe000) {
+                utf8.push(0xe0 | (charcode >> 12),
+                    0x80 | ((charcode >> 6) & 0x3f),
+                    0x80 | (charcode & 0x3f));
+            }
+            // surrogate pair
+            else {
+                i++;
+                // UTF-16 encodes 0x10000-0x10FFFF by
+                // subtracting 0x10000 and splitting the
+                // 20 bits of 0x0-0xFFFFF into two halves
+                charcode = 0x10000 + (((charcode & 0x3ff) << 10)
+                    | (str.charCodeAt(i) & 0x3ff));
+                utf8.push(0xf0 | (charcode >> 18),
+                    0x80 | ((charcode >> 12) & 0x3f),
+                    0x80 | ((charcode >> 6) & 0x3f),
+                    0x80 | (charcode & 0x3f));
+            }
+        }
+        return utf8;
+    }
+}
+
+
+/**
  * Shapefile generator base class
  * 
  * */
@@ -135,6 +212,10 @@ class ESRIFileGen {
         this.X2 = -9999;
         this.Y1 = -9999;
         this.Y2 = 9999;
+
+        this.propertyNames = [];
+        this.propertyLengths = [];
+        this.useCSV = false;
     }
     checkBounds(X, Y) {
         if (this.X1 > X) this.X1 = X;
@@ -182,7 +263,7 @@ class ESRIFileGen {
             id++;
         }, this);
 
-        this._writeHeader(this.shpView, size);
+        this._writeShpxHeader(this.shpView, size);
     }
     writeShx() {
         if (this.records.length == 0)
@@ -204,9 +285,9 @@ class ESRIFileGen {
             id++;
         }, this);
 
-        this._writeHeader(this.shxView, size);
+        this._writeShpxHeader(this.shxView, size);
     }
-    _writeHeader(dataView, size) {
+    _writeShpxHeader(dataView, size) {
         dataView.setInt32(0, 9994, false); //big
         dataView.setInt32(24, size / 2, false); //filesize - big
         dataView.setInt32(28, 1000, true); //little
@@ -216,31 +297,12 @@ class ESRIFileGen {
         dataView.setFloat64(52, this.X2, true);
         dataView.setFloat64(60, this.Y1, true);
     }
-}
 
-/**
- * Shapefile record class
- *
- * */
-class ShapeRecord {
-    constructor(fileGen) {
-        this.fileGen = fileGen;
-        this.points = [];
-        this.partIndices = [];
-        this.partCount = 0;
+    _writeDBF() {
 
-        this.X1 = 9999;
-        this.X2 = -9999;
-        this.Y1 = -9999;
-        this.Y2 = 9999;
-
-        fileGen.records.push(this);
     }
-    checkBounds(X, Y) {
-        if (this.X1 > X) this.X1 = X;
-        if (this.X2 < X) this.X2 = X;
-        if (this.Y1 < Y) this.Y1 = Y;
-        if (this.Y2 > Y) this.Y2 = Y;
+    _writeCSV() {
+
     }
 }
 
@@ -260,7 +322,7 @@ class PointFileGen extends ESRIFileGen {
         var g = item.geometry.coordinates;
 
         this.checkBounds(item[0], item[1]);
-        var rec = new ShapeRecord(this);
+        var rec = new ShapeRecord(this, item);
         rec.checkBounds(item[0], item[1]);
         rec.points.push(g[0], g[1]);
     }
@@ -273,7 +335,7 @@ class LineStringFileGen extends ESRIFileGen {
     }
     process(item) {
         var g = item.geometry.coordinates;
-        var rec = new ShapeRecord(this);
+        var rec = new ShapeRecord(this, item);
         rec.partIndices[rec.partCount++] = rec.points.length / 2;
         g.forEach(function (item, index) {
             rec.checkBounds(item[0], item[1]);
@@ -289,7 +351,7 @@ class PolygonFileGen extends ESRIFileGen {
     }
     process(item) {
         var g = item.geometry.coordinates;
-        var rec = new ShapeRecord(this);
+        var rec = new ShapeRecord(this, item);
         g.forEach(function (pg, index) {
             rec.partIndices[rec.partCount++] = rec.points.length / 2;
             pg.forEach(function (item, index) {
@@ -307,7 +369,7 @@ class MultiPointFileGen extends ESRIFileGen {
     }
     process(item) {
         var g = item.geometry.coordinates;
-        var rec = new ShapeRecord(this);
+        var rec = new ShapeRecord(this, item);
         g.forEach(function (item, index) {
             rec.checkBounds(item[0], item[1]);
             rec.points.push(item[0], item[1]);
@@ -322,7 +384,7 @@ class MultiLineStringFileGen extends ESRIFileGen {
     }
     process(item) {
         var g = item.geometry.coordinates;
-        var rec = new ShapeRecord(this);
+        var rec = new ShapeRecord(this, item);
         g.forEach(function (ls, index) {
             rec.partIndices[rec.partCount++] = rec.points.length / 2;
             ls.forEach(function (item, index) {
@@ -340,7 +402,7 @@ class MultiPolygonFileGen extends ESRIFileGen {
     }
     process(item) {
         var g = item.geometry.coordinates;
-        var rec = new ShapeRecord(this);
+        var rec = new ShapeRecord(this, item);
         g.forEach(function (mpg, index) {
             mpg.forEach(function (pg, index) {
                 rec.partIndices[rec.partCount++] = rec.points.length / 2;
