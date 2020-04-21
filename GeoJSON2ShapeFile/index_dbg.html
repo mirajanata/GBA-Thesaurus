@@ -111,15 +111,12 @@
             }
         }
 
-        function testParseGeoJSON() {
+        function testTransformGeoJSON() {
 
             $.ajax({
                 url: "data/Mattersburg Fault_Geo.json",
                 success: function (data) {
-                    data.features.forEach(function (item, index) {
-                        processJSONFeature(item);
-                    }
-                    );
+                    gjsEsri.transform(data);
                 },
                 error: function (req, status) {
                     alert("error " + status);
@@ -135,7 +132,7 @@
 
     <button id="btnTestZip" class="btn btn-primary" onclick="testZip();">Test ZIP</button>
     <button id="testCSV_UTF8" class="btn btn-primary" onclick="testCSV_UTF8();">Test csv/utf8</button>
-    <button id="testParseGeoJSON" class="btn btn-primary" onclick="testParseGeoJSON();">Test parse GeoJSON</button>
+    <button id="testParseGeoJSON" class="btn btn-primary" onclick="testTransformGeoJSON();">Test transform GeoJSON</button>
 
 </body>
 
