@@ -301,17 +301,17 @@ class ESRIFileGen {
     _writeDBF() {
         var headerSize = 32;
         var fieldCount = 1;
-        var fidLen = 0x0b;
+        var flen = 0x0b;
         var recordBytes = fidLen;
         var h = [3, 120, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var f = [46, 49, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0x4e, 0, 0, 0, 0, fidLen, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var f = [46, 49, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0x4e, 0, 0, 0, 0, flen, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         h = h.concat(f);
 
         this.propertyNames.forEach(function (item, index) {
-            var n = Array.from(item);
-            var flen = this.propertyLengths[index];
+            flen = this.propertyLengths[index];
             f = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x43, 0, 0, 0, 0, flen, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var n = Array.from(item);
             for (var i = 0; i < n.length; i++)
                 f[i] = n[i];
             fieldCount++;
