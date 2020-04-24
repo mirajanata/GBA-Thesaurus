@@ -33,6 +33,8 @@ var gjsEsri = {
                 zip.file(f.getShpName(), f.shp);
                 f.writeShx();
                 zip.file(f.getShxName(), f.shx);
+                f.writeDbf();
+                zip.file(f.getDbfName(), f.shx);
             }
         }
 
@@ -195,6 +197,24 @@ class ShapeRecord {
         }
         return utf8;
     }
+    getDBFRecordArray(id, idLen, recordBytes) {
+        var rec = new Array(1/*delMarker*/ + recordBytes).fill(32);
+        var val = Array.from(id.toString());
+        // write fid
+        for (var d = idLen, s = val.length - 1; s >= 0; d-- , s--)
+            rec[d] = val[s];
+        this.fileGen.propertyNames.forEach(function (name, index) {
+            flen = this.fileGen.propertyLengths[index];
+            f = new Array(flen).fill(32);
+            val = this.properties[name];
+            if (val) {
+                var n = Array.from(val);
+                for (var i = 0; i < n.length; i++)
+                    f[i] = n[i];
+            }
+            rec = rec.concat(f);
+        }, this);
+    }
 }
 
 
@@ -233,6 +253,9 @@ class ESRIFileGen {
     }
     getShxName() {
         return this.geometry + ".shx";
+    }
+    getDbfName() {
+        return this.geometry + ".dbf";
     }
     getShxSize() {
         var s = 100 + (8 * this.records.length);
@@ -298,10 +321,11 @@ class ESRIFileGen {
         dataView.setFloat64(60, this.Y1, true);
     }
 
-    _writeDBF() {
+    writeDbf() {
         var headerSize = 32;
         var fieldCount = 1;
-        var flen = 0x0b;
+        var idLen = 0x0b;
+        var flen = idLen;
         var recordBytes = fidLen;
         var h = [3, 120, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         var f = [46, 49, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0x4e, 0, 0, 0, 0, flen, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -320,27 +344,25 @@ class ESRIFileGen {
         }, this);
 
         headerSize += 32 * fieldCount + 1/*fieldTerm*/;
-        var size = headerSize + ((1/*delMarker*/+recordBytes) * this.records.length);
+        var size = headerSize + ((1/*delMarker*/ + recordBytes) * this.records.length);
 
-        var dbf = new ArrayBuffer(size);
-        var array = new Uint8Array(dbf);
+        this.dbf = new ArrayBuffer(size);
+        var array = new Uint8Array(this.dbf);
 
 
-        array.set(h, 0); //little
-        var dataView = new DataView(dbf);
+        array.set(h, 0);
+        var dataView = new DataView(this.dbf);
         dataView.setUint32(4, this.records.length);
         dataView.setUint16(8, headerSize);
         dataView.setUint16(10, recordBytes);
 
         var offset = headerSize;
         var id = 1;
-        this.records.forEach(function (item, index) {
-            f = new Array(1+recordBytes).fill(0);
-            for (var i = fidLen-1; i < n.length; i++)
-                f[i] = n[i];
-            fieldCount++;
-            recordBytes += flen;
-            h = h.concat(f);
+        this.records.forEach(function (record, index) {
+            var rec = record.getDBFRecordArray(id, idLen, recordBytes);
+            array.set(rec, offset);
+            offset += 1/*delMarker*/ + recordBytes;
+
             id++;
         }, this);
     }
