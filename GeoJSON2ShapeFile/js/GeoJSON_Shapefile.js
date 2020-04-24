@@ -34,7 +34,15 @@ var gjsEsri = {
                 f.writeShx();
                 zip.file(f.getShxName(), f.shx);
                 f.writeDbf();
-                zip.file(f.getDbfName(), f.shx);
+                zip.file(f.getDbfName(), f.dbf);
+                zip.file(f.getCpgName(), "UTF-8");
+                if (f.useCSV) {
+                    f.writeCsv();
+                    zip.file(f.getCsvName(), f.csv);
+                }
+
+                if (jsonObject.crs && jsonObject.crs.properties && jsonObject.crs.properties.name)
+                    zip.file(f.getPrjName(), jsonObject.crs.properties.name);
             }
         }
 
@@ -139,17 +147,24 @@ class ShapeRecord {
         this.Y1 = -9999;
         this.Y2 = 9999;
 
+        fileGen.useCSV = false;
         fileGen.records.push(this);
 
         this.properties = [];
+        this.propertiesOrig = [];
         if (item.properties) {
             for (var pname in item.properties) {
                 fileGen.propertyNames[pname] = pname;
-                var val = this.toUTF8Array(item.properties[pname]);
-                this.properties[pname] = val;
+                var orig = item.properties[pname];
+                var val = this.toUTF8Array(orig);
                 var len = val ? val.length : 0;
-                if (len > 250)
+                if (len > 250) {
                     fileGen.useCSV = true;
+                    len = 250;
+                    val = val.slice(0, 250);
+                }
+                this.properties[pname] = val;
+                this.propertiesOrig[pname] = orig;
                 if (!fileGen.propertyLengths[pname] || fileGen.propertyLengths[pname] < len)
                     fileGen.propertyLengths[pname] = len;
             }
@@ -161,13 +176,30 @@ class ShapeRecord {
         if (this.Y1 < Y) this.Y1 = Y;
         if (this.Y2 > Y) this.Y2 = Y;
     }
-    toUTF8Array(str) {
+    toStr(str) {
         if (!str) return null;
         switch (typeof str) {
-            case "number": return str.toString();
-            case "boolean": return str ? "1" : "0";
-            case "object": return str.toString();
+            case "number": str = str.toString();
+                break;
+            case "boolean": str = str ? "1" : "0";
+                break;
+            case "object": str = str.toString();
+                break;
         }
+        return str;
+    }
+    toArray(str) {
+        if (!str) return null;
+        str = this.toStr(str);
+        var res = [];
+        for (var i = 0; i < str.length; i++)
+            res[i] = str.charCodeAt(i);
+        return res;
+    }
+    
+    toUTF8Array(str) {
+        if (!str) return null;
+        str = this.toStr(str);
         var utf8 = [];
         for (var i = 0; i < str.length; i++) {
             var charcode = str.charCodeAt(i);
@@ -197,23 +229,36 @@ class ShapeRecord {
         }
         return utf8;
     }
-    getDBFRecordArray(id, idLen, recordBytes) {
-        var rec = new Array(1/*delMarker*/ + recordBytes).fill(32);
-        var val = Array.from(id.toString());
+    getDbfRecordArray(id, idLen) {
+        var rec = new Array(1/*delMarker*/ + idLen).fill(32);
+        var val = this.toArray(id);
         // write fid
         for (var d = idLen, s = val.length - 1; s >= 0; d-- , s--)
             rec[d] = val[s];
-        this.fileGen.propertyNames.forEach(function (name, index) {
-            flen = this.fileGen.propertyLengths[index];
-            f = new Array(flen).fill(32);
-            val = this.properties[name];
+
+        for (var item in this.fileGen.propertyNames) {
+            var flen = this.fileGen.propertyLengths[item];
+            var f = new Array(flen).fill(32);
+            val = this.properties[item];
             if (val) {
-                var n = Array.from(val);
-                for (var i = 0; i < n.length; i++)
-                    f[i] = n[i];
+                for (var i = 0; i < val.length; i++)
+                    f[i] = val[i];
             }
             rec = rec.concat(f);
-        }, this);
+        };
+        return rec;
+    }
+    getCsvRecordString(id) {
+        var rec = id.toString();
+
+        for (var item in this.fileGen.propertyNames) {
+            var val = this.toStr(this.propertiesOrig[item]);
+            if (val) {
+                rec += ";\"" + val.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+            }
+            else rec += ";";
+        };
+        return rec;
     }
 }
 
@@ -256,6 +301,15 @@ class ESRIFileGen {
     }
     getDbfName() {
         return this.geometry + ".dbf";
+    }
+    getCpgName() {
+        return this.geometry + ".cpg";
+    }
+    getCsvName() {
+        return this.geometry + ".csv";
+    }
+    getPrjName() {
+        return this.geometry + ".prj";
     }
     getShxSize() {
         var s = 100 + (8 * this.records.length);
@@ -326,24 +380,23 @@ class ESRIFileGen {
         var fieldCount = 1;
         var idLen = 0x0b;
         var flen = idLen;
-        var recordBytes = fidLen;
+        var recordBytes = flen;
         var h = [3, 120, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        var f = [46, 49, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0x4e, 0, 0, 0, 0, flen, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
+        var f = [0x46, 0x49, 0x44, 0, 0, 0, 0, 0, 0, 0, 0, 0x4e, 0, 0, 0, 0, flen, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         h = h.concat(f);
 
-        this.propertyNames.forEach(function (item, index) {
-            flen = this.propertyLengths[index];
+        for (var item in this.propertyNames) {
+            flen = this.propertyLengths[item];
             f = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x43, 0, 0, 0, 0, flen, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-            var n = Array.from(item);
-            for (var i = 0; i < n.length; i++)
-                f[i] = n[i];
+            for (var i = 0; i < item.length; i++)
+                f[i] = item.charCodeAt(i);
             fieldCount++;
             recordBytes += flen;
             h = h.concat(f);
-        }, this);
+        };
 
         headerSize += 32 * fieldCount + 1/*fieldTerm*/;
+        h[headerSize - 1] = 13;/*fieldTerm*/
         var size = headerSize + ((1/*delMarker*/ + recordBytes) * this.records.length);
 
         this.dbf = new ArrayBuffer(size);
@@ -352,22 +405,44 @@ class ESRIFileGen {
 
         array.set(h, 0);
         var dataView = new DataView(this.dbf);
-        dataView.setUint32(4, this.records.length);
-        dataView.setUint16(8, headerSize);
-        dataView.setUint16(10, recordBytes);
+        dataView.setUint32(4, this.records.length, true);
+        dataView.setUint16(8, headerSize, true);
+        dataView.setUint16(10, recordBytes, true);
 
         var offset = headerSize;
         var id = 1;
         this.records.forEach(function (record, index) {
-            var rec = record.getDBFRecordArray(id, idLen, recordBytes);
+            var rec = record.getDbfRecordArray(id, idLen);
             array.set(rec, offset);
-            offset += 1/*delMarker*/ + recordBytes;
+            offset += (1/*delMarker*/ + recordBytes);
 
             id++;
         }, this);
     }
-    _writeCSV() {
+    writeCsv() {
+        //headers
+        //var BOM = "\uFEFF";
+        var res = "FID";
+        var fieldCount = 1;
+        for (var item in this.propertyNames) {
+            res += ";" + item;
+            fieldCount++;
+        };
 
+        var id = 1;
+        var lastRec = null;
+        this.records.forEach(function (record, index) {
+            lastRec = record;
+            var rec = record.getCsvRecordString(id);
+
+            res += "\n" + rec;
+
+            id++;
+        }, this);
+
+        if (lastRec != null)
+            this.csv = [0xef, 0xbb, 0xbf].concat(lastRec.toUTF8Array(res));
+            //this.csv = [0xef, 0xbb, 0xbf].concat(lastRec.toUTF8Array(res));
     }
 }
 
