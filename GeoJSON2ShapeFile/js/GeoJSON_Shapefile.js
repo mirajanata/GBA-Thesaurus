@@ -1,8 +1,8 @@
 ﻿"use strict"
 /**
  * The singleton gjsEsri provides public transform() method for conversion of GeoJSON to zipped shapefile(s).
- * The shapefile can contain only the records of same type of geometry, so the transform() method generates standalon shapefile
- * 
+ * Because the shapefile can contain only the records of same type of geometry the transform() method generates standalone shapefile set (shp, shx, dbf, cpg, prj, csv)
+ * for each distinct geometry type.
  * Usage: gjsEsri.transformAndDownload(parsedGeoJSONObject, "zippedShapeFile.zip");
  * 
  * */
@@ -49,7 +49,7 @@ var gjsEsri = {
         if (!resultZipFile)
             resultZipFile = "result.zip";
         zip.generateAsync({ type: "blob" }).then(function (blob) { // 1) generate the zip file
-            saveAs(blob, resultZipFile);                          // 2) trigger the download
+            saveAs(blob, resultZipFile);                           // 2) trigger the download
         }, function (err) {
             jQuery("#blob").text(err);
         });
@@ -449,8 +449,7 @@ class ESRIFileGen {
 /**
  * Shapefile generators implementing all GeoJSON geometries
  *
- * */
-
+ */
 class PointFileGen extends ESRIFileGen {
     constructor() {
         super("Point", 1);
