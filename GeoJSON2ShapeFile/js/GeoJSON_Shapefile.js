@@ -156,7 +156,7 @@ class ShapeRecord {
             for (var pname in item.properties) {
                 fileGen.propertyNames[pname] = pname;
                 var orig = item.properties[pname];
-                var val = this.toUTF8Array(orig);
+                var val = ShapeRecord.toUTF8Array(orig);
                 var len = val ? val.length : 0;
                 if (len > 250) {
                     fileGen.useCSV = true;
@@ -176,7 +176,7 @@ class ShapeRecord {
         if (this.Y1 < Y) this.Y1 = Y;
         if (this.Y2 > Y) this.Y2 = Y;
     }
-    toStr(str) {
+    static toStr(str) {
         if (!str) return null;
         switch (typeof str) {
             case "number": str = str.toString();
@@ -188,18 +188,18 @@ class ShapeRecord {
         }
         return str;
     }
-    toArray(str) {
+    static toArray(str) {
         if (!str) return null;
-        str = this.toStr(str);
+        str = ShapeRecord.toStr(str);
         var res = [];
         for (var i = 0; i < str.length; i++)
             res[i] = str.charCodeAt(i);
         return res;
     }
-    
-    toUTF8Array(str) {
+
+    static toUTF8Array(str) {
         if (!str) return null;
-        str = this.toStr(str);
+        str = ShapeRecord.toStr(str);
         var utf8 = [];
         for (var i = 0; i < str.length; i++) {
             var charcode = str.charCodeAt(i);
@@ -231,7 +231,7 @@ class ShapeRecord {
     }
     getDbfRecordArray(id, idLen) {
         var rec = new Array(1/*delMarker*/ + idLen).fill(32);
-        var val = this.toArray(id);
+        var val = ShapeRecord.toArray(id);
         // write fid
         for (var d = idLen, s = val.length - 1; s >= 0; d-- , s--)
             rec[d] = val[s];
@@ -252,7 +252,7 @@ class ShapeRecord {
         var rec = id.toString();
 
         for (var item in this.fileGen.propertyNames) {
-            var val = this.toStr(this.propertiesOrig[item]);
+            var val = ShapeRecord.toStr(this.propertiesOrig[item]);
             if (val) {
                 rec += ";\"" + val.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
             }
@@ -407,7 +407,7 @@ class ESRIFileGen {
         var dataView = new DataView(this.dbf);
         dataView.setUint32(4, this.records.length, true);
         dataView.setUint16(8, headerSize, true);
-        dataView.setUint16(10, recordBytes, true);
+        dataView.setUint16(10, recordBytes+1, true);
 
         var offset = headerSize;
         var id = 1;
@@ -426,17 +426,14 @@ class ESRIFileGen {
         };
 
         var id = 1;
-        var lastRec = null;
         this.records.forEach(function (record, index) {
-            lastRec = record;
             var rec = record.getCsvRecordString(id);
             res += "\n" + rec;
 
             id++;
         }, this);
 
-        if (lastRec != null)
-            this.csv = [0xef, 0xbb, 0xbf].concat(lastRec.toUTF8Array(res));
+        this.csv = [0xef, 0xbb, 0xbf].concat(ShapeRecord.toUTF8Array(res));
     }
 }
 
