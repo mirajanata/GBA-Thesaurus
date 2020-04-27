@@ -243,6 +243,39 @@
         "def": "The Mattersburg fault ěščřžýáíéüß consists of two NW-SE striking and steeply NE-dipping subfaults that extend from Wiener Neustadt via Mattersburg to the Austrian-Hungarian border. Based on the Molasse subsurface map, it has a normal fault character with an offset of up to 1000 m. (Wessely et al., 1993)",
         "alt": "0"
       }
+    },
+    {
+      "type": "Feature",
+      "id": 153,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [ 16.269122169277237, 47.806748244807714 ]
+      },
+      "properties": {
+        "OBJECTID": 152,
+        "THESURL": "http://resource.geolba.ac.at/structure/81",
+        "label": "Point",
+        "def": "The Point",
+        "alt": "0"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 151,
+      "geometry": {
+        "type": "MultiPoint",
+        "coordinates": [
+        [ 16.249122169277237, 47.806748244807714 ],
+        [ 16.259122169277237, 47.806748244807714 ]
+        ]
+      },
+      "properties": {
+        "OBJECTID": 152,
+        "THESURL": "http://resource.geolba.ac.at/structure/81",
+        "label": "MultiPoint",
+        "def": "The MultiPoint",
+        "alt": "0"
+      }
     }
   ]
 }

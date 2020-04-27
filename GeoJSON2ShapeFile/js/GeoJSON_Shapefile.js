@@ -112,7 +112,7 @@ var gjsEsri = {
         for (var i = 0; i < pc; i++)
             shpView.setFloat64(ofs + (8 * i), rec.points[i], true);
     },
-    _writeMultiPointGeometry(rec, shpView, offset) {
+    _recWriteMultiPointGeometry(rec, shpView, offset, id) {
         var pc = rec.points.length;
         if (pc == 0)
             return;
@@ -420,13 +420,9 @@ class ESRIFileGen {
         }, this);
     }
     writeCsv() {
-        //headers
-        //var BOM = "\uFEFF";
         var res = "FID";
-        var fieldCount = 1;
         for (var item in this.propertyNames) {
             res += ";" + item;
-            fieldCount++;
         };
 
         var id = 1;
@@ -434,7 +430,6 @@ class ESRIFileGen {
         this.records.forEach(function (record, index) {
             lastRec = record;
             var rec = record.getCsvRecordString(id);
-
             res += "\n" + rec;
 
             id++;
@@ -442,7 +437,6 @@ class ESRIFileGen {
 
         if (lastRec != null)
             this.csv = [0xef, 0xbb, 0xbf].concat(lastRec.toUTF8Array(res));
-            //this.csv = [0xef, 0xbb, 0xbf].concat(lastRec.toUTF8Array(res));
     }
 }
 
