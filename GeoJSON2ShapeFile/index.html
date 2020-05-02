@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>GeoJSON to ESRI shapefile convertor</title>
+
+    <link rel="shortcut icon" type="image/png" href="img/favicon.png" />
+    <link rel="apple-touch-icon" href="img/icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="img/icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="img/icon.png" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://blackrockdigital.github.io/startbootstrap-blog-post/css/blog-post.css">
+
+    <link rel="stylesheet" href="css/FontAwesome/all.min.css" />
+    <link rel="stylesheet" href="css/site.css">
+
+    <script src="js/jszip.js"></script>
+    <script src="js/GeoJSON_Shapefile.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            margin: 20px;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+
+
+        });
+
+        function testTransformGeoJSON1() {
+
+            $.ajax({
+                url: "data/Mattersburg Fault_Geo.json",
+                success: function (data) {
+                    gjsEsri.transformAndDownload(data);
+                },
+                error: function (req, status) {
+                    alert("error " + status);
+                }
+            });
+
+
+        }
+
+    </script>
+</head>
+<body>
+    <h1>GeoJSON to ESRI shapefile convertor</h1>
+    <hr />
+    <button style="width:350px;" class="btn btn-success" onclick="testTransformGeoJSON1();">Convert [Mattersburg Fault_Geo.json]</button>
+
+    <a style="margin-left:50px;" href="data/Mattersburg Fault_Geo.json" target="_blank">Download [Mattersburg Fault_Geo.json]</a>
+
+</body>
+
+</html>

@@ -49,15 +49,34 @@ var gjsEsri = {
         if (!resultZipFile)
             resultZipFile = "result.zip";
         zip.generateAsync({ type: "blob" }).then(function (blob) { // 1) generate the zip file
-            saveAs(blob, resultZipFile);                           // 2) trigger the download
+            gjsEsri._downloadBlob(blob, resultZipFile);                           // 2) trigger the download
         }, function (err) {
             jQuery("#blob").text(err);
         });
     },
+    _downloadBlob: function (blob, resultZipFile) {
+        if (window.navigator && window.navigator.msSaveBlob)
+            window.navigator.msSaveBlob(blob, resultZipFile);
+        else {
+            var a = document.createElement("a");
+            a.style = "display: none";
+            document.body.appendChild(a);
+            //Create a DOMString representing the blob
+            //and point the link element towards it
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = resultZipFile;
+            a.target = "_blank";
+            //programatically click the link to trigger the download
+            a.click();
+            //release the reference to the file by revoking the Object URL
+            window.URL.revokeObjectURL(url);
+        }
+    },
     /**
      * Low level record writer - bounding box
      */
-    _recWriteBox: function (rec, shpView, offset) {
+    _recWriteBox: function(rec, shpView, offset) {
         var ofs = 8 + offset;
         shpView.setFloat64(4 + ofs, rec.X1, true);
         shpView.setFloat64(12 + ofs, rec.Y1, true);
@@ -67,19 +86,19 @@ var gjsEsri = {
     /**
      * Low level record writers - record length calculators
      */
-    _recGetPointContentLength(rec) {
+    _recGetPointContentLength: function(rec) {
         return 20;
     },
-    _recGetMultiPointContentLength(rec) {
+    _recGetMultiPointContentLength: function(rec) {
         return 40 + (8 * rec.points.length);
     },
-    _recGetPolygonContentLength(rec) {
+    _recGetPolygonContentLength: function(rec) {
         return 44 + (4 * rec.partCount) + (8 * rec.points.length);
     },
     /**
      * Low level record writers - geometries
      */
-    _recWritePointGeometry(rec, shpView, offset, id) {
+    _recWritePointGeometry: function(rec, shpView, offset, id) {
         if (rec.points.length == 0)
             return;
         // record header
@@ -91,7 +110,7 @@ var gjsEsri = {
         shpView.setFloat64(4 + ofs, rec.points[0], true);
         shpView.setFloat64(12 + ofs, rec.points[1], true);
     },
-    _recWritePolygonGeometry(rec, shpView, offset, id) {
+    _recWritePolygonGeometry: function(rec, shpView, offset, id) {
         var pc = rec.points.length;
         if (pc == 0)
             return;
@@ -112,7 +131,7 @@ var gjsEsri = {
         for (var i = 0; i < pc; i++)
             shpView.setFloat64(ofs + (8 * i), rec.points[i], true);
     },
-    _recWriteMultiPointGeometry(rec, shpView, offset, id) {
+    _recWriteMultiPointGeometry: function(rec, shpView, offset, id) {
         var pc = rec.points.length;
         if (pc == 0)
             return;
@@ -407,7 +426,7 @@ class ESRIFileGen {
         var dataView = new DataView(this.dbf);
         dataView.setUint32(4, this.records.length, true);
         dataView.setUint16(8, headerSize, true);
-        dataView.setUint16(10, recordBytes+1, true);
+        dataView.setUint16(10, recordBytes + 1, true);
 
         var offset = headerSize;
         var id = 1;
@@ -521,7 +540,7 @@ class MultiLineStringFileGen extends ESRIFileGen {
                 rec.checkBounds(item[0], item[1]);
                 rec.points.push(item[0], item[1]);
             }, this);
-        });
+        }, this);
     }
 }
 class MultiPolygonFileGen extends ESRIFileGen {
