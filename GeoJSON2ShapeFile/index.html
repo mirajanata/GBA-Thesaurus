@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>GeoJSON to ESRI shapefile convertor</title>
+    <title>GeoJSON to ESRI shapefile converter</title>
 
     <link rel="shortcut icon" type="image/png" href="img/favicon.png" />
     <link rel="apple-touch-icon" href="img/icon.png" />
@@ -38,7 +38,6 @@
         });
 
         function testTransformGeoJSON1() {
-
             $.ajax({
                 url: "data/Mattersburg Fault_Geo.json",
                 success: function (data) {
@@ -48,18 +47,32 @@
                     alert("error " + status);
                 }
             });
-
-
+        }
+        function transformGeoJSON() {
+            $("#resultDiv").html("");
+            try {
+                var s = $("#jsontext").val();
+                gjsEsri.transformAndDownload(JSON.parse(s));
+                $("#resultDiv").html("Conversion OK");
+            }
+            catch (e) {
+                $("#resultDiv").html("Error: " + e);
+            }
         }
 
     </script>
 </head>
 <body>
-    <h1>GeoJSON to ESRI shapefile convertor</h1>
+    <h1>GeoJSON to ESRI shapefile converter</h1>
     <hr />
-    <button style="width:350px;" class="btn btn-success" onclick="testTransformGeoJSON1();">Convert [Mattersburg Fault_Geo.json]</button>
+    Write/paste GeoJSON text here:<br />
+    <textarea style="width:90%;" id="jsontext" rows="10"></textarea>
+    <br />
+    <button style="width:150px;" class="btn btn-success" onclick="transformGeoJSON();">Convert</button>
 
     <a style="margin-left:50px;" href="data/Mattersburg Fault_Geo.json" target="_blank">Download [Mattersburg Fault_Geo.json]</a>
+    <br />
+    <div id="resultDiv" />
 
 </body>
 

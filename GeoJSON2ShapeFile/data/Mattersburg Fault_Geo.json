@@ -291,6 +291,82 @@
         "def": "The MultiPoint",
         "alt": "3"
       }
+    },
+    {
+      "type": "Feature",
+      "id": 151,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [ 16.249122169277237, 47.806748244807714 ],
+          [ 16.259122169277237, 47.806748244807714 ]
+        ]
+      },
+      "properties": {
+        "OBJECTID": 1577,
+        "THESURL": "http://resource.geolba.ac.at/structure/81",
+        "label": "LineString",
+        "def": "The LineString",
+        "alt": "333"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 151,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [ 100.0, 0.0 ],
+            [ 101.0, 0.0 ],
+            [ 101.0, 1.0 ],
+            [ 100.0, 1.0 ],
+            [ 100.0, 0.0 ]
+          ]
+        ]
+      },
+      "properties": {
+        "OBJECTID": 15771,
+        "THESURL": "http://resource.geolba.ac.at/structure/81",
+        "label": "Polygon",
+        "def": "The Polygon",
+        "alt": "333"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 151,
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [ 100.0, 0.0 ],
+              [ 101.0, 0.0 ],
+              [ 101.0, 1.0 ],
+              [ 100.0, 1.0 ],
+              [ 100.0, 0.0 ]
+            ]
+          ],
+          [
+            [
+              [ 102.0, 0.0 ],
+              [ 103.0, 0.0 ],
+              [ 103.0, 1.0 ],
+              [ 102.0, 1.0 ],
+              [ 102.0, 0.0 ]
+            ]
+          ]
+
+        ]
+      },
+      "properties": {
+        "OBJECTID": 15772,
+        "THESURL": "http://resource.geolba.ac.at/structure/81",
+        "label": "MultiPolygon",
+        "def": "The MultiPolygon",
+        "alt": "333"
+      }
     }
   ]
 }

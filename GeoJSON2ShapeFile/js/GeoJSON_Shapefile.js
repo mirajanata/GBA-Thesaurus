@@ -230,7 +230,7 @@ class ShapeRecord {
         if (this.Y2 > Y) this.Y2 = Y;
     }
     /**
-     * Object to string convertor
+     * Object to string converter
      * 
      * @param {any} str
      */
@@ -247,7 +247,7 @@ class ShapeRecord {
         return str;
     }
     /**
-     * String to array convertor
+     * String to array converter
      *
      * @param {any} str
      */
@@ -261,7 +261,7 @@ class ShapeRecord {
     }
 
     /**
-     * String to UTF8 ancoded array convertor
+     * String to UTF8 ancoded array converter
      *
      * @param {any} str
      */
@@ -294,7 +294,7 @@ class ShapeRecord {
         return utf8;
     }
     /**
-     * Record to DBF record convertor
+     * Record to DBF record converter
      *
      * @param {any} id - record id
      * @param {any} idLen - record id field length
@@ -319,7 +319,7 @@ class ShapeRecord {
         return rec;
     }
     /**
-     * Record to CSV record convertor
+     * Record to CSV record converter
      *
      * @param {any} id - record id
      */
