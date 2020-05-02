@@ -9,6 +9,8 @@
 var gjsEsri = {
 
     /**
+     * GeoJSON to shapefile conversion
+     * 
      * @param {any} jsonObject - input GeoJSON object
      * @param {any} resultZipFile - desired filename of output zip file
      */
@@ -22,7 +24,16 @@ var gjsEsri = {
         this.files["MultiPolygon"] = new MultiPolygonFileGen();
 
         jsonObject.features.forEach(function (item, index) {
-            this.files[item.geometry.type].process(item);
+            if (item.geometry)
+                this.files[item.geometry.type].process(item);
+            else if (item.geometries) {
+                //GeometryCollection
+                item.geometries.forEach(function (item, index) {
+                    var gitem = {};
+                    gitem.geometry = item;
+                    this.files[item.type].process(gitem);
+                }, this);
+            }
         }, this);
 
         var zip = new JSZip();
@@ -54,6 +65,11 @@ var gjsEsri = {
             jQuery("#blob").text(err);
         });
     },
+    /**
+     * Blob data download
+     * @param {any} blob
+     * @param {any} resultZipFile
+     */
     _downloadBlob: function (blob, resultZipFile) {
         if (window.navigator && window.navigator.msSaveBlob)
             window.navigator.msSaveBlob(blob, resultZipFile);
@@ -74,9 +90,12 @@ var gjsEsri = {
         }
     },
     /**
-     * Low level record writer - bounding box
+     * Shape record writers - bounding box
+     * @param {any} rec - ShapeRecord object
+     * @param {any} shpView - file view
+     * @param {any} offset - file offset
      */
-    _recWriteBox: function(rec, shpView, offset) {
+    _recWriteBox: function (rec, shpView, offset) {
         var ofs = 8 + offset;
         shpView.setFloat64(4 + ofs, rec.X1, true);
         shpView.setFloat64(12 + ofs, rec.Y1, true);
@@ -84,21 +103,28 @@ var gjsEsri = {
         shpView.setFloat64(28 + ofs, rec.Y2, true);
     },
     /**
-     * Low level record writers - record length calculators
+     * Shape record writers - record length calculators
+     * 
+     * @param {any} rec - ShapeRecord object
      */
-    _recGetPointContentLength: function(rec) {
+    _recGetPointContentLength: function (rec) {
         return 20;
     },
-    _recGetMultiPointContentLength: function(rec) {
+    _recGetMultiPointContentLength: function (rec) {
         return 40 + (8 * rec.points.length);
     },
-    _recGetPolygonContentLength: function(rec) {
+    _recGetPolygonContentLength: function (rec) {
         return 44 + (4 * rec.partCount) + (8 * rec.points.length);
     },
     /**
-     * Low level record writers - geometries
+     * Shape record writers - geometry writers
+     *
+     * @param {any} rec - ShapeRecord object
+     * @param {any} shpView - file view
+     * @param {any} offset - file offset
+     * @param {any} id - record id
      */
-    _recWritePointGeometry: function(rec, shpView, offset, id) {
+    _recWritePointGeometry: function (rec, shpView, offset, id) {
         if (rec.points.length == 0)
             return;
         // record header
@@ -110,7 +136,7 @@ var gjsEsri = {
         shpView.setFloat64(4 + ofs, rec.points[0], true);
         shpView.setFloat64(12 + ofs, rec.points[1], true);
     },
-    _recWritePolygonGeometry: function(rec, shpView, offset, id) {
+    _recWritePolygonGeometry: function (rec, shpView, offset, id) {
         var pc = rec.points.length;
         if (pc == 0)
             return;
@@ -131,7 +157,7 @@ var gjsEsri = {
         for (var i = 0; i < pc; i++)
             shpView.setFloat64(ofs + (8 * i), rec.points[i], true);
     },
-    _recWriteMultiPointGeometry: function(rec, shpView, offset, id) {
+    _recWriteMultiPointGeometry: function (rec, shpView, offset, id) {
         var pc = rec.points.length;
         if (pc == 0)
             return;
@@ -152,6 +178,8 @@ var gjsEsri = {
 
 /**
  * Shapefile record class
+ * 
+ * Gathers all informations about single shape record - source geometry, file generator object, bounding box, properties
  *
  * */
 class ShapeRecord {
@@ -189,12 +217,23 @@ class ShapeRecord {
             }
         }
     }
+    /**
+     * Update the record geometry bounds with respect to given point
+     *
+     * @param {any} X
+     * @param {any} Y
+     */
     checkBounds(X, Y) {
         if (this.X1 > X) this.X1 = X;
         if (this.X2 < X) this.X2 = X;
         if (this.Y1 < Y) this.Y1 = Y;
         if (this.Y2 > Y) this.Y2 = Y;
     }
+    /**
+     * Object to string convertor
+     * 
+     * @param {any} str
+     */
     static toStr(str) {
         if (!str) return null;
         switch (typeof str) {
@@ -207,6 +246,11 @@ class ShapeRecord {
         }
         return str;
     }
+    /**
+     * String to array convertor
+     *
+     * @param {any} str
+     */
     static toArray(str) {
         if (!str) return null;
         str = ShapeRecord.toStr(str);
@@ -216,6 +260,11 @@ class ShapeRecord {
         return res;
     }
 
+    /**
+     * String to UTF8 ancoded array convertor
+     *
+     * @param {any} str
+     */
     static toUTF8Array(str) {
         if (!str) return null;
         str = ShapeRecord.toStr(str);
@@ -232,12 +281,8 @@ class ShapeRecord {
                     0x80 | ((charcode >> 6) & 0x3f),
                     0x80 | (charcode & 0x3f));
             }
-            // surrogate pair
             else {
                 i++;
-                // UTF-16 encodes 0x10000-0x10FFFF by
-                // subtracting 0x10000 and splitting the
-                // 20 bits of 0x0-0xFFFFF into two halves
                 charcode = 0x10000 + (((charcode & 0x3ff) << 10)
                     | (str.charCodeAt(i) & 0x3ff));
                 utf8.push(0xf0 | (charcode >> 18),
@@ -248,6 +293,12 @@ class ShapeRecord {
         }
         return utf8;
     }
+    /**
+     * Record to DBF record convertor
+     *
+     * @param {any} id - record id
+     * @param {any} idLen - record id field length
+     */
     getDbfRecordArray(id, idLen) {
         var rec = new Array(1/*delMarker*/ + idLen).fill(32);
         var val = ShapeRecord.toArray(id);
@@ -267,6 +318,11 @@ class ShapeRecord {
         };
         return rec;
     }
+    /**
+     * Record to CSV record convertor
+     *
+     * @param {any} id - record id
+     */
     getCsvRecordString(id) {
         var rec = id.toString();
 
@@ -285,8 +341,15 @@ class ShapeRecord {
 /**
  * Shapefile generator base class
  * 
+ * This class and his subclasses gather all ShapeRecord objects for single geometry type and control the shape file generation
+ * 
  * */
 class ESRIFileGen {
+    /**
+     * Constructor
+     * @param {any} geometry - geometry name
+     * @param {any} shape - target ESRI shape type
+     */
     constructor(geometry, shape) {
         this.geometry = geometry;
         this.shape = shape;
@@ -301,6 +364,12 @@ class ESRIFileGen {
         this.propertyLengths = [];
         this.useCSV = false;
     }
+    /**
+     * Update the file geometry bounds with respect to given point
+     *
+     * @param {any} X
+     * @param {any} Y
+     */
     checkBounds(X, Y) {
         if (this.X1 > X) this.X1 = X;
         if (this.X2 < X) this.X2 = X;
@@ -308,10 +377,16 @@ class ESRIFileGen {
         if (this.Y2 > Y) this.Y2 = Y;
     }
 
+    /**
+     * Geometry processing method. Each geometry has its specific process() method implemented by subclasses of this class
+     * 
+     * @param {any} item
+     */
     process(item) {
     }
-
-
+    /**
+     * Target files - names
+     */
     getShpName() {
         return this.geometry + ".shp";
     }
@@ -330,6 +405,9 @@ class ESRIFileGen {
     getPrjName() {
         return this.geometry + ".prj";
     }
+    /**
+     * Target files - size calculations
+     */
     getShxSize() {
         var s = 100 + (8 * this.records.length);
         return s;
@@ -341,6 +419,9 @@ class ESRIFileGen {
         }, this);
         return s;
     }
+    /**
+     * Target files - writers
+     */
     writeShp() {
         if (this.records.length == 0)
             return;
@@ -457,8 +538,7 @@ class ESRIFileGen {
 }
 
 /**
- * Shapefile generators implementing all GeoJSON geometries
- *
+ * Shapefile generators implementing all GeoJSON geometries, each implementing geometry specific process() method
  */
 class PointFileGen extends ESRIFileGen {
     constructor() {
