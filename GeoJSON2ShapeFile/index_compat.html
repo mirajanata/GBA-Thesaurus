@@ -21,10 +21,10 @@
 
     <script src="js/jszip.js"></script>
     <script src="js/GeoJSON_Shapefile_compat.js"></script>
+    <!-- JS converted using https://es6console.com/ -->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-    <!-- JS converted using https://es6console.com/ -->
 
 
     <style>
@@ -39,17 +39,6 @@
 
         });
 
-        function testTransformGeoJSON1() {
-            $.ajax({
-                url: "data/Mattersburg Fault_Geo.json",
-                success: function (data) {
-                    gjsEsri.transformAndDownload(data);
-                },
-                error: function (req, status) {
-                    alert("error " + status);
-                }
-            });
-        }
         function transformGeoJSON() {
             $("#resultDiv").html("");
             try {

@@ -37,17 +37,6 @@
 
         });
 
-        function testTransformGeoJSON1() {
-            $.ajax({
-                url: "data/Mattersburg Fault_Geo.json",
-                success: function (data) {
-                    gjsEsri.transformAndDownload(data);
-                },
-                error: function (req, status) {
-                    alert("error " + status);
-                }
-            });
-        }
         function transformGeoJSON() {
             $("#resultDiv").html("");
             try {
@@ -72,7 +61,7 @@
 
     <a style="margin-left:50px;" href="data/Mattersburg Fault_Geo.json" target="_blank">Download [Mattersburg Fault_Geo.json]</a>
     <br />
-    <div id="resultDiv" ></div>
+    <div id="resultDiv"></div>
 
 </body>
 
