@@ -300,7 +300,9 @@ class ShapeRecord {
      * @param {any} idLen - record id field length
      */
     getDbfRecordArray(id, idLen) {
-        var rec = new Array(1/*delMarker*/ + idLen).fill(32);
+        var rec = new Array(1/*delMarker*/ + idLen)/*.fill(32)*/;
+        for (var i = 0; i < rec.length; i++)
+            rec[i] = 32;
         var val = ShapeRecord.toArray(id);
         // write fid
         for (var d = idLen, s = val.length - 1; s >= 0; d-- , s--)
@@ -308,7 +310,9 @@ class ShapeRecord {
 
         for (var item in this.fileGen.propertyNames) {
             var flen = this.fileGen.propertyLengths[item];
-            var f = new Array(flen).fill(32);
+            var f = new Array(flen)/*.fill(32)*/;
+            for (var i = 0; i < f.length; i++)
+                f[i] = 32;
             val = this.properties[item];
             if (val) {
                 for (var i = 0; i < val.length; i++)

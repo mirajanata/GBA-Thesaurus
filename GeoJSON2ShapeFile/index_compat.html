@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>GeoJSON to ESRI shapefile converter</title>
+    <title>GeoJSON to ESRI shapefile converter (maximum browser compatibility)</title>
 
     <link rel="shortcut icon" type="image/png" href="img/favicon.png" />
     <link rel="apple-touch-icon" href="img/icon.png" />
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="css/site.css">
 
     <script src="js/jszip.js"></script>
-    <script src="js/GeoJSON_Shapefile.js"></script>
+    <script src="js/GeoJSON_Shapefile_compat.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
@@ -63,7 +63,7 @@
     </script>
 </head>
 <body>
-    <h1>GeoJSON to ESRI shapefile converter</h1>
+    <h1>GeoJSON to ESRI shapefile converter (maximum browser compatibility)</h1>
     <hr />
     Write/paste GeoJSON text here:<br />
     <textarea style="width:90%;" id="jsontext" rows="10"></textarea>
@@ -72,7 +72,7 @@
 
     <a style="margin-left:50px;" href="data/Mattersburg Fault_Geo.json" target="_blank">Download [Mattersburg Fault_Geo.json]</a>
     <br />
-    <div id="resultDiv" ></div>
+    <div id="resultDiv"></div>
 
 </body>
 
