@@ -1,0 +1,360 @@
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Thesaurus | Mineral resources DB</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="js/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://bootswatch.com/4/simplex/bootstrap.min.css">
+    <link rel="stylesheet" href="css/FontAwesome/all.min.css" />
+
+    <!-- Load Leaflet from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@2.3.0/dist/esri-leaflet.js"></script>
+    <script src="js/ws.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/GeoShape_compat.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+
+        #info-pane {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 400;
+            padding: 1em;
+            background: white;
+        }
+
+        #getFile {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            height: 70px;
+            width: 60px;
+            z-index: 500;
+            background: rgba(255, 255, 255, 0.7);
+            font-family: sans-serif;
+            font-size: 11px;
+            border: 0px;
+        }
+
+        .minres1 {
+            color: red;
+        }
+
+        .minres2 {
+            color: darkorange;
+        }
+
+        .pop {
+            font-size: 100%;
+        }
+
+        #map {
+            background: white;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 1000;
+            color: aqua;
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .irisIcon {
+            width: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="getFile" onclick="downloadShape();" data-toggle="tooltip" data-placement="left"
+        title="download shapefile" data-original-title="Tooltip on left"><i style="color: Dodgerblue;"
+            class="fas fa-4x fa-file-download"></i></button>
+    <div id="map"></div>
+    <div id="loading" class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+    <div id="resultDiv"></div>
+    <script>
+        let urlParams = new URLSearchParams(window.location.search);
+        let USER_LANG = 'de'; //(navigator.language || navigator.language).substring(0, 2);
+        if (urlParams.has('lang')) {
+            USER_LANG = urlParams.get('lang');
+        }
+        let uri = '';
+        let vocData = [];
+        let wfsFeatures = [];
+
+        let map = L.map('map').setView([47.7, 13.5], 8);
+        const mainIcon = L.divIcon({
+            html: '<i class="fas fa-circle"></i>',
+            className: 'minres1'
+        });
+        const sideIcon = L.divIcon({
+            html: '<i class="fas fa-dot-circle"></i>',
+            className: 'minres2'
+        });
+
+        L.tileLayer("https://mapsneu.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png", {
+            opacity: 0.6,
+            attribution: '&copy; <a href="http://basemap.at">Basemap.at</a>, <a href="http://www.geologie.ac.at">Geologie.ac.at</a>'
+        }).addTo(map); 
+
+        if (urlParams.has('uri')) {
+            uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, ''));
+            let query = encodeURIComponent(`PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+                            PREFIX dcterms:<http://purl.org/dc/terms/>
+                            PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
+                            SELECT distinct ?s ?p
+                            (group_concat(distinct ?L; separator = "; ") as ?Label)
+                            (group_concat(distinct ?Description; separator = "; ") as ?desc)
+                            (group_concat(distinct ?ax; separator = "; ") as ?Synonyms)
+                            (group_concat(distinct ?r; separator = "; ") as ?References)
+                            (group_concat(distinct ?Map; separator = "; ") as ?Mapping)
+                            (group_concat(distinct ?pic; separator = "; ") as ?Picture)
+                            WHERE {
+                            {values ?map {skos:exactMatch skos:closeMatch skos:narrowMatch skos:broadMatch}
+                            <${uri}> skos:narrower* ?s .
+                            ?s skos:prefLabel ?p; skos:prefLabel ?px . filter(lang(?p)="de") filter(lang(?px)="${USER_LANG}")
+                            bind(coalesce(?px, ?p, "") as ?L)
+                            optional {?s skos:altLabel ?ax filter(lang(?ax)="${USER_LANG}")}
+                            optional {?s skos:definition ?d filter(lang(?d)="en")}
+                            optional {?s skos:definition ?dx filter(lang(?dx)="${USER_LANG}")}
+                            bind(coalesce(?dx, ?d, "") as ?Description)
+                            optional {?s dcterms:references ?r}
+                            optional {?s ?map ?Map}
+                            optional {?s foaf:depiction ?pic}
+                            } }
+                            group by ?s ?p`);
+
+            fetch(`${ws.endpoint}mineral?query=${query}&format=application/json`)
+                .then(res => res.json())
+                .then(jsonData => {
+                    //console.log('jsonData: ', jsonData); //OK
+                    vocData = jsonData.results.bindings.map(c => ({
+                        uri: c.s.value,
+                        searchTerm: c.p.value,
+                        Label: c.Label.value,
+                        Synonyms: c.Synonyms.value,
+                        Desc: c.desc.value,
+                        References: c.References.value,
+                        Mapping: c.Mapping.value,
+                        Picture: c.Picture.value
+                    }));
+                    //console.log('vocData: ', vocData); //OK
+                    const nql = 40; //network query limit defined by SQL DB proxy => max length "where in"
+                    let st = vocData.map(a => a.searchTerm);
+                    let searchTerms = new Array(Math.ceil(st.length / nql))
+                        .fill()
+                        .map(_ => st.splice(0, nql));
+                    //console.log(searchTerms);
+
+                    let promises = [];
+                    searchTerms.forEach(sT_part => {
+                        let queryMap = `(Mineralien like '%${sT_part.join("%')or(Mineralien like '%")}%')`;
+                        //console.log(queryMap);
+
+ 
+                        promises.push(
+                            fetch(
+                                `https://gis.geosphere.at/maps/rest/services/IRIS/Lagerstaetten/MapServer/0/query?where=${encodeURI(queryMap)}&outSR=4326&outFields=*&f=pjson`
+                            )
+                            .then(res => res.json())
+                            .then(data => {
+                                //console.log('data: ', data);
+                                let wf = wfsFeatures.map(x => x.attributes['ID']);
+                                data.features.forEach(f => {
+                                    if (!wf.includes(f.attributes['ID'])) {
+                                        wfsFeatures.push(f);
+                                        //console.log('add: '+f.attributes['ID']); //OK
+                                    }
+                                });
+                            })
+                        );
+                    });
+
+                    Promise.all(promises).then(() => {
+                        //console.log('WFS: ', wfsFeatures);
+                        for (let a of wfsFeatures) {
+                            let bn = '';
+                            if (a.attributes['BEZIRK_URL'] !== null) {
+                                bn =
+                                    `<a href="${a.attributes['BEZIRK_URL']}">
+                                        ${a.attributes['BEZIRKNAME']}
+                                    </a><br>`;
+                            }
+                            let icon = sideIcon;
+
+                            for (let i of searchTerms[0]) {
+                                if (a.attributes['MINERALIEN'].indexOf(i + ' (H)') > -1) {
+                                    icon = mainIcon;
+                                }
+                            }
+
+                            let min = 'MINERALIEN';
+                            if (USER_LANG == 'en') {
+                                min = 'MINERALS'
+                            }
+
+                            L.marker([a.geometry.y, a.geometry.x], {
+                                    icon: icon
+                                }).addTo(
+                                    map
+                                ) //https://geolba.maps.arcgis.com/apps/webappviewer/images/shortcut.ico
+                                .bindPopup(`<div class="pop">
+                                            <h5><img class="irisIcon" src="https://gis.geosphere.at/portal/sharing/rest/content/items/b862c90df49743379af6da148ef551a7/data" >
+                                            <a href="https://geosphereaustria.maps.arcgis.com/apps/webappviewer/index.html?id=ef8095943a714d7893d41f02ec9c156d&marker=${a.geometry.x};${a.geometry.y};;;;${a.attributes['VORK_NAME']}&level=11">
+                                                ${a.attributes['VORK_NAME']}
+                                            </a>
+                                            </h5>
+                                            ${(a.attributes[min] == undefined)?a.attributes['MINERALIEN']:a.attributes[min].split(',').join(', ')}
+                                            <hr>
+                                            ${bn}
+                                            ${a.attributes['ART_TXT']} / ${a.attributes['FORM_TXT']}<br>
+                                            ${a.attributes['HAUPTROHSTOFF']} / ${a.attributes['WERTSTOFFE']}<br>
+                                            </div>`);
+                        }
+                        $('#loading').hide();
+                    });
+                });
+        } else {
+            alert('URI parameter not defined');
+        }
+
+        function downloadShape() {
+
+            wfsFeatures = JSON.parse(JSON.stringify(wfsFeatures).replace(/attributes/g, 'properties'));
+
+            if (wfsFeatures.length > 0) {
+                let removeProp = ["INSP_FORM",
+                    "INSP_FORMURI", "SYMBOL1", "STREICHEN", "GROESSE_TXT", "GBANR", "HAUPTROHSTOFF", "STATUS_TXT",
+                    "SCHAUBERGWERK", "ISOTOP", "GBA_BETR_DAUER", "PRAEHIST_A", "ROEMERZEITLICH_A",
+                    "FRUEHMITTELALTER_A", "MITTELALTER_A", "JH15_A", "JH16_A", "JH17_A", "JH18_A", "JH19_A",
+                    "JH20_A", "JH21_A", "VITRINIT_U", "VITRINIT_O", "TYP", "GEW_ART", "BERGBAU_FLAECHE_m2",
+                    "BERGBAU_LAENGE_M", "BERGBAU_BREITE_M", "gba_DOK_TEXT_ID", "DocumentationURL"
+                ];
+                /* let removeProp = ["BEZIRKNAME", "BEZIRK_URL", "ART_TXT", "INSP_FORM",
+                    "INSP_FORMURI", "SYMBOL1", "FORM_TXT", "STREICHEN", "GROESSE_TXT", "TEKT_EINH", "GBANR",
+                    "HAUPTROHSTOFF", "WERTSTOFFE", "commodities", "MINERALIEN", "MINERALS", "STATUS_TXT",
+                    "SCHAUBERGWERK", "ISOTOP", "GBA_BETR_DAUER", "PRAEHIST_A", "ROEMERZEITLICH_A",
+                    "FRUEHMITTELALTER_A", "MITTELALTER_A", "JH15_A", "JH16_A", "JH17_A", "JH18_A", "JH19_A",
+                    "JH20_A", "JH21_A", "VITRINIT_U", "VITRINIT_O", "TYP", "GEW_ART", "BERGBAU_FLAECHE_m2",
+                    "BERGBAU_LAENGE_M", "BERGBAU_BREITE_M", "gba_DOK_TEXT_ID", "DocumentationURL"
+                ]; */
+
+                /* let exportFields = Object.getOwnPropertyNames(wfsFeatures[0].properties)
+                    .map(a => a.replace('', '').replace('', ''))
+                    .filter(e => e !== 'OBJECTID');
+                console.log(exportFields);
+
+                let exportArr = []; */
+                let mainConcept = vocData.find(a => a.uri == uri).Label;
+                let langPrefix = ['Hauptrohstoff', 'u.a.'];
+                if (USER_LANG == 'en') {
+                    langPrefix = ['Main resource', 'i.a.'];
+                }
+
+                let st = vocData.map(a => a.searchTerm);
+                //console.log(st);
+
+                console.log(wfsFeatures);
+
+                for (let i of wfsFeatures) {
+                    for (let j of removeProp) {
+                        delete i.properties['' + j];
+                        delete i.properties['OBJECTID'];
+                        delete i.properties['ID'];
+                    } 
+
+                    i.properties.uri = '';
+                    i.properties.Desc = '';
+                    //i.properties.Label = `${langPrefix[1]} ${mainConcept}`;
+                    i.properties.Synonyms = '';
+                    i.properties.Mapping = '';
+
+                    let l = i.properties['MINERALIEN']
+                        .replace(/\)\,/g, ' ').split(' ')
+                        .filter(x => st.includes(x));
+                    i.properties.Label = l.join('; ');
+                    //console.log(l);
+                    if (l.length == 1) {
+                        let j = vocData.map(a => a.Label).indexOf(l[0]);
+                        try {
+                            i.properties.uri = vocData[j].uri;
+                            i.properties.Desc = vocData[j].Desc;
+                            i.properties.Synonyms = vocData[j].Synonyms;
+                            i.properties.Mapping = vocData[j].Mapping;
+                        } catch (e) {
+
+                        }
+                    }
+
+                    i.type = 'Feature';
+                    i.geometry = {
+                        type: 'Point',
+                        coordinates: [i.geometry.x, i.geometry.y]
+                    };
+
+                    for (let o of vocData) {
+                        if (i.properties['MINERALIEN'].indexOf(o.searchTerm + ' (H)') > -1) {
+                            i.properties.Label = o.Label;
+                            i.properties.uri = o.uri;
+                            i.properties.Desc = o.Desc;
+                            i.properties.Synonyms = o.Synonyms;
+                            i.properties.Mapping = o.Mapping;
+                        }
+
+                    }
+                }
+
+                let wfsData = {
+                    type: "FeatureCollection",
+                    crs: {
+                        type: "name",
+                        properties: {
+                            name: `GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]`
+                        }
+                    },
+                    features: wfsFeatures
+                };
+                
+                /* let w = JSON.parse(JSON.stringify(wfsData)
+                    .replace(//g, '')
+                    .replace(//g, ''));
+                //console.log(w); */
+
+                try {
+                    GeoShape.transformAndDownload(wfsData, mainConcept);
+                    //alert(mainConcept + ".zip downloaded");
+                } catch (e) {
+                    alert("Error: " + e);
+                }
+            } else {
+                alert('nothing to download');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
