@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 
 <head>
     <meta charset=utf-8 />
@@ -147,7 +147,8 @@
                             } }
                             group by ?s ?p`);
 
-            fetch(`${ws.endpoint}mineral?query=${query}&format=application/json`)
+            //fetch(`${ws.endpoint}mineral?query=${query}&format=application/json`)
+            fetch(ws.getMineralUrl(query)
                 .then(res => res.json())
                 .then(jsonData => {
                     //console.log('jsonData: ', jsonData); //OK

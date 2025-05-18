@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 
 <head>
     <meta charset=utf-8 />
@@ -89,7 +89,8 @@
             BIND (IF(exists{<${uri}> skos:narrower* ?s} , ?s, 0) AS ?n)
             }`);
 
-            fetch(`${ws.endpoint}structure?query=${queryMap}&format=application/json`)
+            //fetch(`${ws.endpoint}structure?query=${queryMap}&format=application/json`)
+            fetch(ws.getStructureUrl(queryMap))
                 .then(res => res.json())
                 .then(jsonData => {
                     //console.log(jsonData);
@@ -179,7 +180,8 @@
                             } }
                             group by ?s ?Label ?Description`);
 
-                fetch(`${ws.endpoint}structure?query=${queryDownLoad}&format=application/json`)
+                //fetch(`${ws.endpoint}structure?query=${queryDownLoad}&format=application/json`)
+                fetch(ws.getStructureUrl(queryDownLoad))
                     .then(res => res.json())
                     .then(jsonData => {
                         //console.log(jsonData);

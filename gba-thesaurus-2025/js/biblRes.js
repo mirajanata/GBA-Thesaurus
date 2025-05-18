@@ -26,13 +26,15 @@ var biblRes = {
                                             }
                                             ORDER BY ?C`);
 
-        let url = `${ws.endpoint}${thesProjName}?query=${query1}&format=application/json`;
+        //let url = `${ws.endpoint}${thesProjName}?query=${query1}&format=application/json`;
+        let url = ws.getProjUrl(thesProjName, query1)
         let refs = [];
 
 
         let result =
             all ?
-                fetch(`${ws.endpoint}ref?query=${query2}&format=application/json`).then(function (response) {
+                //fetch(`${ws.endpoint}ref?query=${query2}&format=application/json`).then(function (response) {
+                fetch(ws.getRefUrl(query2)).then(function (response) {
                     return response.json();
                 })
                     .catch(function (error) {
@@ -47,7 +49,8 @@ var biblRes = {
                 }).then(function (data) {
                     refs = Array.from(data.results.bindings, a => (a.o.value));
                     //console.log(refs);
-                    return fetch(`${ws.endpoint}ref?query=${query2}&format=application/json`);
+                    //return fetch(`${ws.endpoint}ref?query=${query2}&format=application/json`);
+                    return fetch(ws.getRefUrl(query2));
                 })
                     .then(function (response) {
                         return response.json();

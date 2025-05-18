@@ -133,7 +133,11 @@ var detail = {
                     case 'citation':
                         let a = [];
                         ul.forEach(i => {
-                            a.push($.parseHTML(i)[0].innerHTML);
+                            var p = $.parseHTML(i)[0];
+                            // fix invalid citation uri
+                            p = $(p).attr("href").split("uri=")[1];
+                            a.push(p);
+                            //a.push($.parseHTML(i)[0].innerHTML);
                         });
                         html += '<div id="citation"></div>';
                         this.getCitation(a);
