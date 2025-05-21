@@ -158,8 +158,9 @@ var page = {
                             . FILTER(lang(?cL)="${lang.ID}") . 
                             ?c skos:hasTopConcept ?tc . ?tc skos:prefLabel ?tcL . FILTER(lang(?tcL)="${lang.ID}") . 
                             ?tc skos:narrower* ?n 
-                            BIND(CONCAT(STR(?tc),"$",STR(?tcL)) AS ?L) 
+                            BIND(CONCAT(STR(?tc),"$",STR(?tcL)) AS ?L)
                             OPTIONAL {?c dcterms:description ?cD . FILTER(lang(?cD)="${lang.ID}")} 
+                            @@filter
                             } 
                             GROUP BY ?cL ?cD ORDER BY ?cL`;
 

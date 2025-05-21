@@ -18,6 +18,21 @@ var ws = {
             .then(thenFunc);
     },
     projectJson: function (projectId, query, thenFunc) {
+        let projectFilter = {
+            'GeologicUnit': 'FILTER(contains(STR(?c), "/geolunit") || contains(STR(?c), "/geomorph"))',
+            'structure': 'FILTER(contains(STR(?c), "/struct"))',
+            'GeologicTimeScale': 'FILTER(contains(STR(?c), "/time"))',
+            'lithology': 'FILTER(contains(STR(?c), "/lith"))',
+            'tectonicunit': 'FILTER(contains(STR(?c), "/tect"))',
+            'mineral': 'FILTER(contains(STR(?c), "/mineral"))',
+            'minres': 'FILTER(contains(STR(?c), "/minres"))',
+        };
+        var filter = projectFilter[projectId];
+        if (!filter) {
+            filter = "";
+        }
+        query = query.replace('@@filter', filter);
+
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson')
             .then(res => res.json())
             .then(thenFunc)

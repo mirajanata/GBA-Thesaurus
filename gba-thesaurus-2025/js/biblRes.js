@@ -9,7 +9,7 @@ var biblRes = {
         let all = thesProjName == null || thesProjName == "";
 
         //$('#headRef').text(`Bibliographic references used for ${thesProjName}`);
-        //console.log(urlParams.get('uri')); // "http.."
+        //console.log(urlParams.get('uri')); // "http.." 
         let query1 = encodeURIComponent(`   PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                             PREFIX dcterms:<http://purl.org/dc/terms/>
                                             SELECT DISTINCT ?o

@@ -185,6 +185,7 @@ var page = {
                             ?tc skos:narrower* ?n 
                             BIND(CONCAT(STR(?tc),"$",STR(?tcL)) AS ?L) 
                             OPTIONAL {?c dcterms:description ?cD . FILTER(lang(?cD)="${lang.ID}")} 
+                            @@filter
                             } 
                             GROUP BY ?cL ?cD ORDER BY ?cL`;
 
