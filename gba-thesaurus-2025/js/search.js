@@ -9,6 +9,7 @@ var search = {
                                         WHERE { 
                                         VALUES ?p {skos:prefLabel skos:altLabel} 
                                         ?s a skos:Concept; ?p ?L . FILTER(lang(?L)="${lang.ID}") 
+                                        @@filter
                                         } ORDER BY STRLEN(STR(?L)) ?L`;
 
         lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {

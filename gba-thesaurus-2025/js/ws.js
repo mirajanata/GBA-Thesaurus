@@ -2,15 +2,32 @@
 "use strict";
 var ws = {
     endpoint: 'https://resource.geosphere.at/graphdb/repositories/thes',
+    projectFilter: {
+        'GeologicUnit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
+        'geolunit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
+        'structure': 'FILTER(contains(STR(?@@item), "/struct"))',
+        'struct': 'FILTER(contains(STR(?@@item), "/struct"))',
+        'GeologicTimeScale': 'FILTER(contains(STR(?@@item), "/time"))',
+        'time': 'FILTER(contains(STR(?@@item), "/time"))',
+        'lithology': 'FILTER(contains(STR(?@@item), "/lith"))',
+        'lith': 'FILTER(contains(STR(?@@item), "/lith"))',
+        'tectonicunit': 'FILTER(contains(STR(?@@item), "/tect"))',
+        'tect': 'FILTER(contains(STR(?@@item), "/tect"))',
+        'mineral': 'FILTER(contains(STR(?@@item), "/mineral"))',
+        'minres': 'FILTER(contains(STR(?@@item), "/minres"))',
+        'citation': 'FILTER(contains(STR(?@@item), "/citation"))',
+        'ref': 'FILTER(contains(STR(?@@item), "/citation"))',
+    },
 
     doc: function (query, thenFunc) {
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson').then(thenFunc);
     },
-    json: function (uri, query, thenFunc) {
+    json: function (uriPart, query, filteredItem, thenFunc) {
+        query = ws.__processFilter(uriPart, query, filteredItem);
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson')
             .then(res => res.json())
             .then(thenFunc)
-            .catch(error => $('#pageContent').append(`<br>no results for <br>URI: <span style="color: red;"><strong>${uri}</strong></span> <br>`));
+            .catch(error => $('#pageContent').append(`<br>no results for <br>URI: <span style="color: red;"><strong>${uriPart}</strong></span> <br>`));
     },
     docJson: function (query, thenFunc) {
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson')
@@ -18,29 +35,7 @@ var ws = {
             .then(thenFunc);
     },
     projectJson: function (projectId, query, filteredItem, thenFunc) {
-        let projectFilter = {
-            'GeologicUnit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
-            'geolunit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
-            'structure': 'FILTER(contains(STR(?@@item), "/struct"))',
-            'struct': 'FILTER(contains(STR(?@@item), "/struct"))',
-            'GeologicTimeScale': 'FILTER(contains(STR(?@@item), "/time"))',
-            'time': 'FILTER(contains(STR(?@@item), "/time"))',
-            'lithology': 'FILTER(contains(STR(?@@item), "/lith"))',
-            'lith': 'FILTER(contains(STR(?@@item), "/lith"))',
-            'tectonicunit': 'FILTER(contains(STR(?@@item), "/tect"))',
-            'tect': 'FILTER(contains(STR(?@@item), "/tect"))',
-            'mineral': 'FILTER(contains(STR(?@@item), "/mineral"))',
-            'minres': 'FILTER(contains(STR(?@@item), "/minres"))',
-        };
-        var filter = projectFilter[projectId];
-        if (!filter) {
-            filter = "";
-        }
-        if (!filteredItem) {
-            filteredItem = "c";
-        }
-        query = query.replaceAll('@@filter', filter);
-        query = query.replaceAll('@@item', filteredItem);
+        query = ws.__processFilter(projectId, query, filteredItem);
 
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson')
             .then(res => res.json())
@@ -57,7 +52,17 @@ var ws = {
                 }
             });
     },
-
+    __processFilter: function (projectId, query, filteredItem) {
+        var filter = ws.projectFilter[projectId];
+        if (!filter) {
+            filter = "";
+        }
+        if (!filteredItem) {
+            filteredItem = "c";
+        }
+        query = query.replaceAll('@@filter', filter);
+        return query.replaceAll('@@item', filteredItem);
+    },
     getProjUrl: function (projectId, query) {
         return this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson';
     },

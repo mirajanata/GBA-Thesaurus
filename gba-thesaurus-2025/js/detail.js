@@ -40,11 +40,11 @@ var detail = {
                     WHERE { 
                     VALUES ?s {<${uri}>} ?s a skos:Concept . ?s ?p ?o .
                     OPTIONAL {?o a skos:Concept; skos:prefLabel ?L}
-                    } 
+                    }
                     GROUP BY ?p ?o 
             `;
 
-        ws.json(uri.split("/")[3], query, function (data) {
+        ws.json(uri.split("/")[4], query, "s", function (data) {
             if (data.results.bindings.length > 1) {
                 var F = page.isEmbedded ? detail.FRONT_LIST_EMBEDDED : detail.FRONT_LIST;
                 for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()));
@@ -292,9 +292,10 @@ var detail = {
                     BIND (IF(exists{?r dcterms:identifier ?dsn} , ?dsn, "") AS ?DSN)
                     OPTIONAL {?r dcterms:source ?pdf}
                     BIND (IF(exists{?r dcterms:source ?pdf} , ?pdf, "") AS ?PDF)
+                    @@filter
                     }`;
 
-        ws.json("ref", query, jsonData => {
+        ws.json("ref", query, "r", jsonData => {
             var html = '<br><blockquote class="blockquote">';
             jsonData.results.bindings.forEach((i) => {
 
@@ -330,7 +331,7 @@ var detail = {
                     ORDER BY ?Label 
                     LIMIT 50 
                     OFFSET ${offset}`;
-        ws.json(uri.split("/")[3], query, function (data) {
+        ws.json(uri.split("/")[4], query, "b", function (data) {
             var allConcepts = $('#allConcepts');
             let a = [];
             $('#' + divID).append('');
