@@ -12,7 +12,7 @@ var search = {
                                         } ORDER BY STRLEN(STR(?L)) ?L`;
 
         lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
-            ws.projectJson(project.id, query, jsonData => {
+            ws.projectJson(project.id, query, "s", jsonData => {
                 a = [...a, ...jsonData.results.bindings];
                 b += 1;
 
@@ -279,7 +279,7 @@ var search = {
 
         lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
 
-            ws.projectJson(project.id, query, jsonData => {
+            ws.projectJson(project.id, query, "s", jsonData => {
 
                 jsonData.results.bindings.forEach(function (a) {
                     if ($('#searchresults li').length > 199) {

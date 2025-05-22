@@ -190,7 +190,7 @@ var page = {
                             GROUP BY ?cL ?cD ORDER BY ?cL`;
 
         lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
-            ws.projectJson(project.id, query, jsonData => {
+            ws.projectJson(project.id, query, "c", jsonData => {
                 div.append('<div class="card my-4"><h4 class="card-header">' + project.name +
                     '</h4><div id="' + project.id + 'Card" class="card-body"></div></div>');
 

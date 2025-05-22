@@ -17,21 +17,30 @@ var ws = {
             .then(res => res.json())
             .then(thenFunc);
     },
-    projectJson: function (projectId, query, thenFunc) {
+    projectJson: function (projectId, query, filteredItem, thenFunc) {
         let projectFilter = {
-            'GeologicUnit': 'FILTER(contains(STR(?c), "/geolunit") || contains(STR(?c), "/geomorph"))',
-            'structure': 'FILTER(contains(STR(?c), "/struct"))',
-            'GeologicTimeScale': 'FILTER(contains(STR(?c), "/time"))',
-            'lithology': 'FILTER(contains(STR(?c), "/lith"))',
-            'tectonicunit': 'FILTER(contains(STR(?c), "/tect"))',
-            'mineral': 'FILTER(contains(STR(?c), "/mineral"))',
-            'minres': 'FILTER(contains(STR(?c), "/minres"))',
+            'GeologicUnit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
+            'geolunit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
+            'structure': 'FILTER(contains(STR(?@@item), "/struct"))',
+            'struct': 'FILTER(contains(STR(?@@item), "/struct"))',
+            'GeologicTimeScale': 'FILTER(contains(STR(?@@item), "/time"))',
+            'time': 'FILTER(contains(STR(?@@item), "/time"))',
+            'lithology': 'FILTER(contains(STR(?@@item), "/lith"))',
+            'lith': 'FILTER(contains(STR(?@@item), "/lith"))',
+            'tectonicunit': 'FILTER(contains(STR(?@@item), "/tect"))',
+            'tect': 'FILTER(contains(STR(?@@item), "/tect"))',
+            'mineral': 'FILTER(contains(STR(?@@item), "/mineral"))',
+            'minres': 'FILTER(contains(STR(?@@item), "/minres"))',
         };
         var filter = projectFilter[projectId];
         if (!filter) {
             filter = "";
         }
-        query = query.replace('@@filter', filter);
+        if (!filteredItem) {
+            filteredItem = "c";
+        }
+        query = query.replaceAll('@@filter', filter);
+        query = query.replaceAll('@@item', filteredItem);
 
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson')
             .then(res => res.json())

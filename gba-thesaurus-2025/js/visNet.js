@@ -16,7 +16,8 @@ var visNet = {
     init: function () {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
-        let project = uri.split('/')[3];
+        //let project = uri.split('/')[3];
+        let project = uri.split('/')[4];
         let lang = urlParams.get('lang');
 
         visNet._uri = uri;
@@ -115,10 +116,11 @@ var visNet = {
                                                 OPTIONAL {?o skos:prefLabel ?oL . FILTER(lang(?oL)='${lang}')}
                                                 OPTIONAL {?s dbpo:colourHexCode ?sC}
                                                 OPTIONAL {?o dbpo:colourHexCode ?oC}
+                                                @@filter
                                                 }
                                                 ORDER BY ?sL`;
 
-        ws.projectJson(project, query, function (jsonData) {
+        ws.projectJson(project, query, "s", function (jsonData) {
             visNet.visData = jsonData.results.bindings;
             //console.log(visNet.visData);
 
