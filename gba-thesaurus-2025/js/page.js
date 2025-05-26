@@ -9,7 +9,7 @@ var page = {
 
     // called on page loaded
     init: function () {
-        var USER_LANG = (navigator.language || navigator.language).substring(0, 2);
+        let USER_LANG = (navigator.language || navigator.language).substring(0, 2);
         $('#appsCard').toggle();
         if (this.urlParams.has('lang')) {
             USER_LANG = this.urlParams.get('lang');
@@ -194,9 +194,11 @@ var page = {
                 div.append('<div class="card my-4"><h4 class="card-header">' + project.name +
                     '</h4><div id="' + project.id + 'Card" class="card-body"></div></div>');
 
-                //work around for HTML5 details and summary tags
-                //$('#' + project.id + 'Comment').append('<details id="'+ project.id + 'ReadMore' +'"><summary class="text-muted"><em>read more ..</em></summary><br></details>');
-                $('#' + project.id + 'Comment').append(`
+                const cardDiv = $('#' + project.id + 'Card');
+                const commentDiv = $('#' + project.id + 'Comment');
+                const readMoreDiv = $('#' + project.id + 'ReadMore');
+
+                commentDiv.append(`
                             <br>
                             <div style="cursor: pointer;" id="${project.id}rmBtn"
                             onclick="javascript: page.toggleRead(\'${project.id}rmBtn\', \'${project.id}ReadMore\', \'read more\');"
@@ -209,15 +211,15 @@ var page = {
 
                 jsonData.results.bindings.forEach(function (a) {
                     //console.log(a.topConcepts.value);
-                    $('#' + project.id + 'Card').append('<strong style="color:#006666;">' + a.cL.value + '</strong>' + ': <a href="' + page.BASE + '?uri=' +
+                    cardDiv.append('<strong style="color:#006666;">' + a.cL.value + '</strong>' + ': <a href="' + page.BASE + '?uri=' +
                         a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' + page.BASE + '?uri=') + '</a><br>');
                     //add concept schemes + topConcepts to project descriptions
-                    $('#' + project.id + 'ReadMore').append('<h4>' + a.cL.value + ' (' + a.count.value +
+                    readMoreDiv.append('<h4>' + a.cL.value + ' (' + a.count.value +
                         '):</h4><a href="' + page.BASE + '?uri=' + a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' +
                             page.BASE + '?uri=') + '</a><br>' + a.desc.value + '<br><br>');
                 });
 
-                $('#' + project.id + 'ReadMore').append(`
+                readMoreDiv.append(`
                         <p class="">
                             <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='rdf/${project.id}.rdf'">
                                 RDF/XML download
