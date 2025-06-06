@@ -43,8 +43,8 @@ var detail = {
                     }
                     GROUP BY ?p ?o 
             `;
-
-        ws.json(uri.split("/")[4], query, "s", function (data) {
+        let projectId = ws.getProject(uri);
+        ws.json(projectId, query, "s", function (data) {
             if (data.results.bindings.length > 1) {
                 var F = page.isEmbedded ? detail.FRONT_LIST_EMBEDDED : detail.FRONT_LIST;
                 for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()));
@@ -62,10 +62,25 @@ var detail = {
                 for (key in detail.TECHNICAL_LIST) detail.insertTechnicalPart(key, data, Array.from(detail.TECHNICAL_LIST[key].values()));
                 div.append('');
 
-                if (uri.split("/")[3] !== 'doc') {
+                if (projectId !== 'doc') {
                     detail.insertConceptBrowser(div, uri, 50);
                 } else {
                     div.append('<br><br><br><br><br><br><br><br><br><br>');
+                }
+                if (["mineral", "minres", "structure", "struct"].includes(projectId)) {
+                    let dv = $("#data_viewer");
+                    dv.append(`
+        <data-viewer class="card-body" style="height:210px;"
+          concept-uris="${uri}"
+          basemap-style="data-light" 
+          include-narrower 
+          color="#0284c7"
+          secondary-color="#e11d48"
+          opacity="0.8"
+          >
+        </data-viewer>
+                    `);
+                    dv.show();
                 }
             } else {
                 $('#pageContent').append(`<br>no results for <br>URI: <span style="color: red;"><strong>${uri}</strong></span> <br>`);
@@ -92,7 +107,7 @@ var detail = {
                                     <a href="javascript:detail.rdfTS('${uri}')"> RDF download</a>
                                 </p>
                                 <hr>`;
-                        this.insertApp('Database', 'queries', `${ws.endpoint}${uri.split('/')[3]}`, 'list-alt'); //&list=${encodeURIComponent(pL)}&lang=${lang.ID}`, 'list-alt');
+                        this.insertApp('Database', 'queries', `${ws.endpoint}${ws.getProject(uri)}`, 'list-alt'); //&list=${encodeURIComponent(pL)}&lang=${lang.ID}`, 'list-alt');
                         page.updateSharingTexts(pL);
                         break;
                     case 'dataViewer': //*********************########################################################
@@ -332,7 +347,7 @@ var detail = {
                     ORDER BY ?Label 
                     LIMIT 50 
                     OFFSET ${offset}`;
-        ws.json(uri.split("/")[4], query, "b", function (data) {
+        ws.json(ws.getProject(uri), query, "b", function (data) {
             var allConcepts = $('#allConcepts');
             let a = [];
             $('#' + divID).append('');

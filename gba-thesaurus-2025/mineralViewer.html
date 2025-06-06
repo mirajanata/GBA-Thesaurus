@@ -122,7 +122,7 @@
 
         if (urlParams.has('uri')) {
             uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, ''));
-            let query = encodeURIComponent(`PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+            let query = `PREFIX foaf:<http://xmlns.com/foaf/0.1/>
                             PREFIX dcterms:<http://purl.org/dc/terms/>
                             PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                             SELECT distinct ?s ?p
@@ -145,10 +145,10 @@
                             optional {?s ?map ?Map}
                             optional {?s foaf:depiction ?pic}
                             } }
-                            group by ?s ?p`);
+                            group by ?s ?p`;
 
             //fetch(`${ws.endpoint}mineral?query=${query}&format=application/json`)
-            fetch(ws.getMineralUrl(query)
+            fetch(ws.getMineralUrl(query))
                 .then(res => res.json())
                 .then(jsonData => {
                     //console.log('jsonData: ', jsonData); //OK

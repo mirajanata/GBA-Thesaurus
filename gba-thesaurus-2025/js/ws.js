@@ -2,6 +2,9 @@
 "use strict";
 var ws = {
     endpoint: 'https://resource.geosphere.at/graphdb/repositories/thes',
+    getProject: function (uri) {
+        return uri.split('/')[4];
+    },
     projectFilter: {
     },
     projectFrom: {

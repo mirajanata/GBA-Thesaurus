@@ -230,7 +230,7 @@ var search = {
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         let entry = value.L.value;
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
-                            entry = entry + ' <span class="addVoc">(' + lang[value.s.value.split('\/')[3] + 'Desc'].name + ')</span>';
+                            entry = entry + ' <span class="addVoc">(' + lang[ws.getProject(value.s.value) + 'Desc'].name + ')</span>';
                         }
                         $('#dropdown').append('<tr><td class="searchLink" data_url="' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '" onclick="document.location.href=\'' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
                     });
