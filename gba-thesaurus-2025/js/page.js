@@ -177,7 +177,8 @@ var page = {
         var query = `
                             PREFIX dcterms:<http://purl.org/dc/terms/> 
                             PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
-                            SELECT ?cL (COALESCE(?cD, "") AS ?desc) (COUNT(?n) AS ?count) (GROUP_CONCAT(DISTINCT ?L; separator = "|") as ?topConcepts) 
+                            SELECT ?cL (COALESCE(?cD, "") AS ?desc) (COUNT(?n) AS ?count) (GROUP_CONCAT(DISTINCT ?L; separator = "|") as ?topConcepts)
+                            @@from
                             WHERE { 
                             ?c a skos:ConceptScheme; dcterms:title ?cL
                             . FILTER(lang(?cL)="${lang.ID}") . 

@@ -106,6 +106,7 @@ var visNet = {
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
                                                 (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor)
+                                                @@from
                                                 WHERE {
                                                 VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
                                                 VALUES ?p2 {skos:broadMatch}

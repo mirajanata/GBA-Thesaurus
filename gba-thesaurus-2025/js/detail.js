@@ -285,6 +285,7 @@ var detail = {
 
         let query = `PREFIX dcterms:<http://purl.org/dc/terms/>
                     SELECT DISTINCT ?Citation ?DSN ?PDF
+                    @@from
                     WHERE {
                     VALUES ?r {${refArr}}
                     ?r dcterms:bibliographicCitation ?Citation .

@@ -5,7 +5,8 @@ var search = {
         var a = [];
         var b = 0;
         var query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
-                                        SELECT ?s ?L 
+                                        SELECT ?s ?L
+                                        @@from
                                         WHERE { 
                                         VALUES ?p {skos:prefLabel skos:altLabel} 
                                         ?s a skos:Concept; ?p ?L . FILTER(lang(?L)="${lang.ID}") 

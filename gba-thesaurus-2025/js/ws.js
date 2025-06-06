@@ -3,27 +3,29 @@
 var ws = {
     endpoint: 'https://resource.geosphere.at/graphdb/repositories/thes',
     projectFilter: {
-        'GeologicUnit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
-        'geolunit': 'FILTER(contains(STR(?@@item), "/geolunit") || contains(STR(?@@item), "/geomorph"))',
-        'structure': 'FILTER(contains(STR(?@@item), "/struct"))',
-        'struct': 'FILTER(contains(STR(?@@item), "/struct"))',
-        'GeologicTimeScale': 'FILTER(contains(STR(?@@item), "/time"))',
-        'time': 'FILTER(contains(STR(?@@item), "/time"))',
-        'lithology': 'FILTER(contains(STR(?@@item), "/lith"))',
-        'lith': 'FILTER(contains(STR(?@@item), "/lith"))',
-        'tectonicunit': 'FILTER(contains(STR(?@@item), "/tect"))',
-        'tect': 'FILTER(contains(STR(?@@item), "/tect"))',
-        'mineral': 'FILTER(contains(STR(?@@item), "/mineral"))',
-        'minres': 'FILTER(contains(STR(?@@item), "/minres"))',
-        'citation': 'FILTER(contains(STR(?@@item), "/citation"))',
-        'ref': 'FILTER(contains(STR(?@@item), "/citation"))',
+    },
+    projectFrom: {
+        'GeologicUnit': 'FROM <https://resource.geosphere.at/thes/geolunit> FROM <https://resource.geosphere.at/thes/geomorph>',
+        'geolunit': 'FROM <https://resource.geosphere.at/thes/geolunit> FROM <https://resource.geosphere.at/thes/geomorph>',
+        'structure': 'FROM <https://resource.geosphere.at/thes/struct>',
+        'struct': 'FROM <https://resource.geosphere.at/thes/struct>',
+        'GeologicTimeScale': 'FROM <https://resource.geosphere.at/thes/time>',
+        'time': 'FROM <https://resource.geosphere.at/thes/time>',
+        'lithology': 'FROM <https://resource.geosphere.at/thes/lith>',
+        'lith': 'FROM <https://resource.geosphere.at/thes/lith>',
+        'tectonicunit': 'FROM <https://resource.geosphere.at/thes/tect>',
+        'tect': 'FROM <https://resource.geosphere.at/thes/tect>',
+        'mineral': 'FROM <https://resource.geosphere.at/thes/mineral>',
+        'minres': 'FROM <https://resource.geosphere.at/thes/minres>',
+        'citation': 'FROM <https://resource.geosphere.at/thes/citation>',
+        'ref': 'FROM <https://resource.geosphere.at/thes/citation>',
     },
 
     doc: function (query, thenFunc) {
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson').then(thenFunc);
     },
     json: function (uriPart, query, filteredItem, thenFunc) {
-        query = ws.__processFilter(uriPart, query, filteredItem);
+        query = ws.processSparql(uriPart, query, filteredItem);
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson')
             .then(res => res.json())
             .then(thenFunc)
@@ -35,7 +37,7 @@ var ws = {
             .then(thenFunc);
     },
     projectJson: function (projectId, query, filteredItem, thenFunc) {
-        query = ws.__processFilter(projectId, query, filteredItem);
+        query = ws.processSparql(projectId, query, filteredItem);
 
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson')
             .then(res => res.json())
@@ -52,16 +54,23 @@ var ws = {
                 }
             });
     },
-    __processFilter: function (projectId, query, filteredItem) {
-        var filter = ws.projectFilter[projectId];
+    processSparql: function (projectId, query, filteredItem) {
+        let filter = ws.projectFilter ? ws.projectFilter[projectId] : null;
         if (!filter) {
             filter = "";
         }
         if (!filteredItem) {
             filteredItem = "c";
         }
-        query = query.replaceAll('@@filter', filter);
-        return query.replaceAll('@@item', filteredItem);
+        query = query.replaceAll('@@filter', filter).replaceAll('@@item', filteredItem);
+
+        let from = ws.projectFrom ? ws.projectFrom[projectId] : null;
+        if (!from) {
+            from = "";
+        }
+        query = query.replaceAll('@@from', from);
+
+        return query;
     },
     getProjUrl: function (projectId, query) {
         return this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson';
