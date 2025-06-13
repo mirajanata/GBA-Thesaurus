@@ -147,8 +147,40 @@ var visNet = {
                 }
             });
             visNet.extGraph(uri, true);
+
+            visNet.createHierarchy();
+
             visNet.drawNetwork();
         });
+    },
+
+    createHierarchy: function () {
+        visNet.hRoot = null;
+        visNet.hIndex = [];
+        if (visNet.visData.length == 0) {
+            return;
+        }
+        visNet.visData.forEach((i) => {
+            let from = visNet.hIndex[i.s.value];
+            if (!from) {
+                from = { title: i.sLabel.value, color: i.sColor.value, uri: i.s.value, children: [] };
+                visNet.hIndex[i.s.value] = from;
+            }
+            let to = visNet.hIndex[i.o.value];
+            if (!to) {
+                to = { title: i.oLabel.value, color: i.oColor.value, uri: i.o.value, children: [] };
+                visNet.hIndex[i.o.value] = to;
+                to.parent = from;
+            }
+            from.children.push(to);
+        });
+        let idx = visNet.hIndex;
+        for (let key in idx) {
+            let n = idx[key];
+            if (!n.parent) {
+                visNet.hRoot = n;
+            }
+        };
     },
 
     createEdge: function (from, to, arrows, dashes, color) {

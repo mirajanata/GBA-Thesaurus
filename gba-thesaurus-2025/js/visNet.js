@@ -17,7 +17,7 @@ var visNet = {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         //let project = uri.split('/')[3];
-        let project = es.getProject(uri);
+        let project = ws.getProject(uri);
         let lang = urlParams.get('lang');
 
         visNet._uri = uri;
