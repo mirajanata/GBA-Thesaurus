@@ -18,7 +18,7 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
     padding = 1, // horizontal padding for first and last column
     fill = "#999", // fill for nodes
     fillOpacity, // fill opacity for nodes
-    stroke = "#555", // stroke for links
+    stroke = "#888", // stroke for links
     strokeWidth = 1.5, // stroke width for links
     strokeOpacity = 0.4, // stroke opacity for links
     strokeLinejoin, // stroke line join for links
@@ -35,6 +35,7 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
     const root = path != null ? d3.stratify().path(path)(data)
         : id != null || parentId != null ? d3.stratify().id(id).parentId(parentId)(data)
             : d3.hierarchy(data, children);
+
     // Sort the nodes.
     if (sort != null) root.sort(sort);
 
@@ -87,9 +88,25 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
         .selectAll("a")
         .data(root.descendants())
         .join("a")
-        .attr("xlink:href", link == null ? null : d => link(d.data, d))
+        .attr("href", link == null ? null : d => link(d.data, d))
+        .attr("style", d =>
+            d.data.c.length == 0 ? "cursor:default;" : "cursor: pointer;")
         .attr("target", link == null ? null : linkTarget)
-        .attr("transform", d => `translate(${d.y},${d.x})`);
+        .attr("transform", d => `translate(${d.y},${d.x})`)
+        .attr("uri", d => title(d.data, d));
+
+    node.on("click", function (target) {
+        visNet.expandHierarchy(visNet.hIndex[this.attributes["uri"].value], 1);
+        chart = Tree(data, {
+            label: d => d.label,
+            title: (d, n) => d.title,
+            link: (d, n) => null,
+            width: 1152
+        });
+        d3.select("#d3tree").html(""); // Clear the previous chart
+        d3.select("#d3tree").append(() => chart);
+    });
+
 
     node.append("circle")
         .attr("fill", d => d.children ? stroke : fill)
@@ -109,6 +126,18 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
 
     return svg.node();
 }
+
+visNet.init(function (data) {
+    chart = Tree(data, {
+        label: d => d.label,
+        title: (d, n) => d.title,
+        link: (d, n) => null,
+        width: 1152
+    });
+    d3.select("#d3tree").append(() => chart);
+});
+
+/*
 fetch('flare.json', {
     method: 'GET',
     headers: {
@@ -118,15 +147,12 @@ fetch('flare.json', {
     .then(response => {
         flare = response.json().then(flare => {
             chart = Tree(flare, {
-                label: d => {
-                    d.name
-                },
-                title: (d, n) => {
-                    `${n.ancestors().reverse().map(d => d.data.name).join(".")}`
-                }                        , // hover text
+                label: d => d.name,
+                title: (d, n) => `${n.ancestors().reverse().map(d => d.data.name).join(".")}`, // hover text
                 link: (d, n) => `https://github.com/prefuse/Flare/${n.children ? "tree" : "blob"}/master/flare/src/${n.ancestors().reverse().map(d => d.data.name).join("/")}${n.children ? "" : ".as"}`,
                 width: 1152
             });
             d3.select("#d3tree").append(() => chart);
         });
     });
+    */

@@ -13,7 +13,7 @@ var visNet = {
     _lang: null,
     _itopic: false,
 
-    init: function () {
+    init: function (afterRead) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         let project = uri.split('/')[3];
@@ -98,9 +98,9 @@ var visNet = {
         };
 
 
-        this.createNetwork(uri, lang, ws.endpoint, project);
+        this.createNetwork(uri, lang, ws.endpoint, project, afterRead);
     },
-    createNetwork: function (uri, lang, endpoint, project) {
+    createNetwork: function (uri, lang, endpoint, project, afterRead) {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
@@ -148,13 +148,17 @@ var visNet = {
             });
             visNet.extGraph(uri, true);
 
-            visNet.createHierarchy();
+            visNet.createHierarchy(uri);
 
-            visNet.drawNetwork();
+            if (afterRead) {
+                afterRead(visNet.hRoot);
+            } else {
+                visNet.drawNetwork();   
+                }
         });
     },
 
-    createHierarchy: function () {
+    createHierarchy: function (uri) {
         visNet.hRoot = null;
         visNet.hIndex = [];
         if (visNet.visData.length == 0) {
@@ -162,25 +166,48 @@ var visNet = {
         }
         visNet.visData.forEach((i) => {
             let from = visNet.hIndex[i.s.value];
+            let to = visNet.hIndex[i.o.value];
             if (!from) {
-                from = { title: i.sLabel.value, color: i.sColor.value, uri: i.s.value, children: [] };
+                from = { label: visNet.getLabel(i.sLabel.value), color: i.sColor.value, title: i.s.value, c: [] };
                 visNet.hIndex[i.s.value] = from;
             }
-            let to = visNet.hIndex[i.o.value];
             if (!to) {
-                to = { title: i.oLabel.value, color: i.oColor.value, uri: i.o.value, children: [] };
+                to = { label: visNet.getLabel(i.oLabel.value), color: i.oColor.value, title: i.o.value, c: [] };
                 visNet.hIndex[i.o.value] = to;
                 to.parent = from;
             }
-            from.children.push(to);
-        });
-        let idx = visNet.hIndex;
-        for (let key in idx) {
-            let n = idx[key];
-            if (!n.parent) {
-                visNet.hRoot = n;
+            if (from.parent != to) {
+                from.c.push(to);
+            } else {
+                // do nothing
+                from = from;
             }
-        };
+        });
+        visNet.hRoot = visNet.hIndex[uri];
+        visNet.expandHierarchy(visNet.hRoot, 2);
+    },
+    expandHierarchy: function (node, levels) {
+        node.children = node.c;
+        levels--;
+        if (levels > 0) {
+            node.children.forEach((c) => {
+                visNet.expandHierarchy(c, levels);
+            });
+        }
+    },
+
+    getLabel: function (uri) {
+        let Label = uri;
+        let nodeText = uri;
+        if (Label.includes('//')) {
+            for (let i in visNet.abbrev) {
+                if (Label.includes(visNet.abbrev[i])) {
+                    Label = nodeText.split('/').pop() + ' (' + i + ')';
+                    Label = (Label.charAt(0).toUpperCase() + Label.slice(1)).replace(/_/g, ' ');
+                }
+            }
+        }
+        return Label;
     },
 
     createEdge: function (from, to, arrows, dashes, color) {
@@ -232,7 +259,8 @@ var visNet = {
         BGS: 'http://data.bgs.ac.uk/id/EarthMaterialClass/',
         WIKIDATA: 'https://www.wikidata.org/entity/',
         GEMET: 'https://www.eionet.europa.eu/gemet/',
-        GBA: 'https://resource.geolba.ac.at'
+        GBA: 'https://resource.geolba.ac.at',
+        GBA2: 'http://resource.geolba.ac.at'
     },
     isExternal: function (uri) {
         return !uri.includes(visNet.abbrev.GBA);
