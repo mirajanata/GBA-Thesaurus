@@ -77,7 +77,7 @@ treeChart = function (data) {
         nodeEnter.append("title").html(d => `<p class="title">${d.data.name}</p>`);
 
         nodeEnter.append("circle")
-            .attr("r", 2.5)
+            .attr("r", 3)
             .attr("fill", d => d._children ? "#ffcc00" : "#999")
             .attr("stroke-width", 10);
 
@@ -144,7 +144,6 @@ treeChart = function (data) {
     root.y0 = 0;
     root.descendants().forEach((d, i) => {
         d.id = i;
-        d.data.name = d.data.label;
         d._children = d.children;
         if (d.depth && d.data.name.length !== 7) d.children = null;
     });
@@ -154,7 +153,7 @@ treeChart = function (data) {
     return svg.node();
 }
 
-visNet.init(function (data) {
+d3data.init(function (data) {
     chart = treeChart(data);
     d3.select("#d3tree").append(() => chart);
 });
