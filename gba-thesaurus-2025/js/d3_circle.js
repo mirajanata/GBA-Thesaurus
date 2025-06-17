@@ -25,18 +25,38 @@ circleChart = function (data) {
         .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
         .attr("width", width)
         .attr("height", height)
-        .attr("style", `max-width: 100%; height: auto; display: block; font: 15px Calibri; margin: 0 -14px; background: #e0e0e0; cursor: pointer;`);
+        .attr("style", `max-width: 100%; height: auto; display: block; font: 15px Calibri; margin: 0 -14px; background: #e8e8e8; cursor: pointer;`);
 
     // Append the nodes.
     const node = svg.append("g")
         .selectAll("circle")
         .data(root.descendants().slice(1))
         .join("circle")
-        .attr("fill", d => d.children ? color(d.depth) : "white")
-        .attr("pointer-events", d => !d.children ? "none" : null)
-        .on("mouseover", function () { d3.select(this).attr("stroke", "#000"); })
-        .on("mouseout", function () { d3.select(this).attr("stroke", null); })
-        .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()));
+        .attr("id", d => "c" + d.data.id)
+        .attr("text", d => d.data.name)
+        .attr("fill", d => d.data.color ? d.data.color : "#ffffff")
+        .attr("pointer-events", d => true)
+        .on("mouseover", function (event, d) {
+            let e = d3.select(this);
+            id = e.attr("id");
+            let t = d3.select("#t" + id.substring(1));
+            let disp = t.attr("display");
+            if (d.children) {
+                e.attr("stroke", "#202070");
+            }
+            t.text(e.attr("text"));
+        })
+        .on("mouseout", function (event, d) {
+            let e = d3.select(this);
+            id = e.attr("id");
+            let t = d3.select("#t" + id.substring(1));
+            let disp = t.style("display");
+            if (d.children) {
+                e.attr("stroke", null);
+            }
+            d3.select("#t" + id.substring(1)).text(nodeText(e.attr("text")));
+        })
+        .on("click", (event, d) => { if (d.children && d.parent === focus) { focus !== d && (zoom(event, d), event.stopPropagation()); } });
 
     // Append the text labels.
     const label = svg.append("g")
@@ -45,6 +65,7 @@ circleChart = function (data) {
         .selectAll("text")
         .data(root.descendants())
         .join("text")
+        .attr("id", d => "t" + d.data.id)
         .style("fill-opacity", d => d.parent === root ? 1 : 0)
         .style("display", d => d.parent === root ? "inline" : "none")
         .text(d => nodeText(d.data.name));

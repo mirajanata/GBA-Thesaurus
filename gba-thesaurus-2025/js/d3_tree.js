@@ -76,14 +76,24 @@ treeChart = function (data) {
 
         nodeEnter.append("title").html(d => `<p class="title">${d.data.name}</p>`);
 
+        nodeEnter.filter(function (d) { return d._children ? true : false; }).append("rect")
+            .attr("r", 4)
+            .attr("x", -4)
+            .attr("y", -4)
+            .attr("width", 8)
+            .attr("height", 8)
+            .attr("fill", "#ffffff")
+            .attr("stroke", "#202070")
+            .attr("stroke-width", 1);
+
         nodeEnter.append("circle")
-            .attr("r", 3)
-            .attr("fill", d => d._children ? "#ffcc00" : "#999")
+            .attr("r", 4)
+            .attr("fill", d => d.data.color)
             .attr("stroke-width", 10);
 
         nodeEnter.append("text")
             .attr("dy", "0.31em")
-            .attr("x", d => d._children ? -6 : 6)
+            .attr("x", d => d._children ? -8 : 8)
             .attr("text-anchor", d => d._children ? "end" : "start")
             .text(d => nodeText(d.data.name))
             .attr("stroke-linejoin", "round")

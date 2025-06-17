@@ -26,6 +26,7 @@ var d3data = {
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
                                                 (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor)
+                                                @@from
                                                 WHERE {
                                                 VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
                                                 VALUES ?p2 {skos:broadMatch}
@@ -36,10 +37,11 @@ var d3data = {
                                                 OPTIONAL {?o skos:prefLabel ?oL . FILTER(lang(?oL)='${lang}')}
                                                 OPTIONAL {?s dbpo:colourHexCode ?sC}
                                                 OPTIONAL {?o dbpo:colourHexCode ?oC}
+                                                @@filter
                                                 }
                                                 ORDER BY ?sL`;
 
-        ws.projectJson(project, query, function (jsonData) {
+        ws.projectJson(project, query, "s", function (jsonData) {
             d3data.visData = jsonData.results.bindings;
             //console.log(d3data.visData);
 
@@ -59,19 +61,20 @@ var d3data = {
         if (d3data.visData.length == 0) {
             return;
         }
+        let Id = 0;
         d3data.visData.forEach((i) => {
             let from = d3data.hIndex[i.s.value];
             let to = d3data.hIndex[i.o.value];
             if (!from) {
                 let s = d3data.getLabel(i.sLabel.value);
                 from = {
-                    label: s, name: s, color: i.sColor.value, title: i.s.value, c: [], r: [], value: 1
+                    id:(++Id), label: s, name: s, color: i.sColor.value, title: i.s.value, c: [], r: [], value: 1
                 };
                 d3data.hIndex[i.s.value] = from;
             }
             if (!to) {
                 let s = d3data.getLabel(i.oLabel.value);
-                to = { label: s, name: s, color: i.oColor.value, title: i.o.value, c: [], r: [], value: 1 };
+                to = { id: (++Id), label: s, name: s, color: i.oColor.value, title: i.o.value, c: [], r: [], value: 1 };
                 d3data.hIndex[i.o.value] = to;
                 to.parent = from;
             }
