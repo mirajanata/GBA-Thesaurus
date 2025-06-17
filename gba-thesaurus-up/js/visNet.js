@@ -168,16 +168,17 @@ var visNet = {
             let from = visNet.hIndex[i.s.value];
             let to = visNet.hIndex[i.o.value];
             if (!from) {
-                from = { label: visNet.getLabel(i.sLabel.value), color: i.sColor.value, title: i.s.value, c: [] };
+                from = { label: visNet.getLabel(i.sLabel.value), color: i.sColor.value, title: i.s.value, c: [], r: [] };
                 visNet.hIndex[i.s.value] = from;
             }
             if (!to) {
-                to = { label: visNet.getLabel(i.oLabel.value), color: i.oColor.value, title: i.o.value, c: [] };
+                to = { label: visNet.getLabel(i.oLabel.value), color: i.oColor.value, title: i.o.value, c: [], r: [] };
                 visNet.hIndex[i.o.value] = to;
                 to.parent = from;
             }
             if (from.parent != to) {
                 from.c.push(to);
+                from.r.push(i.x.value.split('#')[1]);
             } else {
                 // do nothing
                 from = from;

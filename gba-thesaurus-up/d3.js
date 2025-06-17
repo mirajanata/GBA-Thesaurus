@@ -1,6 +1,10 @@
 ﻿// Copyright 2021-2023 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/tree
+
+var rootHeight = 0, x0, x1; // Global variable to track the height of the root node
+const dx = 15;
+
 function Tree(data, { // data is either tabular (array of objects) or hierarchy (nested objects)
     path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
     id = Array.isArray(data) ? d => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
@@ -16,9 +20,9 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
     height, // outer height, in pixels
     r = 6, // radius of nodes
     padding = 1, // horizontal padding for first and last column
-    fill = "#999", // fill for nodes
+    fill = "#a0a0f0", // fill for nodes
     fillOpacity, // fill opacity for nodes
-    stroke = "#888", // stroke for links
+    stroke = "#4040c0", // stroke for links
     strokeWidth = 1.5, // stroke width for links
     strokeOpacity = 0.4, // stroke opacity for links
     strokeLinejoin, // stroke line join for links
@@ -44,13 +48,13 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
     const L = label == null ? null : descendants.map(d => label(d.data, d));
 
     // Compute the layout.
-    const dx = 10;
-    const dy = width / (root.height + padding);
+    rootHeight = root.height + padding;
+    dy = width / rootHeight;
     tree().nodeSize([dx, dy])(root);
 
     // Center the tree.
-    let x0 = Infinity;
-    let x1 = -x0;
+    x0 = Infinity;
+    x1 = -x0;
     root.each(d => {
         if (d.x > x1) x1 = d.x;
         if (d.x < x0) x0 = d.x;
@@ -63,12 +67,12 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
     if (typeof curve !== "function") throw new Error(`Unsupported curve`);
 
     const svg = d3.create("svg")
+        .attr("id", "d3treesvg")
         .attr("viewBox", [-dy * padding / 2, x0 - dx, width, height])
         .attr("width", width)
         .attr("height", height)
-        .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
-        .attr("font-family", "sans-serif")
-        .attr("font-size", 10);
+        .attr("font-family", "Calibri")
+        .attr("font-size", 14);
 
     svg.append("g")
         .attr("fill", "none")
@@ -109,7 +113,7 @@ function Tree(data, { // data is either tabular (array of objects) or hierarchy 
 
 
     node.append("circle")
-        .attr("fill", d => d.children ? stroke : fill)
+        .attr("fill", d => d.data.c.length == 0 || d.children != null ? fill : stroke)
         .attr("r", r);
 
     if (title != null) node.append("title")
@@ -134,25 +138,29 @@ visNet.init(function (data) {
         link: (d, n) => null,
         width: 1152
     });
-    d3.select("#d3tree").append(() => chart);
-});
+    let c = d3.select("#d3tree");
+    c.append(() => chart);
 
-/*
-fetch('flare.json', {
-    method: 'GET',
-    headers: {
-        'Accept': 'application/json',
-    },
-})
-    .then(response => {
-        flare = response.json().then(flare => {
-            chart = Tree(flare, {
-                label: d => d.name,
-                title: (d, n) => `${n.ancestors().reverse().map(d => d.data.name).join(".")}`, // hover text
-                link: (d, n) => `https://github.com/prefuse/Flare/${n.children ? "tree" : "blob"}/master/flare/src/${n.ancestors().reverse().map(d => d.data.name).join("/")}${n.children ? "" : ".as"}`,
-                width: 1152
-            });
-            d3.select("#d3tree").append(() => chart);
+    var svg = $("#d3treesvg"),
+        container = svg.parent();
+
+    d3.select(window)
+        .on("resize", function () {
+            var targetWidth = container.width();
+            var targetHeight = container.height();
+            let dy = targetWidth / (rootHeight);
+            let padding = 1;
+            svg
+                .attr("width", targetWidth)
+                .attr("height", targetHeight);
+            console.log("Resized to: " + targetWidth + "x" + targetHeight);
         });
-    });
-    */
+    let targetWidth = container.width();
+    let targetHeight = container.height();
+    let dy = targetWidth / (rootHeight);
+    let padding = 1;
+    svg
+        .attr("width", targetWidth)
+        .attr("height", targetHeight);
+    console.log("Resized to: " + targetWidth + "x" + targetHeight);
+});
