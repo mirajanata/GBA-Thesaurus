@@ -6,7 +6,7 @@ var d3data = {
     _lang: null,
     _itopic: false,
 
-    init: function (afterRead) {
+    init: function (afterRead, expandTo) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         let project = uri.split('/')[3];
@@ -19,9 +19,9 @@ var d3data = {
 
 
 
-        this.createNetwork(uri, lang, ws.endpoint, project, afterRead);
+        this.createNetwork(uri, lang, ws.endpoint, project, afterRead, expandTo);
     },
-    createNetwork: function (uri, lang, endpoint, project, afterRead) {
+    createNetwork: function (uri, lang, endpoint, project, afterRead, expandTo) {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
@@ -45,17 +45,15 @@ var d3data = {
             d3data.visData = jsonData.results.bindings;
             //console.log(d3data.visData);
 
-            d3data.createHierarchy(uri);
+            d3data.createHierarchy(uri, expandTo);
 
             if (afterRead) {
                 afterRead(d3data.hRoot);
-            } else {
-                d3data.drawNetwork();
             }
         });
     },
 
-    createHierarchy: function (uri) {
+    createHierarchy: function (uri, expandTo) {
         d3data.hRoot = null;
         d3data.hIndex = [];
         if (d3data.visData.length == 0) {
@@ -68,7 +66,7 @@ var d3data = {
             if (!from) {
                 let s = d3data.getLabel(i.sLabel.value);
                 from = {
-                    id:(++Id), label: s, name: s, color: i.sColor.value, title: i.s.value, c: [], r: [], value: 1
+                    id: (++Id), label: s, name: s, color: i.sColor.value, title: i.s.value, c: [], r: [], value: 1
                 };
                 d3data.hIndex[i.s.value] = from;
             }
@@ -87,12 +85,14 @@ var d3data = {
             }
         });
         d3data.hRoot = d3data.hIndex[uri];
-        d3data.expandHierarchy(d3data.hRoot, 2);
+        if (!expandTo)
+            expandTo = 2;
+        d3data.expandHierarchy(d3data.hRoot, expandTo);
     },
     expandHierarchy: function (node, levels) {
         node.children = node.c;
         levels--;
-        if (levels > 0) {
+        if (node.c.length > 0 && levels > 0) {
             node.children.forEach((c) => {
                 d3data.expandHierarchy(c, levels);
             });

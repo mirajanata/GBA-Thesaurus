@@ -2,7 +2,7 @@
 treeChart = function (data) {
 
     // Specify the charts’ dimensions. The height is variable, depending on the layout.
-    const width = 928;
+    const width = 1480;
     const marginTop = 40;
     const marginRight = 10;
     const marginBottom = 10;
@@ -23,8 +23,8 @@ treeChart = function (data) {
     const svg = d3.create("svg")
         .attr("width", width)
         .attr("height", dx)
-        .attr("viewBox", [-marginLeft, -marginTop, width, dx])
-        .attr("style", "max-width: 100%; height: auto; font: 15px Calibri; user-select: none;");
+        .attr("viewBox", [-marginLeft, -marginTop, width + 200, width + 200])
+        .attr("style", "max-width: 100%; height: auto; font: 14px Calibri; user-select: none;");
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -68,23 +68,13 @@ treeChart = function (data) {
             .attr("transform", d => `translate(${source.y0},${source.x0})`)
             .attr("fill-opacity", 0)
             .attr("stroke-opacity", 0)
-            .attr("style", d => d._children ? "cursor:pointer;" : "cursor: default;")
+            .attr("style", d => d.data.c.length > 0 ? "cursor:pointer;" : "cursor: default;")
             .on("click", (event, d) => {
                 d.children = d.children ? null : d._children;
                 update(event, d);
             });
 
         nodeEnter.append("title").html(d => `<p class="title">${d.data.name}</p>`);
-
-        nodeEnter.filter(function (d) { return d._children ? true : false; }).append("rect")
-            .attr("r", 4)
-            .attr("x", -4)
-            .attr("y", -4)
-            .attr("width", 8)
-            .attr("height", 8)
-            .attr("fill", "#ffffff")
-            .attr("stroke", "#202070")
-            .attr("stroke-width", 1);
 
         nodeEnter.append("circle")
             .attr("r", 4)
@@ -95,10 +85,12 @@ treeChart = function (data) {
             .attr("dy", "0.31em")
             .attr("x", d => d._children ? -8 : 8)
             .attr("text-anchor", d => d._children ? "end" : "start")
+            .attr("text-rendering", "optimizeLegibility")
             .text(d => nodeText(d.data.name))
             .attr("stroke-linejoin", "round")
-            .attr("stroke-width", 3)
-            .attr("stroke", "white")
+            .attr("stroke-width", 0.25)
+            .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "black")
+            .attr("style", d => d.data.c.length > 0 ? "text-decoration: underline;" : "")
             .attr("paint-order", "stroke");
 
         // Transition nodes to their new position.
@@ -166,4 +158,4 @@ treeChart = function (data) {
 d3data.init(function (data) {
     chart = treeChart(data);
     d3.select("#d3tree").append(() => chart);
-});
+}, 10);

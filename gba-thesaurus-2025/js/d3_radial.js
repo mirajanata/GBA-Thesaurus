@@ -1,12 +1,13 @@
 ﻿
 treeChart = function (data) {
     // Specify the chart’s dimensions.
-    const width = 1280;
+    const width = 1480;
     const height = width;
     const cx = width * 0.5; // adjust as needed to fit
     const cy = height * 0.54; // adjust as needed to fit
     const radius = Math.min(width, height) / 2 - 80;
-
+    let maxWidth = 0;
+    let maxHeight = 0;
     // Create a radial cluster layout. The layout’s first dimension (x)
     // is the angle, while the second (y) is the radius.
     const tree = d3.cluster()
@@ -21,64 +22,55 @@ treeChart = function (data) {
     const svg = d3.create("svg")
         .attr("width", width)
         .attr("height", height)
-        .attr("viewBox", [-cx - 100, -cy, width + 400, height + 400])
-        .attr("style", "max-width: 100%; height: auto; font:15px Calibri;overflow:auto;");
+        .attr("viewBox", [-cx - 100, -cy, width + 200, height + 200])
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("style", "max-width: 100%; height: auto; font:16px Calibri;overflow:auto;");
 
     // Append links.
-    svg.append("g")
+    const gNode = svg.append("g")
         .attr("fill", "none")
         .attr("stroke", "#555")
         .attr("stroke-opacity", 0.4)
-        .attr("stroke-width", 1.5)
-        .selectAll()
+        .attr("stroke-width", 1.5);
+
+    gNode.selectAll()
         .data(root.links())
         .join("path")
         .attr("d", d3.linkRadial()
             .angle(d => d.x)
             .radius(d => d.y));
 
-    // Append nodes.
-    svg.append("g")
-        .selectAll()
-        .data(root.descendants().filter(function (d) {
-            return d.data.c.length > 0 ? true : false;
-        }))
-        .join("circle")
-        .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
-        .attr("stroke", "#202040")
-        .attr("stroke-width", "2")
-        .attr("fill", "#ffffff")
-        .attr("r", 6);
+    const nodes = root.descendants().reverse();
+    const node = gNode.selectAll("g")
+        .data(nodes, d => d.id);
 
-    svg.append("g")
-        .selectAll()
-        .data(root.descendants())
-        .join("circle")
-        .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
-        .attr("fill", d => d.data.color)
-        .attr("r", 4);
-
-    // Append labels.
-    svg.append("g")
-        .attr("stroke-linejoin", "round")
-        .attr("stroke-width", 3)
-        .selectAll()
-        .data(root.descendants())
-        .join("text")
+    // Enter any new nodes at the parent's previous position.
+    const nodeEnter = node.enter().append("g")
         .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0) rotate(${d.x >= Math.PI ? 180 : 0})`)
-        .attr("dy", "0.31em")
-        .attr("x", d => d.x < Math.PI === !d.children ? 10 : -10)
-        .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
-        .attr("paint-order", "stroke")
-        .attr("stroke", "white")
-        .attr("style", d => d.data.c.length>0 ? "cursor:pointer;" : "cursor: default;")
-        .attr("fill", "currentColor")
-        .text(d => nodeText(d.data.name))
-        .on("click", (e, d) => {
-            console.log(d);
+        .attr("style", d => d.data.c.length > 0 ? "cursor:pointer;" : "cursor: default;")
+        .on("click", (event, d) => {
             d.data.children = d.data.children ? null : d.data.c;
             update();
         });
+
+    nodeEnter.append("title").html(d => `<p class="title">${d.data.name}</p>`);
+
+    nodeEnter.append("circle")
+        .attr("fill", d => d.data.color)
+        .attr("r", 4);
+
+    nodeEnter.append("text")
+        .attr("dy", "0.31em")
+        .attr("x", d => d.x >= Math.PI != (d.children != null) ? -8 : 8)
+        .attr("text-anchor", d => d.x >= Math.PI != (d.children!=null) ? "end" : "start")
+        .attr("text-rendering", "optimizeLegibility")
+        .text(d => nodeText(d.data.name))
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 0.25)
+        .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "black")
+        .attr("style", d => d.data.c.length > 0 ? "text-decoration: underline;" : "")
+        .attr("paint-order", "stroke");
+
 
     return svg.node();
 }
