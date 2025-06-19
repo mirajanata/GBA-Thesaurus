@@ -79,9 +79,6 @@ var d3data = {
             if (from.parent != to) {
                 from.c.push(to);
                 from.r.push(i.x.value.split('#')[1]);
-            } else {
-                // do nothing
-                from = from;
             }
         });
         d3data.hRoot = d3data.hIndex[uri];
