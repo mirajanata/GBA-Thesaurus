@@ -202,4 +202,4 @@ circleChart = function (data) {
 d3data.init(function (data) {
     chart = circleChart(data);
     d3.select("#d3tree").append(() => chart);
-}, 2);
+}, 10);

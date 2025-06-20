@@ -93,4 +93,4 @@ d3data.init(function (data) {
     treeData = data;
     chart = treeChart(data);
     d3.select("#d3tree").append(() => chart);
-});
+}, 10);

@@ -61,30 +61,69 @@ var d3data = {
         }
         let Id = 0;
         d3data.visData.forEach((i) => {
-            let from = d3data.hIndex[i.s.value];
-            let to = d3data.hIndex[i.o.value];
+            let S = i.s;
+            let O = i.o;
+            let Scolor = i.sColor;
+            let Ocolor = i.oColor;
+            let Slabel = i.sLabel;
+            let Olabel = i.oLabel;
+            let rel = i.x.value.split('#')[1];
+            if (rel == 'broadMatch') {
+                S = i.o;
+                O = i.s;
+                Scolor = i.oColor;
+                Ocolor = i.sColor;
+                Slabel = i.oLabel;
+                Olabel = i.sLabel;
+            }
+            let from = d3data.hIndex[S.value];
+            let to = d3data.hIndex[O.value];
             if (!from) {
-                let s = d3data.getLabel(i.sLabel.value);
+                let s = d3data.getLabel(Slabel.value);
                 from = {
-                    id: (++Id), label: s, name: s, color: i.sColor.value, title: i.s.value, c: [], r: [], value: 1
+                    id: (++Id), label: s, name: s, color: Scolor.value, title: S.value, c: [], r: [], value: 1
                 };
-                d3data.hIndex[i.s.value] = from;
+                d3data.hIndex[S.value] = from;
             }
             if (!to) {
-                let s = d3data.getLabel(i.oLabel.value);
-                to = { id: (++Id), label: s, name: s, color: i.oColor.value, title: i.o.value, c: [], r: [], value: 1 };
-                d3data.hIndex[i.o.value] = to;
+                let s = d3data.getLabel(Olabel.value);
+                to = { id: (++Id), label: s, name: s, color: Ocolor.value, title: O.value, c: [], r: [], value: 1 };
+                d3data.hIndex[O.value] = to;
                 to.parent = from;
             }
             if (from.parent != to) {
-                from.c.push(to);
-                from.r.push(i.x.value.split('#')[1]);
+                if (!d3data.checkLoop(from, to)) {
+                    from.c.push(to);
+                    from.r.push(rel);
+                }
+                else {
+                    let s = d3data.getLabel(Olabel.value);
+                    to = { id: (++Id), label: s, name: s, color: Ocolor.value, title: O.value, c: [], r: [], value: 1 };
+                    d3data.hIndex[O.value] = to;
+                    to.parent = from;
+                    from.c.push(to);
+                    from.r.push(rel);
+                }
             }
         });
         d3data.hRoot = d3data.hIndex[uri];
         if (!expandTo)
             expandTo = 2;
         d3data.expandHierarchy(d3data.hRoot, expandTo);
+    },
+    checkLoop: function (node, newNode) {
+        if (newNode.c.length == 0) {
+            return false;
+        }
+        for (let c of newNode.c) {
+            if (c == node) {
+                return true;
+            } else {
+                if (d3data.checkLoop(c, newNode))
+                    return true;
+            }
+        }
+        return false;
     },
     expandHierarchy: function (node, levels) {
         node.children = node.c;

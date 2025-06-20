@@ -1,6 +1,6 @@
-﻿
+﻿var treeData;
 treeChart = function (data) {
-
+    treeData = data;
     // Specify the charts’ dimensions. The height is variable, depending on the layout.
     const width = 1480;
     const marginTop = 40;
@@ -11,13 +11,13 @@ treeChart = function (data) {
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
     // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
     // “bottom”, in the data domain. The width of a column is based on the tree’s height.
-    const root = d3.hierarchy(data);
+    let root = d3.hierarchy(data);
     const dx = 20;
-    const dy = (width - marginRight - marginLeft) / (1 + root.height);
+    let dy = (width - marginRight - marginLeft) / (1 + root.height);
 
     // Define the tree layout and the shape for links.
-    const tree = d3.tree().nodeSize([dx, dy]);
-    const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+    let tree = d3.tree().nodeSize([dx, dy]);
+    let diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
 
     // Create the SVG container, a layer for the links and a layer for the nodes.
     const svg = d3.create("svg")
@@ -70,8 +70,18 @@ treeChart = function (data) {
             .attr("stroke-opacity", 0)
             .attr("style", d => d.data.c.length > 0 ? "cursor:pointer;" : "cursor: default;")
             .on("click", (event, d) => {
-                d.children = d.children ? null : d._children;
-                update(event, d);
+                if (d.data.c.length > 0 && !d.data.children) {
+                    d.data.children = d.data.c;
+                    d.data.expand = true;
+                    chart = treeChart(treeData);
+                    expandAfterExtension(root)
+                    d3.select("#d3tree").html("");
+                    d3.select("#d3tree").append(() => chart);
+                } else {
+                    d.children = d.children ? null : d._children;
+                    d.data.expand = d.children != null;
+                    update(event, d);
+                }
             });
 
         nodeEnter.append("title").html(d => `<p class="title">${d.data.name}</p>`);
@@ -132,6 +142,16 @@ treeChart = function (data) {
             d.x0 = d.x;
             d.y0 = d.y;
         });
+    }
+
+    function expandAfterExtension(dr) {
+        if (dr.data.expand) {
+            dr.children = dr._children;
+        }
+        if (dr.children) {
+            dr.data.expand = true;
+            dr.children.forEach(child => expandAfterExtension(child));
+        }
     }
 
     function nodeText(text) {
