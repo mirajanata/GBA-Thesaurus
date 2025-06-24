@@ -71,21 +71,21 @@ var d3data = {
             let o_color = i.oColor;
             let s_label = i.sLabel;
             let o_label = i.oLabel;
-            let s_quantity = Math.floor(i.sQ || "0");
-            let o_quantity = Math.floor(i.oQ || "0");
+            let s_quantity = Math.floor(i.sQ || "1");
+            let o_quantity = Math.floor(i.oQ || "1");
             let rel = i.x.value.split('#')[1];
             let from = d3data.hIndex[subject.value];
             let to = d3data.hIndex[object.value];
             if (!from) {
                 let s = d3data.getLabel(s_label.value);
                 from = {
-                    id: (++Id), label: s, name: s, color: s_color.value, title: subject.value, c: [], r: [], value: 1, quantity: s_quantity
+                    id: (++Id), label: s, name: s, color: s_color.value, title: subject.value, c: [], r: [], value: s_quantity || 1, quantity: s_quantity
                 };
                 d3data.hIndex[subject.value] = from;
             }
             if (!to) {
                 let s = d3data.getLabel(o_label.value);
-                to = { id: (++Id), label: s, name: s, color: o_color.value, title: object.value, c: [], r: [], value: 1, quantity: o_quantity };
+                to = { id: (++Id), label: s, name: s, color: o_color.value, title: object.value, c: [], r: [], value: o_quantity || 1, quantity: o_quantity };
                 d3data.hIndex[object.value] = to;
                 to.parent = from;
             }
@@ -96,7 +96,7 @@ var d3data = {
                 }
                 else {
                     let s = d3data.getLabel(o_label.value);
-                    to = { id: (++Id), label: s, name: s, color: o_color.value, title: object.value, c: [], r: [], value: 1, quantity: o_quantity };
+                    to = { id: (++Id), label: s, name: s, color: o_color.value, title: object.value, c: [], r: [], value: o_quantity || 1, quantity: o_quantity };
                     d3data.hIndex[object.value] = to;
                     to.parent = from;
                     from.c.push(to);
