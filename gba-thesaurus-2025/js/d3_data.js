@@ -19,9 +19,9 @@ var d3data = {
 
 
 
-        this.createNetwork(uri, lang, ws.endpoint, project, afterRead, expandTo);
+        this.prepareData(uri, lang, ws.endpoint, project, afterRead, expandTo);
     },
-    createNetwork: function (uri, lang, endpoint, project, afterRead, expandTo) {
+    prepareData: function (uri, lang, endpoint, project, afterRead, expandTo) {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 PREFIX so:<https://schema.org/>
@@ -67,25 +67,23 @@ var d3data = {
         d3data.visData.forEach((i) => {
             let subject = i.s;
             let object = i.o;
-            let s_color = i.sColor;
-            let o_color = i.oColor;
-            let s_label = i.sLabel;
-            let o_label = i.oLabel;
-            let s_quantity = Math.floor(i.sQ || "1");
-            let o_quantity = Math.floor(i.oQ || "1");
+            let o_color = i.oColor.value;
+            let o_label = i.oLabel.value;
+            let s_quantity = i.sQ ? Math.floor(i.sQ.value) : "1";
+            let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
             let rel = i.x.value.split('#')[1];
             let from = d3data.hIndex[subject.value];
             let to = d3data.hIndex[object.value];
             if (!from) {
-                let s = d3data.getLabel(s_label.value);
+                let s = d3data.getLabel(i.sLabel.value);
                 from = {
-                    id: (++Id), label: s, name: s, color: s_color.value, title: subject.value, c: [], r: [], value: s_quantity || 1, quantity: s_quantity
+                    id: (++Id), label: s, name: s, color: i.sColor.value, title: subject.value, c: [], r: [], value: d3data.getQuantityValue(s_quantity), quantity: s_quantity
                 };
                 d3data.hIndex[subject.value] = from;
             }
             if (!to) {
-                let s = d3data.getLabel(o_label.value);
-                to = { id: (++Id), label: s, name: s, color: o_color.value, title: object.value, c: [], r: [], value: o_quantity || 1, quantity: o_quantity };
+                let s = d3data.getLabel(o_label);
+                to = { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
                 d3data.hIndex[object.value] = to;
                 to.parent = from;
             }
@@ -95,8 +93,8 @@ var d3data = {
                     from.r.push(rel);
                 }
                 else {
-                    let s = d3data.getLabel(o_label.value);
-                    to = { id: (++Id), label: s, name: s, color: o_color.value, title: object.value, c: [], r: [], value: o_quantity || 1, quantity: o_quantity };
+                    let s = d3data.getLabel(o_label);
+                    to = { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
                     d3data.hIndex[object.value] = to;
                     to.parent = from;
                     from.c.push(to);
@@ -132,7 +130,12 @@ var d3data = {
             });
         }
     },
-
+    getQuantityValue: function (quantity) {
+        if (quantity > 1) {
+            return Math.log(quantity);
+        }
+        return 1;
+    },
     getLabel: function (uri) {
         let Label = uri;
         let nodeText = uri;

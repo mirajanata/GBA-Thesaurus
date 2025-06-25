@@ -40,9 +40,11 @@ var detail = {
                     WHERE { 
                     VALUES ?s {<${uri}>} ?s a skos:Concept . ?s ?p ?o .
                     OPTIONAL {?o a skos:Concept; skos:prefLabel ?L}
+					OPTIONAL {?o skos:notation ?sN}
                     }
                     GROUP BY ?p ?o 
-            `;
+					ORDER BY ?sN ?p ?o
+        `;
         let projectId = ws.getProject(uri);
         ws.json(projectId, query, "s", function (data) {
             if (data.results.bindings.length > 1) {

@@ -1,5 +1,5 @@
 ﻿
-treeChart = function (data) {
+radialChart = function (data) {
     // Specify the chart’s dimensions.
     const width = 1480;
     const height = width;
@@ -83,7 +83,7 @@ function nodeText(text) {
 }
 
 function update() {
-    chart = treeChart(treeData);
+    chart = radialChart(treeData);
     d3.select("#d3tree").html("");
     d3.select("#d3tree").append(() => chart);
 }
@@ -91,6 +91,6 @@ function update() {
 var treeData;
 d3data.init(function (data) {
     treeData = data;
-    chart = treeChart(data);
+    chart = radialChart(data);
     d3.select("#d3tree").append(() => chart);
 }, 10);
