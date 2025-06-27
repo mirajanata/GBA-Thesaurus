@@ -10,14 +10,22 @@
     <script src="js/d3_circle.js"></script>
 
     <style>
+        body {
+            font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
         .title {
-            font-family: Calibri;
             font-size: 18px;
+        }
+        .shadow {
+            -webkit-filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, .3));
+            filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, .3));
+            /* Similar syntax to box-shadow */
         }
     </style>
 
 </head>
 <body>
+    <h3 id="stackContent"></h3>
     <div id="d3tree" style="width:100%;height:100%; ">
 
     </div>

@@ -24,7 +24,7 @@ radialChart = function (data) {
         .attr("height", height)
         .attr("viewBox", [-cx - 100, -cy, width + 200, height + 200])
         .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("style", "max-width: 100%; height: auto; font:16px Calibri;overflow:auto;");
+        .attr("style", "max-width: 100%; height: auto; font-size:16px;overflow:auto;");
 
     // Append links.
     const gNode = svg.append("g")
@@ -67,7 +67,7 @@ radialChart = function (data) {
         .text(d => nodeText(d.data.name))
         .attr("stroke-linejoin", "round")
         .attr("stroke-width", 0.25)
-        .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "black")
+        .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "grey")
         .attr("style", d => d.data.c.length > 0 ? "text-decoration: underline;" : "")
         .attr("paint-order", "stroke");
 

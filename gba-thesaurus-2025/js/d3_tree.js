@@ -24,7 +24,7 @@ treeChart = function (data) {
         .attr("width", width)
         .attr("height", dx)
         .attr("viewBox", [-marginLeft, -marginTop, width + 200, width + 200])
-        .attr("style", "max-width: 100%; height: auto; font: 14px Calibri; user-select: none;");
+        .attr("style", "max-width: 100%; height: auto; font-size: 14px; user-select: none;");
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -99,7 +99,7 @@ treeChart = function (data) {
             .text(d => nodeText(d.data.name))
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 0.25)
-            .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "black")
+            .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "grey")
             .attr("style", d => d.data.c.length > 0 ? "text-decoration: underline;" : "")
             .attr("paint-order", "stroke");
 

@@ -1,7 +1,6 @@
-﻿var chartData;
-circleChart = function (data) {
-    chartData = data;
+﻿circleChart = function (data) {
     // Specify the chart’s dimensions.
+    let stack = [];
     const width = 928;
     const height = width;
 
@@ -18,18 +17,17 @@ circleChart = function (data) {
         (d3.hierarchy(data)
             .sum(d => d.value)
             .sort((a, b) => b.value - a.value));
-    let root = pack(chartData);
+    let root = pack(data);
 
     // Create the SVG container.
     const svg = d3.create("svg")
         .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
         .attr("width", width)
         .attr("height", height)
-        .attr("style", `max-width: 100%; height: auto; display: block; font: 15px Calibri; margin: 0; background: ${root.data.color}; cursor: pointer;`);
+        .attr("style", `max-width: 100%; height: auto; display: block; font-size: 14px; margin: 0; background: ${root.data.color}; cursor: pointer;`);
 
     const gNode = svg.append("g")
         .attr("fill", "#fff")
-        .attr("stroke", "#000")
         .attr("stroke-opacity", 0.4)
         .attr("stroke-width", 1.5);
 
@@ -37,46 +35,44 @@ circleChart = function (data) {
     const node = gNode.selectAll("g")
         .data(nodes, d => d.id);
 
-    function createElements(node) {
+    function drawStack(d) {
+        let text = null;
+        for (let i = 0; i < stack.length; i++) {
+            text = text != null ? text += " | " : "";
+            text += nodeText(stack[i].data.name);
+        }
+        if (d) {
+            text = text != null ? text += " | " : "";
+            text += nodeText(d.data.name);
+        }
+        document.getElementById("stackContent").innerHTML = text;
+    }
 
+
+    function createElements(node) {
         // Enter any new nodes at the parent's previous position.
         const nodeEnter = node.enter().append("g")
             .attr("id", d => "g" + d.data.id)
             .style("display", d => d.parent === root ? "inline" : "none")
-            .style("fill-opacity", d => d.parent === root ? 1 : 0)
             ;
 
         nodeEnter.append("title").html(d => `<p class="title">${d.data.name}</p>`);
 
         nodeEnter.append("circle")
+            .attr("class", "shadow")
+            .attr("stroke", "#000")
             .attr("fill", d => d.data.color);
 
         nodeEnter.append("text")
             .attr("text-anchor", "middle")
+            .attr("text-rendering", "optimizeLegibility")
             .text(d => nodeText(d.data.name))
-            .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "black")
+            .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "grey")
             .attr("style", d => d.data.c.length > 0 ? "text-decoration: underline;cursor:pointer;" : "cursor: default;")
             .attr("paint-order", "stroke")
             .on("click", (event, d) => {
-                if (!d.children && d.data.c) {
-                    d.data.children = d.data.c;
-                    // Compute the layout.
-                    let p = data => d3.pack()
-                        .size([width, height])
-                        .padding(3)
-                        (d3.hierarchy(data)
-                            .sum(d => d.value)
-                            .sort((a, b) => b.value - a.value));
-                    root = p(chartData);
-
-                    let nodes = root.descendants();
-                    createElements(gNode.selectAll("g")
-                        .data(nodes, d => d.id));
-                    zoom(event, root.data.id, gNode.selectAll("g"));
-                    zoom(event, d.data.id, gNode.selectAll("g"));
-                    event.stopPropagation();
-                }
-                else if (d.children && d.parent === focus) {
+                if (d.children && d.parent === focus) {
+                    stack.push(focus);
                     focus !== d && (zoom(event, d.data.id, gNode.selectAll("g")), event.stopPropagation());
                 }
             });
@@ -84,59 +80,15 @@ circleChart = function (data) {
 
     createElements(node);
 
-    /*
-    
-    
-        // Append the nodes.
-        const node = svg.append("g")
-            .selectAll("circle")
-            .data(root.descendants().slice(1))
-            .join("circle")
-            .attr("id", d => "c" + d.data.id)
-            .attr("text", d => d.data.name)
-            .attr("fill", d => d.data.color ? d.data.color : "#ffffff")
-            .attr("pointer-events", d => true)
-            .on("mouseover", function (event, d) {
-                let e = d3.select(this);
-                id = e.attr("id");
-                let t = d3.select("#t" + id.substring(1));
-                let disp = t.attr("display");
-                if (d.children) {
-                    e.attr("stroke", "#202070");
-                }
-                t.text(e.attr("text"));
-            })
-            .on("mouseout", function (event, d) {
-                let e = d3.select(this);
-                id = e.attr("id");
-                let t = d3.select("#t" + id.substring(1));
-                let disp = t.style("display");
-                if (d.children) {
-                    e.attr("stroke", null);
-                }
-                d3.select("#t" + id.substring(1)).text(nodeText(e.attr("text")));
-            })
-            .on("click", (event, d) => { if (d.children && d.parent === focus) { focus !== d && (zoom(event, d), event.stopPropagation()); } });
-    
-        // Append the text labels.
-        const label = svg.append("g")
-            .attr("pointer-events", "none")
-            .attr("text-anchor", "middle")
-            .selectAll("text")
-            .data(root.descendants())
-            .join("text")
-            .attr("id", d => "t" + d.data.id)
-            .style("fill-opacity", d => d.parent === root ? 1 : 0)
-            .style("display", d => d.parent === root ? "inline" : "none")
-            .text(d => nodeText(d.data.name));
-    */
     // Create the zoom behavior and zoom immediately in to the initial focus node.
     svg.on("click", (event) => {
-        zoom(event, root.data.id, gNode.selectAll("g"));
+        let e = stack.pop() || root;
+        zoom(event, e.data.id, gNode.selectAll("g"));
     });
     let focus = root;
     let view;
     zoomTo([focus.x, focus.y, focus.r * 2], gNode.selectAll("g"));
+    drawStack(root);
 
     function nodeText(text) {
         if (text.length > 20) {
@@ -194,6 +146,7 @@ circleChart = function (data) {
             .on("end", function (d) { if (d.parent !== focus) this.style.display = "none"; });
 
         svg.style("background", focus.data.color);
+        drawStack(d);
     }
 
     return svg.node();
