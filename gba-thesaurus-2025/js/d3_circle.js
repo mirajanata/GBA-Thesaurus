@@ -22,9 +22,9 @@
     // Create the SVG container.
     const svg = d3.create("svg")
         .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
-        .attr("width", width)
-        .attr("height", height)
-        .attr("style", `max-width: 100%; height: auto; display: block; font-size: 14px; margin: 0; background: ${root.data.color}; cursor: pointer;`);
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("style", `font-size: 16px; margin: 0; background: ${root.data.color}; cursor: pointer;`);
 
     const gNode = svg.append("g")
         .attr("fill", "#fff")
@@ -152,7 +152,9 @@
     return svg.node();
 }
 
+/*
 d3data.init(function (data) {
     chart = circleChart(data);
     d3.select("#d3tree").append(() => chart);
 }, 10);
+*/

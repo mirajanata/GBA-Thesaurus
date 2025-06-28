@@ -20,11 +20,11 @@ radialChart = function (data) {
 
     // Creates the SVG container.
     const svg = d3.create("svg")
-        .attr("width", width)
-        .attr("height", height)
+        .attr("width", "100%")
+        .attr("height", "100%")
         .attr("viewBox", [-cx - 100, -cy, width + 200, height + 200])
         .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("style", "max-width: 100%; height: auto; font-size:16px;overflow:auto;");
+        .attr("style", "font-size:32px;overflow:auto;");
 
     // Append links.
     const gNode = svg.append("g")
@@ -71,26 +71,28 @@ radialChart = function (data) {
         .attr("style", d => d.data.c.length > 0 ? "text-decoration: underline;" : "")
         .attr("paint-order", "stroke");
 
+    function nodeText(text) {
+        if (text.length > 20) {
+            return text.substring(0, 20) + "...";
+        }
+        return text;
+    }
+
+    function update() {
+        chart = radialChart(treeData);
+        d3.select("#d3radial").html("");
+        d3.select("#d3radial").append(() => chart);
+    }
+
 
     return svg.node();
 }
 
-function nodeText(text) {
-    if (text.length > 20) {
-        return text.substring(0, 20) + "...";
-    }
-    return text;
-}
-
-function update() {
-    chart = radialChart(treeData);
-    d3.select("#d3tree").html("");
-    d3.select("#d3tree").append(() => chart);
-}
-
+/*
 var treeData;
 d3data.init(function (data) {
     treeData = data;
     chart = radialChart(data);
     d3.select("#d3tree").append(() => chart);
 }, 10);
+*/

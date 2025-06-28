@@ -175,7 +175,9 @@ treeChart = function (data) {
     return svg.node();
 }
 
+/*
 d3data.init(function (data) {
     chart = treeChart(data);
     d3.select("#d3tree").append(() => chart);
 }, 10);
+*/

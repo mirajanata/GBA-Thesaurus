@@ -1,0 +1,284 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Flex Layout with Maximize/Restore</title>
+
+    <link rel="stylesheet" href="https://bootswatch.com/4/simplex/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/FontAwesome/all.min.css" />
+
+    <link rel="stylesheet" href="https://visjs.github.io/vis-network/dist/vis-network.min.css" media="screen" charset="utf-8">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script type="text/javascript" src="https://visjs.github.io/vis-network/dist/vis-network.min.js"></script>
+
+    <script src="js/ws.js"></script>
+    <script src="js/visNet.js"></script>
+    <script src="js/d3_data.js"></script>
+    <script src="js/d3_radial.js"></script>
+    <script src="js/d3_tree.js"></script>
+    <script src="js/d3_circle.js"></script>
+
+    <style>
+        /* Custom styles for the layout */
+        body {
+            font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+            /* Prevent body scroll when a panel is maximized */
+            body.panel-maximized {
+                overflow: hidden;
+            }
+
+        .site-header {
+            background-color: #343a40;
+            color: white;
+            padding: 0.1rem;
+            border-bottom: 4px solid #007bff;
+            transition: transform 0.3s ease;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .panel-container {
+            width: 100%;
+        }
+
+        .panel {
+            position: relative; /* Needed for absolute positioning of the control button */
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+            .panel:not(.maximized):hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+                cursor: pointer;
+            }
+
+            /* Styles for the maximized panel */
+            .panel.maximized {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                z-index: 1050; /* High z-index to be on top of everything */
+                overflow: auto; /* Allow content to scroll if it overflows */
+            }
+
+        /* Hide other elements when a panel is maximized for a clean view */
+        body.panel-maximized .site-header,
+        body.panel-maximized .site-footer,
+        body.panel-maximized .panel:not(.maximized) {
+            display: none;
+        }
+
+        .panel h3 {
+            color: #007bff;
+        }
+
+        .panel p {
+            color: #6c757d;
+        }
+
+        /* Panel control button for maximize/restore */
+        .panel-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10; /* Ensure it's above panel content */
+        }
+
+        .btn-toggle-size {
+            background-color: rgba(255,255,255,0.7);
+            border: 1px solid #ddd;
+            backdrop-filter: blur(2px);
+        }
+
+        .site-footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-top: auto;
+            transition: transform 0.3s ease;
+        }
+
+        #mynetwork {
+            position: absolute;
+            top: 24px;
+            left: 0px;
+            right: 0px;
+            bottom: 24px;
+            overflow: hidden; /* Prevents overflow */
+        }
+
+        p.lead {
+            margin-top:-8px;
+            margin-bottom: 4px;
+        }
+    </style>
+
+    <script>
+        function onResize() {
+        }
+    </script>
+
+</head>
+<body onload="onResize();" onresize="onResize();">
+
+    <!-- Header Section -->
+    <header class="site-header text-center">
+        <h2>Visual Relations</h2>
+        <p class="lead">Use widgets below to analyze related items</p>
+    </header>
+
+    <!-- Main Content with 4 Panels -->
+    <main class="main-content">
+        <div class="container-fluid p-2 panel-container">
+            <div class="row">
+                <!-- Each column is a flex item -->
+                <div id="visNetPanel" class="col-12 col-md-6 col-lg-6 mb-2 p-0">
+                    <div id="mynetworkContainer" class="panel p-0 text-center">
+                        <div id="mynetworkToolbar" class="form-inline">
+                            <div style="float: left; margin-bottom: 10px; visibility:collapse;">
+                                <form class="form-inline">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="cbHierarchy" toggle="toggle" onchange="this.blur();visNet.clickHierarchy();">
+                                            <label class="custom-control-label" for="cbHierarchy">hierarchy layout</label>
+                                        </div>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="cbConcepts" checked toggle="toggle" onchange="this.blur();visNet.clickExtConcepts();">
+                                            <label class="custom-control-label" for="cbConcepts">Linked Data</label>
+                                        </div>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="cbColorize" toggle="toggle" onchange="this.blur();visNet.clickColorize();">
+                                            <label class="custom-control-label" for="cbColorize">web color</label>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                        <div id="mynetwork">
+
+                        </div>
+                        <div id="mynetworkProgressCont" class="progress" style="height:5px;">
+                            <div id="mynetworkProgress" class="progress-bar bg-primary" role="progressbar" style="width:5%; height:5px;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="treePanel" class="col-12 col-md-6 col-lg-6 mb-2 p-0">
+                    <div id="d3tree" class="panel p-0 text-center">
+                    </div>
+                </div>
+                <div id="clusterPanel" class="col-12 col-md-6 col-lg-6 mb-2 p-0">
+                    <div class="panel p-0 text-center">
+                        <h5 id="stackContent" style="position:absolute; top: 0px; left:0px; right:0px; bottom:0px;"></h5>
+                        <div id="d3cluster" style="position:absolute; top: 30px; left:0px; right:0px; bottom:0px;" class="overflow-auto">
+                        </div>
+                    </div>
+                </div>
+                <div id="radialPanel" class="col-12 col-md-6 col-lg-6 mb-2 p-0">
+                    <div class="panel p-0 text-center overflow-auto">
+                        <div id="d3radial" style="position:absolute; top: 30px; left:0px; right:0px; bottom:0px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="site-footer">
+    </footer>
+
+    <!-- jQuery and Bootstrap JS Bundle (Popper.js included) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // --- Dynamically add control buttons to each panel ---
+            const maximizeIcon = `<svg class="icon-maximize" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0 .707 0l4.096-4.096V9.5a.5.5 0 0 0 1 0V5.5a.5.5 0 0 0-.5-.5H6.5a.5.5 0 0 0 0 1h2.793L5.121 9.464a.5.5 0 0 0 0 .707zM1.5 1.5A.5.5 0 0 0 1 2v2.5a.5.5 0 0 0 1 0V2h2.5a.5.5 0 0 0 0-1H1.5zM12 1.5a.5.5 0 0 0-.5.5V4h2.5a.5.5 0 0 0 0-1H12zM1.5 12a.5.5 0 0 0 .5.5h2.5a.5.5 0 0 0 0-1H2v-2.5a.5.5 0 0 0-1 0V12zm11 0a.5.5 0 0 0 .5.5h2.5a.5.5 0 0 0 0-1H14v-2.5a.5.5 0 0 0-1 0V12z"/></svg>`;
+            const minimizeIcon = `<svg class="icon-minimize" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-fullscreen-exit" viewBox="0 0 16 16" style="display:none;"><path d="M5.5 0a.5.5 0 0 1 .5.5v4A.5.5 0 0 1 5.5 5h-4a.5.5 0 0 1 0-1h3.5V.5a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v3.5h3.5a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-3.5H.5a.5.5 0 0 1-.5-.5zm10.5.5a.5.5 0 0 1 .5-.5h3.5v-3.5a.5.5 0 0 1 1 0v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5z"/></svg>`;
+
+            $('.panel').each(function () {
+                $(this).prepend(`
+                                <div class="panel-controls">
+                                    <button class="btn btn-light btn-sm btn-toggle-size" title="Toggle size">
+                                        ${maximizeIcon}
+                                        ${minimizeIcon}
+                                    </button>
+                                </div>
+                            `);
+            });
+
+            // --- Click handler for the new toggle button ---
+            $('.btn-toggle-size').on('click', function (e) {
+                e.stopPropagation(); // VERY IMPORTANT: Prevents the panel's own click event from firing
+
+                var $panel = $(this).closest('.panel');
+
+                // Toggle the maximized classes on the panel and body
+                $panel.toggleClass('maximized');
+                $('body').toggleClass('panel-maximized');
+
+                // Toggle which icon is visible
+                $panel.find('.icon-maximize').toggle();
+                $panel.find('.icon-minimize').toggle();
+
+                setTimeout(onResize, 100);
+            });
+
+
+            // --- Original panel click functionality ---
+            $('.panel').on('click', function () {
+                // We only want this effect when the panel is NOT maximized
+                if ($(this).hasClass('maximized')) {
+                    return;
+                }
+            });
+
+
+            visNet.init(function (data) {
+                d3data.setVisData(data);
+                d3data.init(function (data) {
+                    let chart = treeChart(data);
+                    d3.select("#d3tree").append(() => chart);
+
+                    chart = radialChart(data);
+                    d3.select("#d3radial").append(() => chart);
+
+                    chart = circleChart(data);
+                    d3.select("#d3cluster").append(() => chart);
+                }, 10);
+            });
+
+        });
+    </script>
+
+</body>
+</html>

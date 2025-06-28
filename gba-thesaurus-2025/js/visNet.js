@@ -13,7 +13,7 @@ var visNet = {
     _lang: null,
     _itopic: false,
 
-    init: function () {
+    init: function (afterInit) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         //let project = uri.split('/')[3];
@@ -99,13 +99,14 @@ var visNet = {
         };
 
 
-        this.createNetwork(uri, lang, ws.endpoint, project);
+        this.createNetwork(uri, lang, ws.endpoint, project, afterInit);
     },
-    createNetwork: function (uri, lang, endpoint, project) {
+    createNetwork: function (uri, lang, endpoint, project, afterInit) {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
+                                                PREFIX so:<https://schema.org/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
-                                                (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor)
+                                                (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor) ?sQ ?oQ
                                                 @@from
                                                 WHERE {
                                                 VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
@@ -117,9 +118,12 @@ var visNet = {
                                                 OPTIONAL {?o skos:prefLabel ?oL . FILTER(lang(?oL)='${lang}')}
                                                 OPTIONAL {?s dbpo:colourHexCode ?sC}
                                                 OPTIONAL {?o dbpo:colourHexCode ?oC}
+                                                OPTIONAL {?s so:Quantity ?sQ}
+                                                OPTIONAL {?o so:Quantity ?oQ}
+                                                OPTIONAL {?s skos:notation ?sN}
                                                 @@filter
                                                 }
-                                                ORDER BY ?sL`;
+                                                ORDER BY ?sN`;
 
         ws.projectJson(project, query, "s", function (jsonData) {
             visNet.visData = jsonData.results.bindings;
@@ -151,6 +155,10 @@ var visNet = {
             });
             visNet.extGraph(uri, true);
             visNet.drawNetwork();
+
+            if (afterInit) {
+                afterInit(visNet.visData);
+            }
         });
     },
 

@@ -6,7 +6,7 @@ var d3data = {
     _lang: null,
     _itopic: false,
 
-    init: function (afterRead, expandTo) {
+    init: function (afterInit, expandTo) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         let project = uri.split('/')[3];
@@ -16,12 +16,12 @@ var d3data = {
         d3data._lang = lang;
         d3data._itopic = document.getElementById("itopic");
 
-
-
-
-        this.prepareData(uri, lang, ws.endpoint, project, afterRead, expandTo);
+        this.prepareData(uri, lang, ws.endpoint, project, afterInit, expandTo);
     },
-    prepareData: function (uri, lang, endpoint, project, afterRead, expandTo) {
+    setVisData: function (data) {
+        d3data.visData = data;
+    },
+    prepareData: function (uri, lang, endpoint, project, afterInit, expandTo) {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 PREFIX so:<https://schema.org/>
@@ -44,17 +44,24 @@ var d3data = {
                                                 @@filter
                                                 }
                                                 ORDER BY ?sN`;
+        if (!d3data.visData) {
+            ws.projectJson(project, query, "s", function (jsonData) {
+                d3data.visData = jsonData.results.bindings;
+                //console.log(d3data.visData);
 
-        ws.projectJson(project, query, "s", function (jsonData) {
-            d3data.visData = jsonData.results.bindings;
-            //console.log(d3data.visData);
+                d3data.createHierarchy(uri, expandTo);
 
+                if (afterInit) {
+                    afterInit(d3data.hRoot);
+                }
+            });
+        } else {
             d3data.createHierarchy(uri, expandTo);
 
-            if (afterRead) {
-                afterRead(d3data.hRoot);
+            if (afterInit) {
+                afterInit(d3data.hRoot);
             }
-        });
+        }
     },
 
     createHierarchy: function (uri, expandTo) {
