@@ -262,9 +262,7 @@ var page = {
         $('#appsCard').toggle();
         $('#appsCard .card-header').html('<h4>' + lang.APPS + '</h4>');
         $('#appsBody1').append(page.getAppLink(uri, "network.html", "<br>Network<br>diagram", "Visual Network"));
-        $('#appsBody1').append(page.getAppLink(uri, "d3_tree.html", "<br>Tree<br>diagram", "Visual Tree"));
-        $('#appsBody1').append(page.getAppLink(uri, "d3_radial.html", "<br>Radial<br>diagram", "Visual Radial Tree"));
-        $('#appsBody1').append(page.getAppLink(uri, "d3_circle.html", "<br>Cluster<br>diagram", "Visual Cluster Diagram"));
+        $('#appsBody1').append(page.getAppLink(uri, "visual.html", "<br>Visual<br>Relations", "Visual Relations Viewer"));
     },
     getAppLink: function (uri, page, label, title) {
         return `<div class="apps">
