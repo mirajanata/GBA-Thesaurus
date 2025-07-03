@@ -146,15 +146,18 @@ var d3data = {
         return false;
     },
     expandHierarchy: function (node, levels, echartFormat) {
-        node.children = node.c;
         levels--;
         if (node.c && levels > 0) {
+            node.children = node.c;
             for (let c of node.children) {
                 d3data.expandHierarchy(c, levels, echartFormat);
             };
+            if (echartFormat) {
+                delete node.value;
+            }
         }
         if (echartFormat) {
-            node.c = null;
+            delete node.c;
         }
     },
     getQuantityValue: function (quantity) {
