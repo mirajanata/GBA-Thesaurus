@@ -1,12 +1,12 @@
 ﻿// visual network implementation
 "use strict";
 var d3data = {
-    visData: {},
+    visData: null,
     _uri: null,
     _lang: null,
     _itopic: false,
 
-    init: function (afterInit, expandTo) {
+    init: function (afterInit, expandTo, echartFormat) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         let project = uri.split('/')[3];
@@ -16,12 +16,12 @@ var d3data = {
         d3data._lang = lang;
         d3data._itopic = document.getElementById("itopic");
 
-        this.prepareData(uri, lang, ws.endpoint, project, afterInit, expandTo);
+        this.prepareData(uri, lang, ws.endpoint, project, afterInit, expandTo, echartFormat);
     },
     setVisData: function (data) {
         d3data.visData = data;
     },
-    prepareData: function (uri, lang, endpoint, project, afterInit, expandTo) {
+    prepareData: function (uri, lang, endpoint, project, afterInit, expandTo, echartFormat) {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 PREFIX so:<https://schema.org/>
@@ -49,14 +49,14 @@ var d3data = {
                 d3data.visData = jsonData.results.bindings;
                 //console.log(d3data.visData);
 
-                d3data.createHierarchy(uri, expandTo);
+                d3data.createHierarchy(uri, expandTo, echartFormat);
 
                 if (afterInit) {
                     afterInit(d3data.hRoot);
                 }
             });
         } else {
-            d3data.createHierarchy(uri, expandTo);
+            d3data.createHierarchy(uri, expandTo, echartFormat);
 
             if (afterInit) {
                 afterInit(d3data.hRoot);
@@ -64,77 +64,97 @@ var d3data = {
         }
     },
 
-    createHierarchy: function (uri, expandTo) {
+    createHierarchy: function (uri, expandTo, echartFormat) {
         d3data.hRoot = null;
         d3data.hIndex = [];
         if (d3data.visData.length == 0) {
             return;
         }
         let Id = 0;
-        d3data.visData.forEach((i) => {
+        for (let i of d3data.visData) {
             let subject = i.s;
             let object = i.o;
             let o_color = i.oColor.value;
             let o_label = i.oLabel.value;
-            let s_quantity = i.sQ ? Math.floor(i.sQ.value) : "1";
-            let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
             let rel = i.x.value.split('#')[1];
             let from = d3data.hIndex[subject.value];
             let to = d3data.hIndex[object.value];
+
             if (!from) {
                 let s = d3data.getLabel(i.sLabel.value);
-                from = {
-                    id: (++Id), label: s, name: s, color: i.sColor.value, title: subject.value, c: [], r: [], value: d3data.getQuantityValue(s_quantity), quantity: s_quantity
-                };
+                let s_quantity = i.sQ ? Math.floor(i.sQ.value) : "1";
+                from = echartFormat ?
+                    {
+                        name: s, itemStyle: { color: i.sColor.value }, c: [], r:[], value: d3data.getQuantityValue(s_quantity)
+                    } :
+                    {
+                        id: (++Id), label: s, name: s, color: i.sColor.value, title: subject.value, c: [], r: [], value: d3data.getQuantityValue(s_quantity), quantity: s_quantity
+                    };
                 d3data.hIndex[subject.value] = from;
             }
             if (!to) {
                 let s = d3data.getLabel(o_label);
-                to = { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
+                let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
+                to = echartFormat ?
+                    { name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
+                    { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
                 d3data.hIndex[object.value] = to;
-                to.parent = from;
             }
-            if (from.parent != to) {
-                if (!d3data.checkLoop(from, to)) {
-                    from.c.push(to);
-                    from.r.push(rel);
-                }
-                else {
-                    let s = d3data.getLabel(o_label);
-                    to = { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
-                    d3data.hIndex[object.value] = to;
-                    to.parent = from;
-                    from.c.push(to);
-                    from.r.push(rel);
-                }
+            if (!d3data.checkLoop(from, to)) {
+                from.c.push(to);
+                from.r.push(rel);
             }
-        });
+            else {
+                let s = d3data.getLabel(o_label);
+                let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
+                to = echartFormat ?
+                        { name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
+                        { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
+                d3data.hIndex[object.value] = to;
+                from.c.push(to);
+                from.r.push(rel);
+            }
+        }
         d3data.hRoot = d3data.hIndex[uri];
         if (!expandTo)
             expandTo = 2;
-        d3data.expandHierarchy(d3data.hRoot, expandTo);
+        d3data.expandHierarchy(d3data.hRoot, expandTo, echartFormat);
+        if (echartFormat) {
+            d3data.hRoot = d3data.hRoot.children;
+        }
     },
-    checkLoop: function (node, newNode) {
-        if (newNode.c.length == 0) {
+    checkLoop: function (from, to) {
+        if (to.c.length == 0) {
             return false;
         }
-        for (let c of newNode.c) {
-            if (c == node) {
+        for (let c of to.c) {
+            if (c == from || d3data.checkLoop(from, c)) {
                 return true;
-            } else {
-                if (d3data.checkLoop(c, newNode))
-                    return true;
             }
         }
         return false;
     },
-    expandHierarchy: function (node, levels) {
+    writeStruct: function (prefix,to) {
+        console.log(prefix+to.name + ':' + to.children.length);
+        if (to.children.length == 0) {
+            return false;
+        }
+        prefix += to.name + ' -> ';
+        for (let c of to.children) {
+            d3data.writeStruct(prefix, c);
+        }
+        return false;
+    },
+    expandHierarchy: function (node, levels, echartFormat) {
         node.children = node.c;
         levels--;
-        if (node.c.length > 0 && levels > 0) {
-            node.children.forEach((c) => {
-                d3data.expandHierarchy(c, levels);
-            });
+        if (node.c && levels > 0) {
+            for (let c of node.children) {
+                d3data.expandHierarchy(c, levels, echartFormat);
+            };
+        }
+        if (echartFormat) {
+            node.c = null;
         }
     },
     getQuantityValue: function (quantity) {
