@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>D3 test</title>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/ws.js"></script>
+    <script src="js/d3_data.js"></script>
+    <script src="js/echarts.js"></script>
+
+    <style>
+        body {
+            font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        .title {
+            font-size: 18px;
+        }
+
+        .shadow {
+            -webkit-filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, .3));
+            filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, .3));
+            /* Similar syntax to box-shadow */
+        }
+    </style>
+
+</head>
+<body>
+    <h3 id="stackContent"></h3>
+    <div id="echartsSunburst" style="width:1000px; height:1000px;">
+
+    </div>
+
+    <script>
+
+        let chartDom = document.getElementById('echartsSunburst');
+
+        let myChart = echarts.init(chartDom, null, {
+            renderer: 'svg'
+        });
+
+
+        d3data.init(function (data) {
+            let option = {
+                title: {
+                    text: '',
+                    subtext: '',
+                    textStyle: {
+                        fontSize: 14,
+                        align: 'center'
+                    },
+                    subtextStyle: {
+                        align: 'center'
+                    },
+                    sublink: 'https://worldcoffeeresearch.org/work/sensory-lexicon/'
+                },
+                series: {
+                    type: 'sunburst',
+                    data: data,
+                    radius: [0, '95%'],
+                    sort: undefined,
+                    emphasis: {
+                        focus: 'ancestor'
+                    },
+                    levels: [
+                        {},
+                        {
+                            r0: '15%',
+                            r: '35%',
+                            itemStyle: {
+                                borderWidth: 2
+                            },
+                            label: {
+                                //rotate: 'tangential'
+                                align: 'right'
+                            }
+                        },
+                        {
+                            r0: '35%',
+                            r: '70%',
+                            label: {
+                                align: 'right'
+                            }
+                        },
+                        {
+                            r0: '70%',
+                            r: '72%',
+                            label: {
+                                position: 'outside',
+                                padding: 3,
+                                silent: false
+                            },
+                            itemStyle: {
+                                borderWidth: 3
+                            }
+                        }
+                    ]
+                }
+            };
+
+            setTimeout(function () {
+                option && myChart.setOption(option);
+            }, 10);
+        }, 4, true);
+
+    </script>
+
+</body>
+</html>

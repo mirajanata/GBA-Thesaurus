@@ -77,6 +77,7 @@ var d3data = {
             let o_color = i.oColor.value;
             let o_label = i.oLabel.value;
             let rel = i.x.value.split('#')[1];
+
             let from = d3data.hIndex[subject.value];
             let to = d3data.hIndex[object.value];
 
@@ -85,7 +86,7 @@ var d3data = {
                 let s_quantity = i.sQ ? Math.floor(i.sQ.value) : "1";
                 from = echartFormat ?
                     {
-                        name: s, itemStyle: { color: i.sColor.value }, c: [], r:[], value: d3data.getQuantityValue(s_quantity)
+                        id: s, name: s, itemStyle: { color: i.sColor.value }, c: [], r:[], value: d3data.getQuantityValue(s_quantity)
                     } :
                     {
                         id: (++Id), label: s, name: s, color: i.sColor.value, title: subject.value, c: [], r: [], value: d3data.getQuantityValue(s_quantity), quantity: s_quantity
@@ -96,7 +97,7 @@ var d3data = {
                 let s = d3data.getLabel(o_label);
                 let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
                 to = echartFormat ?
-                    { name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
+                    { id: s, name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
                     { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
                 d3data.hIndex[object.value] = to;
             }
@@ -108,7 +109,7 @@ var d3data = {
                 let s = d3data.getLabel(o_label);
                 let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
                 to = echartFormat ?
-                        { name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
+                    { id: s, name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
                         { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
                 d3data.hIndex[object.value] = to;
                 from.c.push(to);

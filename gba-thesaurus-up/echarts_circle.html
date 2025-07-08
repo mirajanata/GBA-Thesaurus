@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>D3 test</title>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/ws.js"></script>
+    <script src="js/d3_data.js"></script>
+    <script src="js/echarts.js"></script>
+
+    <style>
+        body {
+            font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        .title {
+            font-size: 18px;
+        }
+
+        .shadow {
+            -webkit-filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, .3));
+            filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, .3));
+            /* Similar syntax to box-shadow */
+        }
+    </style>
+
+</head>
+<body>
+    <h3 id="stackContent"></h3>
+    <div id="echartsCircle" style="width:1000px; height:1000px;">
+
+    </div>
+
+    <script>
+        let csv = {
+            toCsv: function (data) {
+                return "id,value\n" + this._toCsv(data, "");
+            },
+            _toCsv: function (data, prefix) {
+                let s = prefix + data.id + "," + (data.value ? data.value:"") + "\n";
+                if (data.children) {
+                    for (let i = 0; i < data.children.length; i++) {
+                        s += this._toCsv(data.children[i], prefix + data.id + ".");
+                    }
+                }
+                return s;
+            }
+        };
+
+        var stratify = d3.stratify()
+            .parentId(function (d) {
+                return d.id.substring(0, d.id.lastIndexOf("."));
+            });
+        const data = {
+            "id": "Weathering Phenomenon",
+            "name": "Weathering Phenomenon",
+            "children": [
+                {
+                    "id": "Pipe-like weathering structure",
+                    "name": "Pipe-like weathering structure",
+                    "value": 1
+                },
+                {
+                    "id": "Spheroidal weathering",
+                    "name": "Spheroidal weathering",
+                    "value": 1
+                }
+            ]
+        };
+        let csvData = csv.toCsv(data);
+        console.log(csvData);
+        rawData = d3.csvParse(csvData)
+
+        {
+            var root = stratify(rawData)
+                .sum(function (d) {
+                    return d.value;
+                })
+                .sort(function (a, b) {
+                    return b.value - a.value;
+                });
+            var maxDepth = 0;
+            var rootd = root.descendants();
+            var seriesData = rootd.map(function (node) {
+                maxDepth = Math.max(maxDepth, node.depth);
+                return [
+                    node.value,
+                    node.depth,
+                    node.id
+                ];
+            });
+
+            var chart = echarts.init(document.getElementById('echartsCircle'));
+
+            function renderItem(params, api) {
+                var context = params.context;
+                if (!context.nodes) {
+                    d3.pack()
+                        .size([api.getWidth() - 2, api.getHeight() - 2])
+                        .padding(3)(root);
+
+                    context.nodes = {};
+                    root.descendants().forEach(function (node, index) {
+                        context.nodes[node.id] = {
+                            index: index,
+                            node: node
+                        }
+                    });
+                }
+
+                var nodePath = api.value(2);
+                var node = context.nodes[nodePath].node;
+                var isLeaf = !node.children || !node.children.length;
+
+                var textFont = api.font({
+                    fontSize: 12,
+                    fontFamily: 'Arial'
+                });
+
+                var focus = new Uint32Array(node.descendants().map(function (node) {
+                    return context.nodes[node.id].index;
+                }));
+
+                var nodeName = isLeaf ? nodePath.slice(nodePath.lastIndexOf('.') + 1).split(/(?=[A-Z][^A-Z])/g).join('\n') : '';
+
+                var z2 = api.value(1) * 2;
+
+                return {
+                    type: 'circle',
+                    focus: focus,
+                    shape: {
+                        cx: node.x,
+                        cy: node.y,
+                        r: node.r
+                    },
+                    z2: z2,
+                    textContent: {
+                        type: 'text',
+                        style: {
+                            text: nodeName,
+                            width: node.r * 1.3,
+                            overflow: 'truncate',
+                            fontSize: node.r / 3
+                            // fill: 'blue'
+                        },
+                        emphasis: {
+                            style: {
+                                overflow: null,
+                                fontSize: Math.max(node.r / 3, 12)
+                                // fill: 'red'
+                            }
+                        }
+                    },
+                    textConfig: {
+                        position: 'inside'
+                    },
+                    style: {
+                        fill: api.visual('color'),
+                        text: nodeName,
+                        font: textFont,
+                    },
+                    emphasis: {
+                        style: {
+                            font: textFont,
+                            shadowBlur: 20,
+                            shadowOffsetX: 3,
+                            shadowOffsetY: 5,
+                            shadowColor: 'rgba(0,0,0,0.3)'
+                        }
+                    }
+                };
+            }
+
+            var option = {
+                tooltip: {},
+                visualMap: {
+                    show: false,
+                    min: 0,
+                    max: maxDepth,
+                    dimension: 1,
+                    inRange: {
+                        color: ['#006edd', '#e0ffff']
+                    }
+                },
+                series: {
+                    type: 'custom',
+                    renderItem: renderItem,
+                    coordinateSystem: null,
+                    encode: {
+                        tooltip: 0,
+                        itemName: 2
+                    },
+                    data: seriesData
+                }
+            };
+
+            chart.setOption(option);
+
+        };
+    </script>
+
+</body>
+</html>
