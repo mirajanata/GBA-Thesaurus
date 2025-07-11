@@ -29,6 +29,7 @@ var d3data = {
                                                 (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor) ?sQ ?oQ
                                                 @@from
                                                 WHERE {
+                                                ?s a skos:Concept
                                                 VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
                                                 VALUES ?p2 {skos:broadMatch}
                                                 {?s ?p1 ?o BIND (?p1 AS ?x)}
