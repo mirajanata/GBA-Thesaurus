@@ -6,7 +6,7 @@ var d3data = {
     _lang: null,
     _itopic: false,
 
-    init: function (afterInit, expandTo, echartFormat) {
+    init: function (afterInit, expandTo) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
         let project = uri.split('/')[3];
@@ -16,12 +16,12 @@ var d3data = {
         d3data._lang = lang;
         d3data._itopic = document.getElementById("itopic");
 
-        this.prepareData(uri, lang, ws.endpoint, project, afterInit, expandTo, echartFormat);
+        this.prepareData(uri, lang, ws.endpoint, project, afterInit, expandTo);
     },
     setVisData: function (data) {
         d3data.visData = data;
     },
-    prepareData: function (uri, lang, endpoint, project, afterInit, expandTo, echartFormat) {
+    prepareData: function (uri, lang, endpoint, project, afterInit, expandTo) {
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 PREFIX so:<https://schema.org/>
@@ -49,24 +49,26 @@ var d3data = {
                 d3data.visData = jsonData.results.bindings;
                 //console.log(d3data.visData);
 
-                d3data.createHierarchy(uri, expandTo, echartFormat);
+                d3data.createHierarchy(uri, expandTo);
 
                 if (afterInit) {
                     afterInit(d3data.hRoot);
                 }
             });
         } else {
-            d3data.createHierarchy(uri, expandTo, echartFormat);
+            d3data.createHierarchy(uri, expandTo);
 
             if (afterInit) {
-                afterInit(d3data.hRoot);
+                afterInit(d3data.hRoot, d3data.fRoot);
             }
         }
     },
 
-    createHierarchy: function (uri, expandTo, echartFormat) {
+    createHierarchy: function (uri, expandTo) {
         d3data.hRoot = null;
         d3data.hIndex = [];
+        d3data.fRoot = null;
+        d3data.fIndex = [];
         if (d3data.visData.length == 0) {
             return;
         }
@@ -78,51 +80,48 @@ var d3data = {
             let o_label = i.oLabel.value;
             let rel = i.x.value.split('#')[1];
 
-            let from = d3data.hIndex[subject.value];
-            let to = d3data.hIndex[object.value];
+            for (let pass = 0; pass < 2; pass++) {
+                if (pass == 1 && !d3data.isLocalItem(object.value)) {
+                    continue;
+                }
+                let index = pass === 0 ? d3data.hIndex : d3data.fIndex;
+                let from = index[subject.value];
+                let to = index[object.value];
 
-            if (!from) {
-                let s = d3data.getLabel(i.sLabel.value);
-                let s_quantity = i.sQ ? Math.floor(i.sQ.value) : "1";
-                from = echartFormat ?
-                    {
-                        id: s, name: s, itemStyle: { color: i.sColor.value }, c: [], r:[], value: d3data.getQuantityValue(s_quantity)
-                    } :
-                    {
-                        id: (++Id), label: s, name: s, color: i.sColor.value, title: subject.value, c: [], r: [], value: d3data.getQuantityValue(s_quantity), quantity: s_quantity
+                if (!from) {
+                    let s = d3data.getLabel(i.sLabel.value);
+                    let s_quantity = i.sQ ? Math.floor(i.sQ.value) : "1";
+                    from = {
+                        id: (++Id), label: s, itemStyle: { color: i.sColor.value }, name: s, color: i.sColor.value, title: subject.value, c: [], r: [], value: d3data.getQuantityValue(s_quantity), quantity: s_quantity
                     };
-                d3data.hIndex[subject.value] = from;
-            }
-            if (!to) {
-                let s = d3data.getLabel(o_label);
-                let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
-                to = echartFormat ?
-                    { id: s, name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
-                    { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
-                d3data.hIndex[object.value] = to;
-            }
-            if (!d3data.checkLoop(from, to)) {
-                from.c.push(to);
-                from.r.push(rel);
-            }
-            else {
-                let s = d3data.getLabel(o_label);
-                let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
-                to = echartFormat ?
-                    { id: s, name: s, itemStyle: { color: o_color }, c: [], r:[], value: d3data.getQuantityValue(o_quantity) } :
-                        { id: (++Id), label: s, name: s, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
-                d3data.hIndex[object.value] = to;
-                from.c.push(to);
-                from.r.push(rel);
+                    index[subject.value] = from;
+                }
+                if (!to) {
+                    let s = d3data.getLabel(o_label);
+                    let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
+                    to = { id: (++Id), label: s, name: s, itemStyle: { color: o_color }, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
+                    index[object.value] = to;
+                }
+                if (!d3data.checkLoop(from, to)) {
+                    from.c.push(to);
+                    from.r.push(rel);
+                }
+                else {
+                    let s = d3data.getLabel(o_label);
+                    let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
+                    to = { id: (++Id), label: s, name: s, itemStyle: { color: o_color }, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
+                    index[object.value] = to;
+                    from.c.push(to);
+                    from.r.push(rel);
+                }
             }
         }
         d3data.hRoot = d3data.hIndex[uri];
+        d3data.fRoot = d3data.fIndex[uri];
         if (!expandTo)
             expandTo = 2;
-        d3data.expandHierarchy(d3data.hRoot, expandTo, echartFormat);
-        if (echartFormat) {
-            d3data.hRoot = d3data.hRoot.children;
-        }
+        d3data.expandHierarchy(d3data.hRoot, expandTo);
+        d3data.expandHierarchy(d3data.fRoot, expandTo);
     },
     checkLoop: function (from, to) {
         if (to.c.length == 0) {
@@ -135,35 +134,25 @@ var d3data = {
         }
         return false;
     },
-    writeStruct: function (prefix,to) {
-        console.log(prefix+to.name + ':' + to.children.length);
-        if (to.children.length == 0) {
-            return false;
-        }
-        prefix += to.name + ' -> ';
-        for (let c of to.children) {
-            d3data.writeStruct(prefix, c);
-        }
-        return false;
-    },
-    expandHierarchy: function (node, levels, echartFormat) {
+    expandHierarchy: function (node, levels) {
         levels--;
-        if (node.c && levels > 0) {
+        if (levels <= 0) {
+            delete node.c;
+            return;
+        }
+        if (node.c) {
             node.children = node.c;
             for (let c of node.children) {
-                d3data.expandHierarchy(c, levels, echartFormat);
+                d3data.expandHierarchy(c, levels);
             };
-            if (echartFormat) {
+            if (node.c.length > 0) {
                 delete node.value;
             }
-        }
-        if (echartFormat) {
-            delete node.c;
         }
     },
     getQuantityValue: function (quantity) {
         if (quantity > 1) {
-            return Math.log(quantity);
+            return quantity;
         }
         return 1;
     },
@@ -180,6 +169,9 @@ var d3data = {
         }
         return Label;
     },
+    isLocalItem: function (uri) {
+        return !uri.startsWith('http://') || uri.indexOf(d3data.abbrev.GBA) || uri.indexOf(d3data.abbrev.GBA2) >= 0;
+    },
 
     abbrev: {
         INSPIRE: 'https://inspire.ec.europa.eu/codelist/',
@@ -190,6 +182,6 @@ var d3data = {
         WIKIDATA: 'https://www.wikidata.org/entity/',
         GEMET: 'https://www.eionet.europa.eu/gemet/',
         GBA: 'https://resource.geolba.ac.at',
-        GBA2: 'http://resource.geolba.ac.at'
+        GBA2: 'http://resource.geolba.at'
     }
 };

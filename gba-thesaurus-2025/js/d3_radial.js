@@ -72,7 +72,7 @@ radialChart = function (data) {
         .attr("paint-order", "stroke");
 
     function nodeText(text) {
-        if (text.length > 20) {
+        if (text.startsWith("https://") && text.length > 20) {
             return text.substring(0, 20) + "...";
         }
         return text;

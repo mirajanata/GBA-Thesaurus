@@ -68,9 +68,9 @@ treeChart = function (data) {
             .attr("transform", d => `translate(${source.y0},${source.x0})`)
             .attr("fill-opacity", 0)
             .attr("stroke-opacity", 0)
-            .attr("style", d => d.data.c.length > 0 ? "cursor:pointer;" : "cursor: default;")
+            .attr("style", d => d.data.c && d.data.c.length > 0 ? "cursor:pointer;" : "cursor: default;")
             .on("click", (event, d) => {
-                if (d.data.c.length > 0 && !d.data.children) {
+                if (d.data.c && d.data.c.length > 0 && !d.data.children) {
                     d.data.children = d.data.c;
                     d.data.expand = true;
                     chart = treeChart(treeData);
@@ -87,20 +87,20 @@ treeChart = function (data) {
         nodeEnter.append("title").html(d => `<p class="title">${d.data.name}</p>`);
 
         nodeEnter.append("circle")
-            .attr("r", 4)
+            .attr("r", 8)
             .attr("fill", d => d.data.color)
             .attr("stroke-width", 10);
 
         nodeEnter.append("text")
             .attr("dy", "0.31em")
-            .attr("x", d => d._children ? -8 : 8)
+            .attr("x", d => d._children ? -12 : 12)
             .attr("text-anchor", d => d._children ? "end" : "start")
             .attr("text-rendering", "optimizeLegibility")
             .text(d => nodeText(d.data.name))
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 0.25)
-            .attr("fill", d => d.data.c.length > 0 ? "#2020ff" : "grey")
-            .attr("style", d => d.data.c.length > 0 ? "text-decoration: underline;" : "")
+            .attr("fill", d => d.data.c && d.data.c.length > 0 ? "#2020ff" : "grey")
+            .attr("style", d => d.data.c && d.data.c.length > 0 ? "text-decoration: underline;" : "")
             .attr("paint-order", "stroke");
 
         // Transition nodes to their new position.
@@ -155,7 +155,7 @@ treeChart = function (data) {
     }
 
     function nodeText(text) {
-        if (text.length > 20) {
+        if (text.startsWith("https://") && text.length > 20) {
             return text.substring(0, 20) + "...";
         }
         return text;

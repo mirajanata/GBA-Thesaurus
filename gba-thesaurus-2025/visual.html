@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bootstrap Flex Layout with Maximize/Restore</title>
+    <title>Thesaurus - Visual Relations</title>
 
     <link rel="stylesheet" href="https://bootswatch.com/4/simplex/bootstrap.min.css" />
     <link rel="stylesheet" href="css/FontAwesome/all.min.css" />
@@ -20,7 +20,10 @@
     <script src="js/d3_data.js"></script>
     <script src="js/d3_radial.js"></script>
     <script src="js/d3_tree.js"></script>
-    <script src="js/d3_circle.js"></script>
+    <!--script src="js/d3_circle.js"></!--script-->
+    <script src="js/echarts.js"></script>
+    <script src="js/echarts_circle.js"></script>
+    <script src="js/echarts_sunburst.js"></script>
 
     <style>
         /* Custom styles for the layout */
@@ -134,7 +137,7 @@
         }
 
         p.lead {
-            margin-top:-8px;
+            margin-top: -8px;
             margin-bottom: 4px;
         }
     </style>
@@ -193,16 +196,16 @@
                     <div id="d3tree" class="panel p-0 text-center">
                     </div>
                 </div>
+                <div id="radialPanel" class="col-12 col-md-6 col-lg-6 mb-2 p-0">
+                    <div class="panel p-0 text-center overflow-auto">
+                        <div id="d3radial" style="position:absolute; top: 30px; left:0px; right:0px; bottom:0px;">
+                        </div>
+                    </div>
+                </div>
                 <div id="clusterPanel" class="col-12 col-md-6 col-lg-6 mb-2 p-0">
                     <div class="panel p-0 text-center">
                         <h5 id="stackContent" style="position:absolute; top: 0px; left:0px; right:0px; bottom:0px;"></h5>
                         <div id="d3cluster" style="position:absolute; top: 30px; left:0px; right:0px; bottom:0px;" class="overflow-auto">
-                        </div>
-                    </div>
-                </div>
-                <div id="radialPanel" class="col-12 col-md-6 col-lg-6 mb-2 p-0">
-                    <div class="panel p-0 text-center overflow-auto">
-                        <div id="d3radial" style="position:absolute; top: 30px; left:0px; right:0px; bottom:0px;">
                         </div>
                     </div>
                 </div>
@@ -268,16 +271,20 @@
 
             visNet.init(function (data) {
                 d3data.setVisData(data);
-                d3data.init(function (data) {
+                d3data.init(function (data, filteredData) {
+                    if (filteredData)
+                        data = filteredData;
                     let chart = treeChart(data);
                     d3.select("#d3tree").append(() => chart);
 
-                    chart = radialChart(data);
-                    d3.select("#d3radial").append(() => chart);
+                    eCharts_sunburstChart(data, 'd3radial');
+                    //chart = radialChart(data);
+                    //d3.select("#d3radial").append(() => chart);
 
-                    chart = circleChart(data);
-                    d3.select("#d3cluster").append(() => chart);
-                }, 10);
+                    eCharts_circleChart(data, 'd3cluster');
+                    //chart = circleChart(data);
+                    //d3.select("#d3cluster").append(() => chart);
+                }, 3);
             });
 
         });

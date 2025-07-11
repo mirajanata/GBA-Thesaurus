@@ -42,6 +42,7 @@
 
 
         d3data.init(function (data) {
+            data = data.children;
             let option = {
                 title: {
                     text: '',
@@ -99,10 +100,8 @@
                 }
             };
 
-            setTimeout(function () {
-                option && myChart.setOption(option);
-            }, 10);
-        }, 4, true);
+            option && myChart.setOption(option);
+        }, 4, false);
 
     </script>
 
