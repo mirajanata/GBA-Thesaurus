@@ -122,7 +122,7 @@
                         text: nodeName,
                         width: node.r * 1.3,
                         overflow: 'truncate',
-                        fontSize: 14,
+                        fontSize: 12,
                         color: 'grey'
                     },
                     emphasis: {

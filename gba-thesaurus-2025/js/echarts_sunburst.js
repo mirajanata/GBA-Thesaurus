@@ -42,7 +42,8 @@
                     label: {
                         //rotate: 'tangential'
                         align: 'right',
-                        color: 'black'
+                        color: 'black',
+                        fontSize: 11
                     }
                 },
                 {
@@ -50,7 +51,8 @@
                     r: '70%',
                     label: {
                         align: 'right',
-                        color: 'black'
+                        color: 'black',
+                        fontSize: 11
                     }
                 },
                 {
@@ -60,7 +62,8 @@
                         position: 'outside',
                         padding: 3,
                         silent: false,
-                        color: 'black'
+                        color: 'black',
+                        fontSize: 11
                     },
                     itemStyle: {
                         borderWidth: 3

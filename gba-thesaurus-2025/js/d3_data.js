@@ -170,7 +170,7 @@ var d3data = {
         return Label;
     },
     isLocalItem: function (uri) {
-        return !uri.startsWith('http://') || uri.indexOf(d3data.abbrev.GBA) || uri.indexOf(d3data.abbrev.GBA2) >= 0;
+        return !uri.startsWith('http') || uri.indexOf("//resource.geo") >= 0;
     },
 
     abbrev: {
@@ -182,6 +182,6 @@ var d3data = {
         WIKIDATA: 'https://www.wikidata.org/entity/',
         GEMET: 'https://www.eionet.europa.eu/gemet/',
         GBA: 'https://resource.geolba.ac.at',
-        GBA2: 'http://resource.geolba.at'
+        GBA2: 'http://resource.geolba.at',
     }
 };
