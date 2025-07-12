@@ -356,35 +356,25 @@ var detail = {
             if (offset == 0) {
                 $('#allConceptsHeader').html(data.results.bindings[0].Schema.value);
                 allConcepts.empty().append('<div class="allConceptsPerex">' + data.results.bindings[0].SchemaDesc.value + '</div><br>');
-
-                data.results.bindings.forEach((i) => {
-                    if (i.s.value == i.tc.value) {
-                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)</div>');
-                    } else {
-                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a></div>');
-                    }
-
-                });
-                let links = a.join('\n\n');
-                allConcepts.append('<div class="allConceptsCards">' + links + '</div>');
+                allConcepts.append('<div class="allConceptsCards"></div>');
                 allConcepts.append(`<div id="coBr" style="justify-content: center; display:flex; margin:5px;">
                     <button type="button" id="rightBtn" class="btn btn-info btn-sm" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+50)">
                         Show next 50...
                     </button>
             </div>
-`);
-            } else {
-                data.results.bindings.forEach((i) => {
-                    if (i.s.value == i.tc.value) {
-                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)</div>');
-                    } else {
-                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a></div>');
-                    }
-
-                });
-                let links = a.join('\n\n');
-                $(".allConceptsCards").append(links);
+                `);
             }
+            data.results.bindings.forEach((i) => {
+                if (i.s.value == i.tc.value) {
+                    a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)</div>');
+                } else {
+                    a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a></div>');
+                }
+
+            });
+            let links = a.join('\n\n');
+            $(".allConceptsCards").append(links);
+
             document.getElementById("rightBtn").value = offset;
             if (Object.keys(data.results.bindings).length < 50) {
                 $("#coBr").hide();
