@@ -499,7 +499,8 @@ figure {
         }
 
         .allConceptsCards div a {
-            color: #FF6600 !important;
+            color: #2020ff !important;
             padding: 0px;
+            font-size: 0.9rem;
             border-bottom: none !important;
         }

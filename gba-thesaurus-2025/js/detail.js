@@ -358,7 +358,7 @@ var detail = {
                 allConcepts.empty().append('<div class="allConceptsPerex">' + data.results.bindings[0].SchemaDesc.value + '</div><br>');
                 allConcepts.append('<div class="allConceptsCards"></div>');
                 allConcepts.append(`<div id="coBr" style="justify-content: center; display:flex; margin:5px;">
-                    <button type="button" id="rightBtn" class="btn btn-info btn-sm" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+50)">
+                    <button type="button" id="rightBtn" class="btn btn-outline-primary" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+50)">
                         Show next 50...
                     </button>
             </div>
