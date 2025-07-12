@@ -459,3 +459,47 @@ figure {
     background-color: #222d3c;
     border-color: #222d3c;
 }
+
+
+/* allConcepts - cards */
+.allConceptsCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 4px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    width: 100%;
+}
+
+    .allConceptsCards div {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 0px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        text-align: center;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .allConceptsCards div:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .allConceptsCards div h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .allConceptsCards div a {
+            color: #FF6600 !important;
+            padding: 0px;
+            border-bottom: none !important;
+        }

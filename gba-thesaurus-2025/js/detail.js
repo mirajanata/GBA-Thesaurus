@@ -353,37 +353,41 @@ var detail = {
             var allConcepts = $('#allConcepts');
             let a = [];
             $('#' + divID).append('');
-            $('#allConceptsHeader').html(data.results.bindings[0].Schema.value + ' (' + Number(offset + 1) + ' .. ' + Number(offset + data.results.bindings.length) + ')');
-            allConcepts.empty().append('<div>' + data.results.bindings[0].SchemaDesc.value + '</div><br>');
+            if (offset == 0) {
+                $('#allConceptsHeader').html(data.results.bindings[0].Schema.value);
+                allConcepts.empty().append('<div class="allConceptsPerex">' + data.results.bindings[0].SchemaDesc.value + '</div><br>');
 
-            data.results.bindings.forEach((i) => {
-                if (i.s.value == i.tc.value) {
-                    a.push('<a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)');
-                } else {
-                    a.push('<a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a>');
-                }
+                data.results.bindings.forEach((i) => {
+                    if (i.s.value == i.tc.value) {
+                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)</div>');
+                    } else {
+                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a></div>');
+                    }
 
-            });
-            if (offset !== 0) {
-                allConcepts.append('.. ');
+                });
+                let links = a.join('\n\n');
+                allConcepts.append('<div class="allConceptsCards">' + links + '</div>');
+                allConcepts.append(`<div id="coBr" style="justify-content: center; display:flex; margin:5px;">
+                    <button type="button" id="rightBtn" class="btn btn-info btn-sm" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+50)">
+                        Show next 50...
+                    </button>
+            </div>
+`);
+            } else {
+                data.results.bindings.forEach((i) => {
+                    if (i.s.value == i.tc.value) {
+                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)</div>');
+                    } else {
+                        a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a></div>');
+                    }
+
+                });
+                let links = a.join('\n\n');
+                $(".allConceptsCards").append(links);
             }
-            allConcepts.append(a.join(', '));
-
-            document.getElementById("leftBtn").value = offset;
             document.getElementById("rightBtn").value = offset;
-            if (document.getElementById("leftBtn").value == "0") {
-                $('#leftBtn').prop('disabled', true);
-                if (Object.keys(data.results.bindings).length < 50) {
-                    $("#coBr").hide();
-                }
-            } else {
-                $('#leftBtn').prop('disabled', false);
-            }
             if (Object.keys(data.results.bindings).length < 50) {
-                $('#rightBtn').prop('disabled', true);
-            } else {
-                $('#rightBtn').prop('disabled', false);
-                allConcepts.append(' ...');
+                $("#coBr").hide();
             }
 
             $(document).ready(function () {
@@ -403,18 +407,6 @@ var detail = {
         div.append(`
         <hr>
         <div class="card my-4">
-            <ul id="coBr" class="pagination mb-4 cardHeaderRight">
-                <li>
-                    <button type="button" id="leftBtn" class="btn btn-outline-secondary btn-sm" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)-50)">
-                        <span class="fa fa-chevron-left"></span>
-                    </button>
-                </li>
-                <li>
-                    <button type="button" id="rightBtn" class="btn btn-outline-secondary btn-sm" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+50)">
-                        <span class="fa fa-chevron-right"></span>
-                    </button>
-                </li>
-            </ul>
             <h4 id="allConceptsHeader" class="card-header"></h4>
             <div id="allConcepts" class="card-body"></div>
         </div>
