@@ -174,6 +174,23 @@ var page = {
     }, */
     insertProjCards: function () {
         var div = $('#proj_links');
+
+        var projectQuery = `PREFIX dcterms:<http://purl.org/dc/terms/> 
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT DISTINCT ?s ?t ?d
+WHERE {
+    ?s a <http://rdfs.org/ns/void#Dataset>; dcterms:title ?t; dcterms:description ?d
+    . FILTER(lang(?t)="${lang.ID}"). FILTER(lang(?d)="${lang.ID}")
+}`;
+
+        let projects = [];
+        ws.json(null, projectQuery, null, jsonData => {
+            jsonData.results.bindings.forEach((i) => {
+                let image = lang.projectIcons[i.s.value];
+                projects.push({ id: i.s.value.split("/")[4], name: i.t.value, image: image, desc: i.d.value });
+            });
+            $('#citation').append(html + '</blockquote>');
+        });
         var query = `
                             PREFIX dcterms:<http://purl.org/dc/terms/> 
                             PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
@@ -190,7 +207,8 @@ var page = {
                             } 
                             GROUP BY ?cL ?cD ORDER BY ?cL`;
 
-        lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
+        //lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
+        projects.forEach(function (project) {
             ws.projectJson(project.id, query, "c", jsonData => {
                 div.append('<div class="card my-4"><h4 class="card-header">' + project.name +
                     '</h4><div id="' + project.id + 'Card" class="card-body"></div></div>');

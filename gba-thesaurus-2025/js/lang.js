@@ -8,6 +8,17 @@ var lang = {
         // after lang loaded:
         this.LIST_THESAURUS_PROJECTS = [this.GeologicUnitDesc, this.lithologyDesc, this.structureDesc, this.GeologicTimeScaleDesc, this.tectonicunitDesc, this.mineralDesc, this.minresDesc];
     },
+    projectIcons: {
+        'inspire': 'INSPIRE.png',
+        'linkedData': 'linkedData.png',
+        'https://resource.geosphere.at/thes/geolunit': 'profil.png',
+        'https://resource.geosphere.at/thes/struct': 'falte.png',
+        'https://resource.geosphere.at/thes/time': 'time.png',
+        'https://resource.geosphere.at/thes/lith': 'granit.png',
+        'https://resource.geosphere.at/thes/tect': 'tektonik.png',
+        'https://resource.geosphere.at/thes/mineral': 'quarz.png',
+        'https://resource.geosphere.at/thes/minres': 'gold.png'
+    },
     // loading functions, one for each language
     de: function () {
         this.LABEL_LICENSE = 'Nutzungsbedingungen';
