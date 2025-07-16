@@ -14,7 +14,8 @@ var search = {
                                         @@filter
                                         } ORDER BY STRLEN(STR(?L)) ?L`;
 
-        projectList = [];
+        search.projectList = [];
+        let projectList = search.projectList;
         page.getAllProjects(projectList).then(() => {
             for (let project of projectList) {
                 ws.projectJson(project.id, query, "s", jsonData => {
@@ -234,7 +235,9 @@ var search = {
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         let entry = value.L.value;
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
-                            entry = entry + ' <span class="addVoc">(' + lang[ws.getProject(value.s.value) + 'Desc'].name + ')</span>';
+                            let e = ws.getProject(value.s.value);
+                            let item = lang[e + 'Desc'];
+                            entry = entry + ' <span class="addVoc">(' + (item ? item.name : e) + ')</span>';
                         }
                         $('#dropdown').append('<tr><td class="searchLink" data_url="' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '" onclick="document.location.href=\'' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
                     });
@@ -283,7 +286,7 @@ var search = {
                                         ORDER BY ?sort 
                                         LIMIT 100`;
 
-        search.projectList.forEach(function (project) {
+        for (project of search.projectList) {
 
             ws.projectJson(project.id, query, "s", jsonData => {
 
@@ -315,7 +318,7 @@ var search = {
             }).catch(function (error) {
                 console.log(error);
             });
-        });
+        }
     },
 
     createSearchResultsText: function (sparqlText, searchText) {
