@@ -1,6 +1,7 @@
 ﻿// search features
 "use strict";
 var search = {
+    projectList: null,
     initProjects: function () {
         var a = [];
         var b = 0;
@@ -13,20 +14,23 @@ var search = {
                                         @@filter
                                         } ORDER BY STRLEN(STR(?L)) ?L`;
 
-        lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
-            ws.projectJson(project.id, query, "s", jsonData => {
-                a = [...a, ...jsonData.results.bindings];
-                b += 1;
+        projectList = [];
+        page.getAllProjects(projectList).then(() => {
+            for (let project of projectList) {
+                ws.projectJson(project.id, query, "s", jsonData => {
+                    a = [...a, ...jsonData.results.bindings];
+                    b += 1;
 
-                if (b == lang.LIST_THESAURUS_PROJECTS.length) {
-                    const options = {
-                        shouldSort: true,
-                        tokenize: true,
-                        keys: ['L.value']
-                    };
-                    window.fuse = new Fuse(a, options);
-                }
-            });
+                    if (b == projectList.length) {
+                        const options = {
+                            shouldSort: true,
+                            tokenize: true,
+                            keys: ['L.value']
+                        };
+                        window.fuse = new Fuse(a, options);
+                    }
+                });
+            }
         });
     },
 
@@ -100,7 +104,7 @@ var search = {
             });
         })
 
-        $.each(LIST_THESAURUS_PROJECTS, function (index, value) {
+        $.each(search.projectList, function (index, value) {
             $('#endpointSelect').append(`<option value="${ws.endpoint}${value.id}">${value.name} (${TOPIC})</option>`);
             if (uri.search(value.id) > -1) {
                 $("#endpointSelect").val(`${ws.endpoint}${value.id}`);
@@ -279,7 +283,7 @@ var search = {
                                         ORDER BY ?sort 
                                         LIMIT 100`;
 
-        lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
+        search.projectList.forEach(function (project) {
 
             ws.projectJson(project.id, query, "s", jsonData => {
 

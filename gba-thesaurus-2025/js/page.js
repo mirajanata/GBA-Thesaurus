@@ -54,7 +54,10 @@ var page = {
             this.insertSideCard_projectInfo(project);
         } else {
             this.insertPageDesc(); //general intro
-            this.insertComments('proj_desc', lang.LIST_THESAURUS_PROJECTS); //project desc from js ,insert before ProjCards!
+            let projects = [];
+            page.getAllProjects(projects).then(() => {
+                this.insertComments('proj_desc', projects); //project desc from js ,insert before ProjCards!
+            });
             this.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
             this.insertProjCards(); //quick access cards, plus extended project comments from sparql
             //this.insertVideo(); //screen cast youtube
@@ -161,36 +164,9 @@ var page = {
         $('#disclaimer').html(lang.LABEL_DISCLAIMER);
         $('#IMG_GBALOGO').attr('src', 'img/' + lang.IMG_GBALOGO);
     },
-    /* insertVideo: function () { // https://www.youtube.com/playlist?list=PLfshul-4XQW9H-k-_Q98eRI5LHfUPGbtc
-        var div = $('#video');
-        div.append(`<div class="card my-4">
-                    <h4 class="card-header"><i style="color:red;" class="fab fa-youtube"></i> Screen video</h4>
-                        <div id="" class="card-body">
-                            <a target="_blank" href="https://www.youtube.com/playlist?list=PLfshul-4XQW9H-k-_Q98eRI5LHfUPGbtc">
-                                <img style="width: 100%; object-fit: cover;" src="img/youTube_img.png" alt="View a screen video at YouTube">
-                            </a>
-                        </div>
-                    </div>`);
-    }, */
     insertProjCards: function () {
         var div = $('#proj_links');
 
-        var projectQuery = `PREFIX dcterms:<http://purl.org/dc/terms/> 
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-SELECT DISTINCT ?s ?t ?d
-WHERE {
-    ?s a <http://rdfs.org/ns/void#Dataset>; dcterms:title ?t; dcterms:description ?d
-    . FILTER(lang(?t)="${lang.ID}"). FILTER(lang(?d)="${lang.ID}")
-}`;
-
-        let projects = [];
-        ws.json(null, projectQuery, null, jsonData => {
-            jsonData.results.bindings.forEach((i) => {
-                let image = lang.projectIcons[i.s.value];
-                projects.push({ id: i.s.value.split("/")[4], name: i.t.value, image: image, desc: i.d.value });
-            });
-            $('#citation').append(html + '</blockquote>');
-        });
         var query = `
                             PREFIX dcterms:<http://purl.org/dc/terms/> 
                             PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
@@ -207,24 +183,24 @@ WHERE {
                             } 
                             GROUP BY ?cL ?cD ORDER BY ?cL`;
 
-        //lang.LIST_THESAURUS_PROJECTS.forEach(function (project) {
-        projects.forEach(function (project) {
-            ws.projectJson(project.id, query, "c", jsonData => {
-                div.append('<div class="card my-4"><h4 class="card-header">' + project.name +
-                    '</h4><div id="' + project.id + 'Card" class="card-body"></div></div>');
+        page.forAllProjects((projectId, projectName, projectDesc, projectUri) => {
 
-                const cardDiv = $('#' + project.id + 'Card');
-                const commentDiv = $('#' + project.id + 'Comment');
-                const readMoreDiv = $('#' + project.id + 'ReadMore');
+            ws.projectJson(projectId, query, "c", jsonData => {
+                div.append('<div class="card my-4"><h4 class="card-header">' + projectName +
+                    '</h4><div id="' + projectId + 'Card" class="card-body"></div></div>');
+
+                const cardDiv = $('#' + projectId + 'Card');
+                const commentDiv = $('#' + projectId + 'Comment');
+                const readMoreDiv = $('#' + projectId + 'ReadMore');
 
                 commentDiv.append(`
                             <br>
-                            <div style="cursor: pointer;" id="${project.id}rmBtn"
-                            onclick="javascript: page.toggleRead(\'${project.id}rmBtn\', \'${project.id}ReadMore\', \'read more\');"
+                            <div style="cursor: pointer;" id="${projectId}rmBtn"
+                            onclick="javascript: page.toggleRead(\'${projectId}rmBtn\', \'${projectId}ReadMore\', \'read more\');"
                             class="text-muted">
                                 <span class="fa fa-caret-down"></span> <em>read more ..</em>
                             </div>
-                            <div style="display:none;" id="${project.id}ReadMore">
+                            <div style="display:none;" id="${projectId}ReadMore">
                                 <br>
                             </div>`);
 
@@ -240,25 +216,45 @@ WHERE {
 
                 readMoreDiv.append(`
                         <p class="">
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='rdf/${project.id}.rdf'">
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='rdf/${projectId}.rdf'">
                                 RDF/XML download
                             </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='${ws.endpoint}${project.id}'">
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='${ws.endpoint}${projectId}'">
                                 SparQL endpoint
                             </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='bibl_res.html?proj=${project.id}';">
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='bibl_res.html?proj=${projectId}';">
                                 ${lang.LABEL_BIBLREF}
                             </button>
                         </p>
-                        <hr>`); 
+                        <hr>`);
             });
+        });
+    },
+    forAllProjects: function (callback) {
+        var projectQuery = `PREFIX dcterms:<http://purl.org/dc/terms/> PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT DISTINCT ?s ?t ?d WHERE {
+    ?s a <http://rdfs.org/ns/void#Dataset>; dcterms:title ?t; dcterms:description ?d
+    . FILTER(lang(?t)="${lang.ID}"). FILTER(lang(?d)="${lang.ID}")
+}`;
+
+        return ws.json(null, projectQuery, null, jsonData => {
+            let projects = jsonData.results.bindings;
+            for (let i of projects) {
+                callback(i.s.value.split("/")[4], i.t.value, i.d.value, i.s.value);
+            }
+        });
+    },
+    getAllProjects: function (projects) {
+        return this.forAllProjects((projectId, projectName, projectDesc, projectUri) => {
+            projects.push({ id: projectId, name: projectName, image: ws.projectIcons[projectUri], desc: projectDesc });
         });
     },
 
     insertComments: function (divID, projects) {
         var div = $('#' + divID);
         div.empty();
-        projects.forEach(function (desc) {
+        for (let desc of projects) {
+            if (!desc.image) desc.image = 'profil.png';
             div.append(`
                                                 <div class="media mb-4">
                                                     <img alt="${desc.name}" class="d-flex mr-3 rounded-circle" src="img/${desc.image}">
@@ -267,7 +263,7 @@ WHERE {
                                                         ${desc.desc}
                                                     </div>
                                                 </div>`);
-        });
+        }
     },
 
     insertPageDesc: function () {

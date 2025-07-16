@@ -23,6 +23,17 @@ var ws = {
         'citation': 'FROM <https://resource.geosphere.at/thes/citation>',
         'ref': 'FROM <https://resource.geosphere.at/thes/citation>',
     },
+    projectIcons: {
+        'inspire': 'INSPIRE.png',
+        'linkedData': 'linkedData.png',
+        'https://resource.geosphere.at/thes/geolunit': 'profil.png',
+        'https://resource.geosphere.at/thes/struct': 'falte.png',
+        'https://resource.geosphere.at/thes/time': 'time.png',
+        'https://resource.geosphere.at/thes/lith': 'granit.png',
+        'https://resource.geosphere.at/thes/tect': 'tektonik.png',
+        'https://resource.geosphere.at/thes/mineral': 'quarz.png',
+        'https://resource.geosphere.at/thes/minres': 'gold.png'
+    },
 
     doc: function (query, thenFunc) {
         return fetch(this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson').then(thenFunc);
