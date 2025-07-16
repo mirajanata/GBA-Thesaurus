@@ -50,8 +50,12 @@ var page = {
             $('#pageContent').empty();
             this.initApps(uri);
             detail.details(uri);
-            var project = lang[uri.split('\/')[3] + 'Desc'];
-            this.insertSideCard_projectInfo(project);
+            let projects = [];
+            page.getAllProjects(projects).then(() => {
+                let projectId = ws.getProject(uri);
+                let item = projects.find((m) => m.id == projectId);
+                this.insertSideCard_projectInfo(item);
+            });
         } else {
             this.insertPageDesc(); //general intro
             let projects = [];

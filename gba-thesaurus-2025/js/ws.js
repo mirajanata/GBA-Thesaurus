@@ -5,8 +5,6 @@ var ws = {
     getProject: function (uri) {
         return uri.split('/')[4];
     },
-    projectFilter: {
-    },
     projectFrom: {
         'GeologicUnit': 'FROM <https://resource.geosphere.at/thes/geolunit> FROM <https://resource.geosphere.at/thes/geomorph>',
         'geolunit': 'FROM <https://resource.geosphere.at/thes/geolunit> FROM <https://resource.geosphere.at/thes/geomorph>',

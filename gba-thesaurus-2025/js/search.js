@@ -235,9 +235,9 @@ var search = {
                     $.each(autoSuggest.slice(0, 10), function (index, value) {
                         let entry = value.L.value;
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
-                            let e = ws.getProject(value.s.value);
-                            let item = lang[e + 'Desc'];
-                            entry = entry + ' <span class="addVoc">(' + (item ? item.name : e) + ')</span>';
+                            let projectId = ws.getProject(value.s.value);
+                            let item = search.projectList.find((m) => m.id == projectId);
+                            entry = entry + ' <span class="addVoc">(' + (item ? item.name : projectId) + ')</span>';
                         }
                         $('#dropdown').append('<tr><td class="searchLink" data_url="' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '" onclick="document.location.href=\'' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
                     });

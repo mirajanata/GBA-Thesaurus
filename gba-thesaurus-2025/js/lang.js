@@ -46,48 +46,6 @@ var lang = {
             name: 'Linked Data',
             desc: 'Alle Begriffe sind als SKOS Konzepte formatiert (Begriffe, einschlie&szlig;lich Synonyme), mit eigenen Web-Adressen &#8594; <a href="http://de.wikipedia.org/wiki/Uniform_Resource_Identifier" title="URI Uniform Resource Identifier" target="_blank">URI\'s</a>, sowie durch polyhierarchische Beziehungen als &uuml;ber-, untergeordnete, und verwandte Konzepte innerhalb eines Themenbereichs definiert , mit Beschreibungen und Quellenangabe &#8594; Literaturverzeichnis<br>Als <a href="http://de.wikipedia.org/wiki/Linked_Open_Data" title="Linked Data" target="_blank">Linked Data</a> Resource ist sie semantisch mit anderen Resourcen im Web verlinkt &#8594; <a href="http://dbpedia.org/" title="DBpedia Knowledge Base" target="_blank">DBpedia</a>, <a href="http://inspire.ec.europa.eu/registry/" title="INSPIRE Codes" target="_blank">INSPIRE</a>, <a href="http://resource.geosciml.org/" title="Resources for Geosciences XML" target="_blank">GeoSciML</a> maschinenlesbar &uuml;ber Webservices (Endpoints) gem&auml;&szlig; den <a href="http://www.w3.org/2013/data/" title="The World Wide Web Consortium" target="_blank">W3C</a> Standards ver&ouml;ffentlicht &#8594 <a href="http://www.w3.org/RDF/" title="Resource Description Framework (RDF)" target="_blank">RDF</a>, <a href="http://www.w3.org/TR/rdf-sparql-query/" title="SPARQL Query Language for RDF" target="_blank">SparQL</a><br>zur Verwendung in Linked Data Webapplikationen, als Hyperlinks, oder als Kodierung f&uuml;r Geodaten &#8594; Datenharmonisierung, DataViewer'
         };
-        this.GeologicUnitDesc = {
-            id: 'GeologicUnit',
-            image: 'profil.png',
-            name: 'Geologische Einheiten',
-            desc: 'Das Thema Geologische Einheiten umfasst verschiedene als Punkte, Linien oder Fl&auml;chen dargestellte Einheiten und Signaturen auf geologischen Karten. Derzeit sind neben den lithostratigraphischen Einheiten der &quot;Stratigraphischen Tabelle von &Ouml;sterreich&quot; (Piller et al., 2004) ebenso lithogenetische, allostratigraphische und geomorphologische Einheiten, sowie lithodemische Einheiten erfasst. Die meist geographischen, informellen Gliederungseinheiten der &quot;Stratigraphischen Tabelle von &Ouml;sterreich&quot;, wurden zus&auml;tzlich noch mit eckigen Klammern gekennzeichnet und sollten nicht zur Attributierung verwendet werden.'
-        };
-        this.structureDesc = {
-            id: 'structure',
-            image: 'falte.png',
-            name: 'Geologische Strukturen',
-            desc: 'Das Projekt Geologische Strukturen beinhaltet lineare und planare Strukturen in geologischen Karten, &uuml;berwiegend Deformationsstrukturen. Dar&uuml;ber hinaus sind Konzepte zu den Schersinn-Indikatoren verf&uuml;gbar.'
-        };
-        this.GeologicTimeScaleDesc = {
-            id: 'GeologicTimeScale',
-            image: 'time.png',
-            name: 'Zeitskala',
-            desc: 'Das Projekt Geologische Zeitskala umfasst chronostratigraphische und geochronologische Einheiten der Internationalen Stratigraphischen Tabelle, der Internationalen Stratigraphischen Kommission sowie deren deutsche &Uuml;bersetzung, wie sie von der &Ouml;sterreichischen Stratigraphischen Kommission verwendet werden. Dar&uuml;ber hinaus sind sowohl die Stufengliederung der Paratethys als auch informelle Einheiten codiert, gegliedert in historische und regional verwendete Einheiten.'
-        };
-        this.lithologyDesc = {
-            id: 'lithology',
-            image: 'granit.png',
-            name: 'Lithologie',
-            desc: 'Das Thema Lithologie umfasst Locker- und Festgesteine, die nach ihrer modalen Zusammensetzung bzw. deren Korngr&ouml;&szlig;en klassifiziert werden. Die Klassifikation von magmatischen und polygenetischen Gesteinen, Metamorphiten und St&ouml;rungsgesteinen ist stark an die IUGS-Empfehlungen der Subkommission f&uuml;r die Systematik von magmatischen bzw. metamorphen Gesteinen angepasst. Die Klassifizierung der sediment&auml;ren Locker- und Festgesteine erfolgte auf der Grundlage der Korngr&ouml;&szlig;enklassifikation und, soweit nicht anwendbar, auf der Grundlage gemeinsamer internationaler Richtlinien.'
-        };
-        this.tectonicunitDesc = {
-            id: 'tectonicunit',
-            image: 'tektonik.png',
-            name: 'Lithotektonische Einheiten',
-            desc: 'Das Thema &quot;Lithotektonische Einheiten&quot; umfasst derzeit Konzeptschemen f&uuml;r eine formale Klassifikation lithotektonischer Einheiten und f&uuml;r lithotektonische Einheiten, wie sie zum Teil auch in Karten und Publikationen der GeoSphere Austria verwendet werden. Somit liegt der Schwerpunkt auf dem Bereich der Ostalpen bzw. deren Umgebung. Die Beschreibung der lithotektonischen Einheiten in &Ouml;sterreich bzw. deren hierarchische Einordnung in dieses System unterliegt einer laufenden &Uuml;berarbeitung und Erweiterung. Zurzeit sind daher nur die Hierarchieebenen bis zum Deckensystem konsolidiert und die dazugeh&ouml;rigen Informationen nur teilweise in Englisch verf&uuml;gbar.'
-        };
-        this.mineralDesc = {
-            id: 'mineral',
-            image: 'quarz.png',
-            name: 'Minerale',
-            desc: 'Das Thema &quot;Minerale&quot; beinhaltet derzeit die wichtigsten gesteinsbildenden Minerale, welche f&uuml;r die Themenbereiche der Geologie, Petrologie und Rohstoffgeologie an der GeoSphere Austria von Bedeutung sind. Die Auswahl erfolgte auf Basis einer Liste von Mineralen und ihren Abk&uuml;rzungen lt. Empfehlung der &quot;Subcommission on the Systematics of Metamorphic Rocks&quot; - SCMR (Fettes & Desmons 2001) sowie auf Basis des Projektes &quot;Systematische Erhebung von Bergbauen und Bergbauhalden mineralischer Rohstoffe im Bundesgebiet&quot; (Schedl et al. 2009). Als Referenz dient zus&auml;tzlich die CNMNC Liste von Mineralnamen der International Mineralogical Association (IMA) mit Stand 2014. Die Systematik der Minerale ist angelehnt an Strunz & Nickel (2001) und bezieht sich auf die chemisch-strukturellen Charakteristika.'
-        };
-        this.minresDesc = {
-            id: 'minres',
-            image: 'gold.png',
-            name: 'Rohstoffgeologie',
-            desc: 'Das Vokabular zum Thema &quot;Rohstoffgeologie&quot; umfasst Begriffe mit Bezug zur geologischen Erforschung der Vorkommen und Lagerst&auml;tten mineralischer Rohstoffe in &Ouml;sterreich und wird zur Beschreibung bzw. Indizierung von Datens&auml;tzen verwendet. Die vorliegenden Begriffe wurden &uuml;berwiegend f&uuml;r das Projekt Min4EU zusammengestellt, im Interaktiven Rohstoff-Informations-System (IRIS) verwendet und enthalten jeweils auch einen Bezug zu den betreffenden INSPIRE Auswahllisten. Die Beitr&auml;ge zu den einzelnen Rohstoffvorkommen bzw. die Beschreibung der minerogenetischen Bezirke erfolgen in enger Zusammenarbeit mit den Mitgliedern des Fachausschusses f&uuml;r Lagerst&auml;ttenforschung des Bergm&auml;nnischen Verband &Ouml;sterreichs.'
-        };
         this.DESC_DISCLAIMER = '<h1>Haftungsausschluss:</h1>Die GeoSphere Austria (GBA) &uuml;bernimmt keine Verantwortung f&uuml;r die Richtigkeit der Inhalte bzw. keine Haftung irgendeiner Art f&uuml;r die zur Verf&uuml;gung gestellten Informationen oder Services und etwaiger Folgesch&auml;den die aus deren Verwendung resultieren. Obwohl versucht wird die Daten sorgf&auml;ltig zu &uuml;berpr&uuml;fen sind die Inhalte dieser Seite nicht notwendigerweise vollst&auml;ndig, aktuell oder fehlerfrei. Die zur Verf&uuml;gung gestellten Daten und Dienste stellen eine (wissenschaftliche) Kompilation dar die nicht notwendigerweise die offizielle Meinung der GeoSphere Austria widerspiegelt. Es wird versucht die Information fehlerfrei und so aktuell wie m&ouml;glich zu halten, dar&uuml;ber hinaus wird versucht berichtete Fehler wenn m&ouml;glich zu korrigieren. Diese Webseite beinhaltet Links zu externen Seiten &uuml;ber die die GeoSphere Austria keine Kontrolle hat und daher keine Verantwortung &uuml;bernimmt. Weder die GeoSphere Austria noch Personen die in ihrem Auftrag handeln, k&ouml;nnen f&uuml;r die Inhalte auf dieser Webseite noch auf deren Verwendung in irgendeiner Weise haftbar gemacht werden. Die GeoSphere Austria beh&auml;lt sich das Recht vor die Inhalte dieser Seite bzw. die Nutzungsbedingungen ohne vorherige Ank&uuml;ndigung zu &auml;ndern. Der Nutzer nimmt diesen Haftungsausschluss ausdr&uuml;cklich zur Kenntnis.<br><br>Die Website nutzt die Standards HTML5/ES16/JQuery und wurde f&uuml;r die Ansicht in Firefox, Chrome, Safari oder Edge optimiert. MS InternetExplorer11 oder &auml;lter wird deshalb nicht mehr unterst&uuml;tzt.';
     },
     en: function () {
@@ -128,48 +86,6 @@ var lang = {
             image: 'linkedData.png',
             name: 'Linked Data',
             desc: 'formatted as SKOS concepts (terms, including synonyms), each with their own web addresses &#8594; <a href="http://en.wikipedia.org/wiki/Uniform_Resource_Identifier" title="URI Uniform Resource Identifier" target="_blank">URIs</a> - specified by polyhierarchical relationships as broader, narrower, and related concepts within the domain including descriptions and bibliographic references - as <a href="http://en.wikipedia.org/wiki/Linked_Open_Data" title="Linked Data" target="_blank">Linked Data</a> resource semantically linked to other web resources &#8594; <a href="http://dbpedia.org/" title="DBpedia Knowledge Base" target="_blank">DBpedia</a>, <a href="http://inspire.ec.europa.eu/registry/" title="INSPIRE Codes" target="_blank">INSPIRE</a>, <a href="http://resource.geosciml.org/" title="Resources for Geosciences XML" target="_blank">GeoSciML</a> - machine-readable published using web services (endpoints) according to the standards of <a href="http://www.w3.org/2013/data/" title="The World Wide Web Consortium" target="_blank">W3C</a> &#8594; <a href="http://www.w3.org/RDF/" title="Resource Description Framework (RDF)" target="_blank">RDF</a>, <a href="http://www.w3.org/TR/rdf-sparql-query/" title="SPARQL Query Language for RDF" target="_blank">SparQL</a> - to be used in Linked Data web applications such as hyperlinks for online texts or as encoding for geospatial data harmonizing data, DataViewer'
-        };
-        this.GeologicUnitDesc = {
-            id: 'GeologicUnit',
-            image: 'profil.png',
-            name: 'Geologic Units',
-            desc: 'The theme Geological Units comprises various units and symbols which were formalised as points, linear or polygonal features on geological maps and covers lithostratigraphic units of the Austrian Stratigraphic Chart (Piller et al., 2004), lithogenetic, lithodemic units and geomorphologic units. Informal subdivisions of the &quot;Stratigraphic Chart of Austria&quot; - most of them are geographic names - are indicated by square brackets and must not be used for coding.'
-        };
-        this.structureDesc = {
-            id: 'structure',
-            image: 'falte.png',
-            name: 'Geologic Structures',
-            desc: 'The Theme Geologic Structures includes linear and planar predominantly deformation structures in geologic maps. Shear sense indicators and fold structures are also covered by this theme.'
-        };
-        this.GeologicTimeScaleDesc = {
-            id: 'GeologicTimeScale',
-            image: 'time.png',
-            name: 'Geologic Time Scale ',
-            desc: 'The theme Geologic Time Scale covers chronostratigraphic and geochronologic Units of the International Stratigraphic Chart with a German translation based on the use by the Austrian Stratigraphic Commission. In addition the stages of the Paratethys as well as informal Units are structured in historic and regional concept schemes.'
-        };
-        this.lithologyDesc = {
-            id: 'lithology',
-            image: 'granit.png',
-            name: 'Lithology',
-            desc: 'The theme Lithology comprises loose- and bed-rock, that were classified according to their modal composition or their grain size, respectively. The classification of magmatic-, polygenetic-, metamorphic- and fault-rocks are based on the IUGS recommendations by the sub-commissions for magmatic and metamorphic rocks, respectively. The classification of sedimentary unconsolidated and solid rocks was based on the grain size classification and, where not applicable, on common international standards.'
-        };
-        this.tectonicunitDesc = {
-            id: 'tectonicunit',
-            image: 'tektonik.png',
-            name: 'Lithotectonic Units',
-            desc: 'The theme Lithotectonic Units contains concept schemes for a formal classification of lithotectonic units and lithotectonic entities for the purpose of the GeoSphere Austria. Therefore, the focus lies on the lithotectionic Units of the Eastern Alps and its surrounding. The description of lithotectonic units is undergoing continuous review and expansion and thus only consolidated down to the hierarchy of the nappe-system. Accordingly, not all descriptions and labels are available in English.'
-        };
-        this.mineralDesc = {
-            id: 'mineral',
-            image: 'quarz.png',
-            name: 'Minerals',
-            desc: 'The theme &quot;minerals&quot; currently contains the most important rock-forming minerals for the thematic areas of geology, petrology and mineral resources at the GeoSphere Austria. The selection is based on a list of minerals and their abbreviations as per recommendation of &quot;Subcommission on the Systematics of Metamorphic Rocks&quot; - SCMR (Fettes & Desmons 2001) and on the project &quot;Systematische Erhebung von Bergbauen und Bergbauhalden mineralischer Rohstoffe im Bundesgebiet&quot; (Schedl et al. 2009). As additional source we used the the official IMA-CNMNC List of Mineral Names 2014. The classification of minerals is based on Strunz & Nickel (2001) and refers to the chemical and structural characteristics.'
-        };
-        this.minresDesc = {
-            id: 'minres',
-            image: 'gold.png',
-            name: 'Mineral resources',
-            desc: 'The vocabulary on &quot;Mineral Resources&quot; includes concepts related to the geological investigation on occurrences and deposits of mineral resources in Austria and is used to describe or encode datasets. These terms were mainly compiled for the Min4EU project, used in the Interactive Resource Information System (IRIS) and also contain a reference to the according INSPIRE code lists. The contributions to the individual mineral deposits or the description of the mineralogenetic districts are made in close cooperation with the members of the expert committee for deposit research of the &quot;Bergm&auml;nnischer Verband &Ouml;sterreichs&quot;.'
         };
 
         this.DESC_DISCLAIMER = '<h1>Disclaimer:</h1>The GeoSphere Austria takes no responsibility for the correctness of the contents and no liability (of any sorts) for the information and services provided and possible consequential damage resulting from the use of these. Although we try to scrutinise our data the information on this site is not necessarily complete, up to date or accurate. The provided data and services represent a scientific compilation that may not reflect the official opinion of the GeoSphere Austria. We try to keep our data as accurate and up to date as possible and in addition we attempt to correct errors if they are reported to us. This website contains links to other external sites over which the GeoSphere Austria has no control and therefore can take no responsibility. Neither the GeoSphere Austria nor persons acting in their behalf can be held liable for the contents of this website or their use. The GeoSphere Austria reserves its right to change the contents of this website and its terms of use without prior announcement. The user of this site takes note and approves this disclaimer.<br><br>The application uses standards like HTML5/ES16/JQuery and is best viewed with Firefox, Chrome, Safari or Edge. MS InternetExplorer11 and older versions are not supported.';
