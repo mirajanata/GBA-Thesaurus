@@ -111,7 +111,7 @@ var d3data = {
                     let s = d3data.getLabel(o_label);
                     let o_quantity = i.oQ ? Math.floor(i.oQ.value) : "1";
                     to = { id: (++Id), label: s, name: s, itemStyle: { color: o_color }, color: o_color, title: object.value, c: [], r: [], value: d3data.getQuantityValue(o_quantity), quantity: o_quantity };
-                    index[object.value] = to;
+                    //index[object.value] = to;
                     from.c.push(to);
                     from.r.push(rel);
                 }
