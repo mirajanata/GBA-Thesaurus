@@ -18,7 +18,7 @@
     <script src="js/ws.js"></script>
     <script src="js/visNet.js"></script>
     <script src="js/d3_data.js"></script>
-    <script src="js/d3_radial.js"></script>
+    <!--<script src="js/d3_radial.js"></script>-->
     <script src="js/d3_tree.js"></script>
     <!--script src="js/d3_circle.js"></!--script-->
     <script src="js/echarts.js"></script>
@@ -276,14 +276,8 @@
                         data = filteredData;
                     let chart = treeChart(data);
                     d3.select("#d3tree").append(() => chart);
-
                     eCharts_sunburstChart(data, 'd3radial');
-                    //chart = radialChart(data);
-                    //d3.select("#d3radial").append(() => chart);
-
                     eCharts_circleChart(data, 'd3cluster');
-                    //chart = circleChart(data);
-                    //d3.select("#d3cluster").append(() => chart);
                 }, 4);
             });
 

@@ -121,8 +121,10 @@ var d3data = {
         d3data.fRoot = d3data.fIndex[uri];
         if (!expandTo)
             expandTo = 2;
-        d3data.expandHierarchy(d3data.hRoot, expandTo);
-        d3data.expandHierarchy(d3data.fRoot, expandTo);
+        if (d3data.hRoot)
+            d3data.expandHierarchy(d3data.hRoot, expandTo);
+        if (d3data.fRoot)
+            d3data.expandHierarchy(d3data.fRoot, expandTo);
     },
     checkLoop: function (from, to) {
         if (to.c.length == 0) {
