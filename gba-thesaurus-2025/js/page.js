@@ -25,11 +25,12 @@ var page = {
 
         this.setNavbarFooter();
         search.insertSearchCard(); //inserts search widget only
-        let projects=[];
-        page.getAllProjects(projects).then(() => {
+        let urlParams = this.urlParams;
+        let startup = () => {
+            let projects = config.projects;
             search.initProjects(projects);
-            var urlParams = this.urlParams;
-                if (urlParams.has('search')) { //need lang parameter only for sparql requests
+
+            if (urlParams.has('search')) { //need lang parameter only for sparql requests
                 search.insertSearch(decodeURI(urlParams.get('search')));
                 this.insertProjCards(); //quick access cards, plus extended project comments from sparql
             } else if (urlParams.has('info')) {
@@ -58,9 +59,9 @@ var page = {
             } else {
                 this.insertPageDesc(); //general intro
                 this.insertComments('proj_desc', projects); //project desc from js ,insert before ProjCards!
-                this.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
+                //this.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
                 this.insertProjCards(); //quick access cards, plus extended project comments from sparql
-            //this.insertVideo(); //screen cast youtube
+                //this.insertVideo(); //screen cast youtube
             }
             document.documentElement.setAttribute('lang', USER_LANG);
 
@@ -73,7 +74,7 @@ var page = {
                 var r = $("#rightSidebar");
                 r.detach();
                 if (!this.isEmbedded)
-                r.prependTo("#contentRow1");
+                    r.prependTo("#contentRow1");
                 r.removeClass("col-lg-4");
                 r.addClass("col-lg-8");
                 $("#appsCard").css('visibility', 'collapse');
@@ -87,8 +88,14 @@ var page = {
                     $("a:not([target])").attr("target", "_blank");
                 }
             }
-        });
-
+        };
+        if (urlParams.has('uri') || urlParams.has('search')) {
+            config.init(false, USER_LANG);
+            startup();
+        }
+        else {
+            config.init(true, USER_LANG).then(startup);
+        }
     },
     updateSharingUrl: function (e) {
         var v = encodeURIComponent(this.uriParameter != null ? this.uriParameter : window.location.href);
@@ -184,8 +191,11 @@ var page = {
                             } 
                             GROUP BY ?cL ?cD ORDER BY ?cL`;
 
-        page.forAllProjects((projectId, projectName, projectDesc, projectUri) => {
-
+        for (let project of config.projects) {
+            let projectId = project.id;
+            let projectName = project.name;
+            let projectDesc = project.desc;
+            let projectUri = project.uri;
             ws.projectJson(projectId, query, "c", jsonData => {
                 div.append('<div class="card my-4"><h4 class="card-header">' + projectName +
                     '</h4><div id="' + projectId + 'Card" class="card-body"></div></div>');
@@ -229,26 +239,7 @@ var page = {
                         </p>
                         <hr>`);
             });
-        });
-    },
-    forAllProjects: function (callback) {
-        var projectQuery = `PREFIX dcterms:<http://purl.org/dc/terms/> PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-SELECT DISTINCT ?s ?t ?d WHERE {
-    ?s a <http://rdfs.org/ns/void#Dataset>; dcterms:title ?t; dcterms:description ?d
-    . FILTER(lang(?t)="${lang.ID}"). FILTER(lang(?d)="${lang.ID}")
-}`;
-
-        return ws.json(null, projectQuery, null, jsonData => {
-            let projects = jsonData.results.bindings;
-            for (let i of projects) {
-                callback(i.s.value.split("/")[4], i.t.value, i.d.value, i.s.value);
-            }
-        });
-    },
-    getAllProjects: function (projects) {
-        return this.forAllProjects((projectId, projectName, projectDesc, projectUri) => {
-            projects.push({ id: projectId, name: projectName, image: ws.projectIcons[projectUri], desc: projectDesc });
-        });
+        }
     },
 
     insertComments: function (divID, projects) {

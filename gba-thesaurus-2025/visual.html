@@ -14,7 +14,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <script type="text/javascript" src="https://visjs.github.io/vis-network/dist/vis-network.min.js"></script>
-
+    <script src="js/config.js"></script>
     <script src="js/ws.js"></script>
     <script src="js/visNet.js"></script>
     <script src="js/d3_data.js"></script>
@@ -233,13 +233,13 @@
             const minimizeIcon = '<div class="fa fa-window-restore icon-minimize" style="width: 16px; height: 16px; display:none;"></div>'
             $('.panel').each(function () {
                 $(this).prepend(`
-                                <div class="panel-controls">
-                                    <button class="btn btn-light btn-sm btn-toggle-size" title="Toggle size">
-                                        ${maximizeIcon}
-                                        ${minimizeIcon}
-                                    </button>
-                                </div>
-                            `);
+                                    <div class="panel-controls">
+                                        <button class="btn btn-light btn-sm btn-toggle-size" title="Toggle size">
+                                            ${maximizeIcon}
+                                            ${minimizeIcon}
+                                        </button>
+                                    </div>
+                                `);
             });
 
             // --- Click handler for the new toggle button ---
@@ -268,7 +268,7 @@
                 }
             });
 
-
+            config.init(false);
             visNet.init(function (data) {
                 d3data.setVisData(data);
                 d3data.init(function (data, filteredData) {

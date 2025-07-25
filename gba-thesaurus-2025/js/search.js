@@ -1,45 +1,38 @@
 ﻿// search features
 "use strict";
 var search = {
-    projectList: null,
     initProjects: function (projects) {
         var a = [];
-        var b = 0;
         var query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
                                         SELECT distinct ?s ?L
                                         @@from
                                         WHERE { 
                                         VALUES ?p {skos:prefLabel skos:altLabel} 
                                         ?s a skos:Concept; ?p ?L . FILTER(lang(?L)="${lang.ID}") 
-                                        @@filter
                                         } ORDER BY STRLEN(STR(?L)) ?L`;
 
-        search.projectList = projects;
-        let ids=[];
-        let projectList = search.projectList;
-            for (let project of projectList) {
-                ws.projectJson(project.id, query, "s", jsonData => {
-
-                    for (let binding of jsonData.results.bindings) {
-                        if (ids.indexOf(binding.s.value)>=0) {
-                            continue;
-                        }
-                        ids.push(binding.s.value);
-                        a.push(binding);
-                    }
-                    //a = [...a, ...jsonData.results.bindings];
-                    b += 1;
-
-                    if (b == projectList.length) {
-                        const options = {
-                            shouldSort: true,
-                            tokenize: true,
-                            keys: ['L.value']
-                        };
-                        window.fuse = new Fuse(a, options);
-                    }
-                });
+        let ids = [];
+        let from = "";
+        for (let project of config.projects) {
+            from += " " + project.from;
+        }
+        query = query.replace('@@from', from);
+        ws.projectJson(null, query, "s", jsonData => {
+            for (let binding of jsonData.results.bindings) {
+                if (ids.indexOf(binding.s.value) >= 0) {
+                    continue;
+                }
+                ids.push(binding.s.value);
+                a.push(binding);
             }
+            //a = [...a, ...jsonData.results.bindings];
+            const options = {
+                shouldSort: true,
+                tokenize: true,
+                keys: ['L.value']
+            };
+            window.fuse = new Fuse(a, options);
+        });
     },
 
     insertSparql: function (uri, label) {
@@ -112,7 +105,7 @@ var search = {
             });
         })
 
-        $.each(search.projectList, function (index, value) {
+        $.each(config.projects, function (index, value) {
             $('#endpointSelect').append(`<option value="${ws.endpoint}${value.id}">${value.name} (${TOPIC})</option>`);
             if (uri.search(value.id) > -1) {
                 $("#endpointSelect").val(`${ws.endpoint}${value.id}`);
@@ -243,7 +236,7 @@ var search = {
                         let entry = value.L.value;
                         if (c.indexOf(entry) !== c.lastIndexOf(entry)) {
                             let projectId = ws.getProject(value.s.value);
-                            let item = search.projectList.find((m) => m.id == projectId);
+                            let item = config.projects.find((m) => m.id == projectId);
                             entry = entry + ' <span class="addVoc">(' + (item ? item.name : projectId) + ')</span>';
                         }
                         $('#dropdown').append('<tr><td class="searchLink" data_url="' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '" onclick="document.location.href=\'' + page.BASE + '?uri=' + value.s.value + '&lang=' + lang.ID + '\';">' + entry + '</td></tr>');
@@ -293,7 +286,7 @@ var search = {
                                         ORDER BY ?sort 
                                         LIMIT 100`;
 
-        for (let project of search.projectList) {
+        for (let project of config.projects) {
 
             ws.projectJson(project.id, query, "s", jsonData => {
 
