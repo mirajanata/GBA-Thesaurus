@@ -6,8 +6,8 @@ var ws = {
         return uri.split('/')[4];
     },
     projectFrom: {
-        'GeologicUnit': 'FROM <https://resource.geosphere.at/thes/geolunit> FROM <https://resource.geosphere.at/thes/geomorph>',
-        'geolunit': 'FROM <https://resource.geosphere.at/thes/geolunit> FROM <https://resource.geosphere.at/thes/geomorph>',
+        'GeologicUnit': 'FROM <https://resource.geosphere.at/thes/geolunit>',
+        'geolunit': 'FROM <https://resource.geosphere.at/thes/geolunit>',
         'structure': 'FROM <https://resource.geosphere.at/thes/struct>',
         'struct': 'FROM <https://resource.geosphere.at/thes/struct>',
         'GeologicTimeScale': 'FROM <https://resource.geosphere.at/thes/time>',

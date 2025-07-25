@@ -2,11 +2,11 @@
 "use strict";
 var search = {
     projectList: null,
-    initProjects: function () {
+    initProjects: function (projects) {
         var a = [];
         var b = 0;
         var query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
-                                        SELECT ?s ?L
+                                        SELECT distinct ?s ?L
                                         @@from
                                         WHERE { 
                                         VALUES ?p {skos:prefLabel skos:altLabel} 
@@ -14,12 +14,20 @@ var search = {
                                         @@filter
                                         } ORDER BY STRLEN(STR(?L)) ?L`;
 
-        search.projectList = [];
+        search.projectList = projects;
+        let ids=[];
         let projectList = search.projectList;
-        page.getAllProjects(projectList).then(() => {
             for (let project of projectList) {
                 ws.projectJson(project.id, query, "s", jsonData => {
-                    a = [...a, ...jsonData.results.bindings];
+
+                    for (let binding of jsonData.results.bindings) {
+                        if (ids.indexOf(binding.s.value)>=0) {
+                            continue;
+                        }
+                        ids.push(binding.s.value);
+                        a.push(binding);
+                    }
+                    //a = [...a, ...jsonData.results.bindings];
                     b += 1;
 
                     if (b == projectList.length) {
@@ -32,7 +40,6 @@ var search = {
                     }
                 });
             }
-        });
     },
 
     insertSparql: function (uri, label) {
@@ -286,7 +293,7 @@ var search = {
                                         ORDER BY ?sort 
                                         LIMIT 100`;
 
-        for (project of search.projectList) {
+        for (let project of search.projectList) {
 
             ws.projectJson(project.id, query, "s", jsonData => {
 

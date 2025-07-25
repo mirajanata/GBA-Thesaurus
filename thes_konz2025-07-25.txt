@@ -1,0 +1,23 @@
+config.js and move the config for each of project, name, types of diagrams
+
+2. remove extern links - for new diagrams narrow/broader relationsips only
+
+3. remove biblio references and /citation, see projects in graphdb
+
+
+4.  circle diagram colorize by scolor
+
+5. allConcepts colorize and close into expander, use html5 details tag\
+
+6. Search fix by old Thes see "Graz"
+
+7.  for biblres user /citation
+
+
+PV:
+
+VRes -> tree only
+
+allConcepts colorize and close into expander, use html5 details tag\
+
+put VR icon to upper toolbar (other icons)

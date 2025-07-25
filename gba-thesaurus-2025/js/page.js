@@ -25,73 +25,70 @@ var page = {
 
         this.setNavbarFooter();
         search.insertSearchCard(); //inserts search widget only
-
-        var urlParams = this.urlParams;
-        if (urlParams.has('search')) { //need lang parameter only for sparql requests
-            search.insertSearch(decodeURI(urlParams.get('search')));
-            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
-        } else if (urlParams.has('info')) {
-            this.insertInfo(decodeURI(urlParams.get('info')));
-            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
-        } else if (urlParams.has('list')) {
-            $('#pageContent').empty();
-            let uri = '§';
-            let label = '§';
-            if (urlParams.has('uri')) {
-                uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
+        let projects=[];
+        page.getAllProjects(projects).then(() => {
+            search.initProjects(projects);
+            var urlParams = this.urlParams;
+                if (urlParams.has('search')) { //need lang parameter only for sparql requests
+                search.insertSearch(decodeURI(urlParams.get('search')));
+                this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+            } else if (urlParams.has('info')) {
+                this.insertInfo(decodeURI(urlParams.get('info')));
+                this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+            } else if (urlParams.has('list')) {
+                $('#pageContent').empty();
+                let uri = '§';
+                let label = '§';
+                if (urlParams.has('uri')) {
+                    uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
+                    this.uriParameter = uri;
+                    label = decodeURI(urlParams.get('list').replace(/["';><]/gi, '')); //avoid injection
+                }
+                search.insertSparql(uri, label);
+                this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+            } else if (urlParams.has('uri')) {
+                let uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
                 this.uriParameter = uri;
-                label = decodeURI(urlParams.get('list').replace(/["';><]/gi, '')); //avoid injection
-            }
-            search.insertSparql(uri, label);
-            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
-        } else if (urlParams.has('uri')) {
-            let uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
-            this.uriParameter = uri;
-            $('#pageContent').empty();
-            this.initApps(uri);
-            detail.details(uri);
-            let projects = [];
-            page.getAllProjects(projects).then(() => {
+                $('#pageContent').empty();
+                this.initApps(uri);
+                detail.details(uri);
                 let projectId = ws.getProject(uri);
                 let item = projects.find((m) => m.id == projectId);
                 this.insertSideCard_projectInfo(item);
-            });
-        } else {
-            this.insertPageDesc(); //general intro
-            let projects = [];
-            page.getAllProjects(projects).then(() => {
+            } else {
+                this.insertPageDesc(); //general intro
                 this.insertComments('proj_desc', projects); //project desc from js ,insert before ProjCards!
-            });
-            this.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
-            this.insertProjCards(); //quick access cards, plus extended project comments from sparql
+                this.insertComments('other_desc', [lang.DESC_INSPIRE, lang.DESC_LINKEDDATA]);
+                this.insertProjCards(); //quick access cards, plus extended project comments from sparql
             //this.insertVideo(); //screen cast youtube
-        }
-        search.initProjects();
-        document.documentElement.setAttribute('lang', USER_LANG);
-
-        this.updateSharingUrl($('#fbShare'));
-        this.updateSharingUrl($('#twShare'));
-        this.updateSharingUrl($('#liShare'));
-
-        this.isEmbedded = urlParams.has('embedded');
-        if (this.isEmbedded || ((screen.width < 1000) && (window.location.search == null || window.location.search == "" || urlParams.has('search')))) {
-            var r = $("#rightSidebar");
-            r.detach();
-            if (!this.isEmbedded)
-                r.prependTo("#contentRow1");
-            r.removeClass("col-lg-4");
-            r.addClass("col-lg-8");
-            $("#appsCard").css('visibility', 'collapse');
-            $("#proj_links").css('display', 'none');
-            if (!this.isEmbedded)
-                $("#search_widget").css('visibility', 'inherit');
-            else {
-                page.hideOnEmbed.forEach(function (s) {
-                    $(s).css('visibility', 'collapse');
-                });
-                $("a:not([target])").attr("target", "_blank");
             }
-        }
+            document.documentElement.setAttribute('lang', USER_LANG);
+
+            this.updateSharingUrl($('#fbShare'));
+            this.updateSharingUrl($('#twShare'));
+            this.updateSharingUrl($('#liShare'));
+
+            this.isEmbedded = urlParams.has('embedded');
+            if (this.isEmbedded || ((screen.width < 1000) && (window.location.search == null || window.location.search == "" || urlParams.has('search')))) {
+                var r = $("#rightSidebar");
+                r.detach();
+                if (!this.isEmbedded)
+                r.prependTo("#contentRow1");
+                r.removeClass("col-lg-4");
+                r.addClass("col-lg-8");
+                $("#appsCard").css('visibility', 'collapse');
+                $("#proj_links").css('display', 'none');
+                if (!this.isEmbedded)
+                    $("#search_widget").css('visibility', 'inherit');
+                else {
+                    page.hideOnEmbed.forEach(function (s) {
+                        $(s).css('visibility', 'collapse');
+                    });
+                    $("a:not([target])").attr("target", "_blank");
+                }
+            }
+        });
+
     },
     updateSharingUrl: function (e) {
         var v = encodeURIComponent(this.uriParameter != null ? this.uriParameter : window.location.href);
