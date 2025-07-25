@@ -178,25 +178,32 @@ var page = {
         var query = `
                             PREFIX dcterms:<http://purl.org/dc/terms/> 
                             PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
-                            SELECT ?cL (COALESCE(?cD, "") AS ?desc) (COUNT(?n) AS ?count) (GROUP_CONCAT(DISTINCT ?L; separator = "|") as ?topConcepts)
+                            SELECT ?g ?cL (COALESCE(?cD, "") AS ?desc) (COUNT(?n) AS ?count) (GROUP_CONCAT(DISTINCT ?L; separator = "|") as ?topConcepts)
                             @@from
                             WHERE { 
-                            ?c a skos:ConceptScheme; dcterms:title ?cL
+                            graph ?g {
+                                ?c a skos:ConceptScheme; dcterms:title ?cL
                             . FILTER(lang(?cL)="${lang.ID}") . 
                             ?c skos:hasTopConcept ?tc . ?tc skos:prefLabel ?tcL . FILTER(lang(?tcL)="${lang.ID}") . 
                             ?tc skos:narrower* ?n 
                             BIND(CONCAT(STR(?tc),"$",STR(?tcL)) AS ?L) 
                             OPTIONAL {?c dcterms:description ?cD . FILTER(lang(?cD)="${lang.ID}")} 
                             @@filter
+                            }
                             } 
-                            GROUP BY ?cL ?cD ORDER BY ?cL`;
+                            GROUP BY ?g ?cL ?cD ORDER BY ?cL`;
 
+        let from = "";
         for (let project of config.projects) {
-            let projectId = project.id;
-            let projectName = project.name;
-            let projectDesc = project.desc;
-            let projectUri = project.uri;
-            ws.projectJson(projectId, query, "c", jsonData => {
+            from += " " + project.from.replace("FROM", "FROM NAMED");
+        }
+        query = query.replace('@@from', "");
+        ws.projectJson(null, query, "c", jsonData => {
+            for (let project of config.projects) {
+                let projectId = project.id;
+                let projectName = project.name;
+                let projectDesc = project.desc;
+                let projectUri = project.uri;
                 div.append('<div class="card my-4"><h4 class="card-header">' + projectName +
                     '</h4><div id="' + projectId + 'Card" class="card-body"></div></div>');
 
@@ -215,7 +222,11 @@ var page = {
                                 <br>
                             </div>`);
 
-                jsonData.results.bindings.forEach(function (a) {
+                let items = jsonData.results.bindings.filter((s) => {
+                    let f = s.g.value == projectUri;
+                    return f;
+                });
+                for (let a of items) {
                     //console.log(a.topConcepts.value);
                     cardDiv.append('<strong style="color:#006666;">' + a.cL.value + '</strong>' + ': <a href="' + page.BASE + '?uri=' +
                         a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' + page.BASE + '?uri=') + '</a><br>');
@@ -223,7 +234,7 @@ var page = {
                     readMoreDiv.append('<h4>' + a.cL.value + ' (' + a.count.value +
                         '):</h4><a href="' + page.BASE + '?uri=' + a.topConcepts.value.split('$').join('&lang=' + lang.ID + '">').split('|').join('</a>, <a href="' +
                             page.BASE + '?uri=') + '</a><br>' + a.desc.value + '<br><br>');
-                });
+                }
 
                 readMoreDiv.append(`
                         <p class="">
@@ -238,8 +249,8 @@ var page = {
                             </button>
                         </p>
                         <hr>`);
-            });
-        }
+            }
+        }); //ws.projectJson
     },
 
     insertComments: function (divID, projects) {
