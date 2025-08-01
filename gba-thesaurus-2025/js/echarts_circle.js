@@ -137,7 +137,7 @@
                     position: 'inside'
                 },
                 style: {
-                    fill: api.visual('color')
+                    fill: (node.data.itemStyle.color || api.visual('color'))
                 },
                 emphasis: {
                     style: {

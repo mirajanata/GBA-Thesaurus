@@ -6,31 +6,38 @@ var config = {
     projectConfiguration: {
         geolunit: {
             from: 'FROM <https://resource.geosphere.at/thes/geolunit>',
-            image: 'profil.png'
+            image: 'profil.png',
+            diagram: 'tree'
         },
         struct: {
             from: 'FROM <https://resource.geosphere.at/thes/struct>',
-            image: 'falte.png'
+            image: 'falte.png',
+            diagram: 'tree'
         },
         time: {
             from: 'FROM <https://resource.geosphere.at/thes/time>',
-            image: 'time.png'
+            image: 'time.png',
+            diagram: 'sunburst'
         },
         lith: {
             from: 'FROM <https://resource.geosphere.at/thes/lith>',
-            image: 'granit.png'
+            image: 'granit.png',
+            diagram: 'tree'
         },
         tect: {
             from: 'FROM <https://resource.geosphere.at/thes/tect>',
-            image: 'tektonik.png'
+            image: 'tektonik.png',
+            diagram: 'tree'
         },
         mineral: {
             from: 'FROM <https://resource.geosphere.at/thes/mineral>',
-            image: 'quarz.png'
+            image: 'quarz.png',
+            diagram: 'tree'
         },
         minres: {
             from: 'FROM <https://resource.geosphere.at/thes/minres>',
-            image: 'gold.png'
+            image: 'gold.png',
+            diagram: 'tree'
         }
     },
 
