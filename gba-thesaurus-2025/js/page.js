@@ -208,7 +208,6 @@ var page = {
 
                 const cardDiv = $('#' + projectId + 'Card');
                 const commentDiv = $('#' + projectId + 'Comment');
-                const readMoreDiv = $('#' + projectId + 'ReadMore');
 
                 commentDiv.append(`
                             <br>
@@ -220,6 +219,8 @@ var page = {
                             <div style="display:none;" id="${projectId}ReadMore">
                                 <br>
                             </div>`);
+
+                const readMoreDiv = $('#' + projectId + 'ReadMore');
 
                 let items = jsonData.results.bindings.filter((s) => {
                     let f = s.g.value == projectUri;

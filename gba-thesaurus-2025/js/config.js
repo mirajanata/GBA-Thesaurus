@@ -38,6 +38,16 @@ var config = {
             from: 'FROM <https://resource.geosphere.at/thes/minres>',
             image: 'gold.png',
             diagram: 'tree'
+        },
+        geomorph: {
+            from: 'FROM <https://resource.geosphere.at/thes/geomorph>',
+            image: 'quarz.png',
+            diagram: 'tree'
+        },
+        fault: {
+            from: 'FROM <https://resource.geosphere.at/thes/fault>',
+            image: 'gold.png',
+            diagram: 'tree'
         }
     },
 
