@@ -279,7 +279,7 @@ var page = {
         $('#appsCard').toggle();
         $('#appsCard .card-header').html('<h4>' + lang.APPS + '</h4>');
         $('#appsBody1').append(page.getAppLink(uri, "network.html", "<br>Network<br>diagram", "Visual Network"));
-        $('#appsBody1').append(page.getAppLink(uri, "visual.html", "<br>Visual<br>Relations", "Visual Relations Viewer"));
+        $('#appsBody1').append(page.getAppLink(uri, "diagram.html", "<br>Diagram<br>", "Relations Diagram"));
     },
     getAppLink: function (uri, page, label, title) {
         return `<div class="apps">

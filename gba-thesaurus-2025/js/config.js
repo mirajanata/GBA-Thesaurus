@@ -22,7 +22,7 @@ var config = {
         lith: {
             from: 'FROM <https://resource.geosphere.at/thes/lith>',
             image: 'granit.png',
-            diagram: 'tree'
+            diagram: 'circle'
         },
         tect: {
             from: 'FROM <https://resource.geosphere.at/thes/tect>',

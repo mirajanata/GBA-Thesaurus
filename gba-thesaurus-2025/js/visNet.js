@@ -16,7 +16,6 @@ var visNet = {
     init: function (afterInit) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
-        //let project = uri.split('/')[3];
         let project = ws.getProject(uri);
         let lang = urlParams.get('lang');
 
@@ -106,7 +105,7 @@ var visNet = {
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 PREFIX so:<https://schema.org/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
-                                                (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor) ?sQ ?oQ
+                                                (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor) ?sQ ?oQ ?sN
                                                 @@from
                                                 WHERE {
                                                 VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
@@ -122,11 +121,10 @@ var visNet = {
                                                 OPTIONAL {?o so:Quantity ?oQ}
                                                 OPTIONAL {?s skos:notation ?sN}
                                                 @@filter
-                                                }
-                                                ORDER BY ?sN`;
+                                                }`;
 
         ws.projectJson(project, query, "s", function (jsonData) {
-            visNet.visData = jsonData.results.bindings;
+            visNet.visData = jsonData.results.bindings.sort(d3data.sortFunction);
             //console.log(visNet.visData);
 
 

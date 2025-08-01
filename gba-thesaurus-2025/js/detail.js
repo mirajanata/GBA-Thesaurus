@@ -51,6 +51,7 @@ var detail = {
                 var F = page.isEmbedded ? detail.FRONT_LIST_EMBEDDED : detail.FRONT_LIST;
                 for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()));
                 var div = $('#pageContent');
+                /*
                 div.append(`<hr>
                                 <div style="cursor: pointer; color: #757575;" id="detailsBtn" 
                                     onclick="javascript: page.toggleRead(\'detailsBtn\', \'detailsToggle\', \'read more\');"> <span class="fa fa-caret-down"></span> <em>read more ..</em>
@@ -59,6 +60,15 @@ var detail = {
                                 <br>
                                     <table id="details"></table>
                                 </div>
+                                `);
+                                */
+                div.append(`<hr>
+                                <details>
+                                <summary>
+                                    <h4 id="detailsBtn" style="display:inline-block;">read more .</h4>
+                                </summary>
+                                    <table id="details"></table>
+                                </details>
                                 `);
 
                 for (key in detail.TECHNICAL_LIST) detail.insertTechnicalPart(key, data, Array.from(detail.TECHNICAL_LIST[key].values()));
@@ -113,15 +123,16 @@ var detail = {
                         page.updateSharingTexts(pL);
                         break;
                     case 'dataViewer': //*********************########################################################
-                        let projDV_Arno = ['GeologicUnit', 'lithology', 'GeologicTimeScale'];
+                        let projDV_Arno = ['geolunit', 'lith', 'time'];
 
-                        if (projDV_Arno.includes(uri.split('\/')[3])) {
+                        let projDV = ws.getProject(uri);
+                        if (projDV_Arno.includes(projDV)) {
                             this.insertApp('Data', 'Viewer', 'https://gisgba.geologie.ac.at/DataViewer/tdv/Index.aspx?url=' + uri + '&lang=' + lang.ID, 'map');
-                        } else if (uri.split('\/')[3] == 'structure') {
+                        } else if (projDV == 'struct') {
                             this.insertApp('Map', 'download', 'structureViewer.html?uri=' + uri + '&lang=' + lang.ID, 'map');
-                        } else if (uri.split('\/')[3] == 'minres') {
+                        } else if (projDV == 'minres') {
                             this.insertApp('Map', 'download', 'minresViewer.html?uri=' + uri + '&lang=' + lang.ID, 'map');
-                        } else if (uri.split('\/')[3] == 'mineral') {
+                        } else if (projDV == 'mineral') {
                             this.insertApp('Map', 'download', 'mineralViewer.html?uri=' + uri + '&lang=' + lang.ID, 'map');
                         }
 
@@ -397,8 +408,12 @@ var detail = {
         div.append(`
         <hr>
         <div class="card my-4">
-            <h4 id="allConceptsHeader" class="card-header"></h4>
+            <details>
+            <summary>
+            <h4 id="allConceptsHeader" style="display:inline-block;"></h4>
+            </summary>
             <div id="allConcepts" class="card-body"></div>
+            </details>
         </div>
                            `);
         this.provideAll('allConcepts', uri, 0);

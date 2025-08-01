@@ -5,15 +5,16 @@ var d3data = {
     _uri: null,
     _lang: null,
     _itopic: false,
-
+    _project: null,
     init: function (afterInit, expandTo) {
         let urlParams = new URLSearchParams(window.location.search);
         let uri = urlParams.get('uri');
-        let project = uri.split('/')[3];
+        let project = ws.getProject(uri);
         let lang = urlParams.get('lang');
 
         d3data._uri = uri;
         d3data._lang = lang;
+        d3data._project = project;
         d3data._itopic = document.getElementById("itopic");
 
         this.prepareData(uri, lang, ws.endpoint, project, afterInit, expandTo);
@@ -26,12 +27,12 @@ var d3data = {
                                                 PREFIX dbpo:<http://dbpedia.org/ontology/>
                                                 PREFIX so:<https://schema.org/>
                                                 SELECT DISTINCT (COALESCE(?sC, '') AS ?sColor) (COALESCE(?sL, ?s) AS ?sLabel) ?s ?x ?o
-                                                (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor) ?sQ ?oQ
+                                                (COALESCE(?oL, ?o) AS ?oLabel) (COALESCE(?oC, '') AS ?oColor) ?sQ ?oQ ?sN
                                                 @@from
                                                 WHERE {
                                                 ?s a skos:Concept
-                                                VALUES ?p1 {skos:narrower skos:related skos:exactMatch skos:closeMatch skos:narrowMatch}
-                                                VALUES ?p2 {skos:broadMatch}
+                                                VALUES ?p1 {skos:narrower}
+                                                VALUES ?p2 {skos:broader}
                                                 {?s ?p1 ?o BIND (?p1 AS ?x)}
                                                 UNION
                                                 {?o ?p2 ?s BIND (skos:narrowMatch AS ?x)}
@@ -43,17 +44,16 @@ var d3data = {
                                                 OPTIONAL {?o so:Quantity ?oQ}
                                                 OPTIONAL {?s skos:notation ?sN}
                                                 @@filter
-                                                }
-                                                ORDER BY ?sN`;
+                                                }`;
         if (!d3data.visData) {
             ws.projectJson(project, query, "s", function (jsonData) {
-                d3data.visData = jsonData.results.bindings;
+                d3data.visData = jsonData.results.bindings.sort(d3data.sortFunction);
                 //console.log(d3data.visData);
 
                 d3data.createHierarchy(uri, expandTo);
 
                 if (afterInit) {
-                    afterInit(d3data.hRoot);
+                    afterInit(d3data.hRoot, d3data.fRoot);
                 }
             });
         } else {
@@ -64,7 +64,19 @@ var d3data = {
             }
         }
     },
+    sortFunction: function (a, b) {
+        const nameA = a.sN ? a.sN.value.toUpperCase() : ""; // ignore upper and lowercase
+        const nameB = b.sN ? b.sN.value.toUpperCase() : ""; // ignore upper and lowercase
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
 
+        // names must be equal
+        return 0;
+    },
     createHierarchy: function (uri, expandTo) {
         d3data.hRoot = null;
         d3data.hIndex = [];

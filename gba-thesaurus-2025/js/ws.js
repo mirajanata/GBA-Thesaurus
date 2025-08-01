@@ -3,7 +3,9 @@
 var ws = {
     endpoint: 'https://resource.geosphere.at/graphdb/repositories/thes',
     getProject: function (uri) {
-        return uri.split('/')[4];
+        let p = uri.split('/')[4];
+        p = p.split('-')[0];
+        return p;
     },
 
     doc: function (query, thenFunc) {
@@ -40,7 +42,7 @@ var ws = {
             });
     },
     processSparql: function (projectId, query, filteredItem) {
-        let project = projectId ? config.projects[projectId] : null;
+        let project = projectId ? config.projectConfiguration[projectId] : null;
         let filter = project ? config.projectConfiguration[projectId].filter : null;
         if (!filter) {
             filter = "";

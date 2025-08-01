@@ -41,9 +41,9 @@ var detail = {
                     OPTIONAL {?o a skos:Concept; skos:prefLabel ?L}
                     } 
                     GROUP BY ?p ?o 
-            `; 
+            `;
 
-        ws.json(uri.split("/")[3], query, function (data) { 
+        ws.json(uri.split("/")[3], query, function (data) {
             for (var key in detail.FRONT_LIST) detail.insertFrontPart(key, uri, data, Array.from(detail.FRONT_LIST[key].values()));
             var div = $('#pageContent');
             div.append(`<hr>
@@ -63,9 +63,9 @@ var detail = {
         });
     },
     rdfTS: function (url) {
-        document.getElementById('irdfQuery').value = "describe <"+url+">";
+        document.getElementById('irdfQuery').value = "describe <" + url + ">";
         document.getElementById('irdfForm').submit();
-    },    
+    },
     insertFrontPart: function (key, uri, data, props) {
         var div = $('#pageContent');
         let html = '<form id="irdfForm" target="_blank" style="display:none;" method="post" action="https://resource.geolba.ac.at/PoolParty/sparql/GeologicTimeScale"><input type="hidden" name="query" id="irdfQuery"/></form>';
@@ -122,7 +122,7 @@ var detail = {
                         this.getCitation(a);
                         break;
                     case 'relatedConcepts':
-                        
+
                         if (html.search('<h4') == -1) {
                             html += '<hr><h4 style="margin-bottom: 1rem;">' + lang.SEM_REL + '</h4>';
                         }
@@ -151,7 +151,7 @@ var detail = {
 
         for (let i in shorten) {
             if (text.search(shorten[i]) != -1) {
-                
+
                 text = text.split('>' + shorten[i])[0] + '>' + text.split('>' + shorten[i])[1].replace('<', ' (' + i + ')<');
             }
         }
@@ -166,7 +166,7 @@ var detail = {
         props.forEach((i) => {
             let ul = this.getObj(data, i);
             if (ul.size > 0) {
-                html += '<tr><td headers="th1' + key + '" class="propTech">' + this.createHref(i) + '</td><td headers="th2' + key +'"><ul><li>' + Array.from(ul).join('</li><li>') + '</li></ul></td></tr>';
+                html += '<tr><td headers="th1' + key + '" class="propTech">' + this.createHref(i) + '</td><td headers="th2' + key + '"><ul><li>' + Array.from(ul).join('</li><li>') + '</li></ul></td></tr>';
 
                 if (i == geoPath + 'lat') {
                     coord.lat = Number(ul.values().next().value);
@@ -283,15 +283,18 @@ var detail = {
 
     provideAll: function (divID, uri, offset) { //provide all available concepts for navigation
         //query Sparql endpoint
-        var query = `PREFIX dcterms:<http://purl.org/dc/terms/> 
+        var query = `PREFIX dcterms:<http://purl.org/dc/terms/>
+                    PREFIX dbpo:<http://dbpedia.org/ontology/>
                     PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
-                    SELECT DISTINCT ?s (STR(?l) AS ?Label) ?cs (STR(?csl) AS ?Schema) (COALESCE(?csd, "") AS ?SchemaDesc) (COALESCE(?sd, "") AS ?Desc) ?tc 
+                    SELECT DISTINCT ?s (STR(?l) AS ?Label) ?cs (STR(?csl) AS ?Schema) (COALESCE(?csd, "") AS ?SchemaDesc) (COALESCE(?sd, "") AS ?Desc) ?tc
+                    (COALESCE(?sC, '') AS ?sColor)
                     WHERE { 
                     <${uri}> skos:broader* ?b . ?b skos:topConceptOf ?cs . 
                     ?cs dcterms:title ?csl .  FILTER(lang(?csl)="${lang.ID}") . 
                     ?cs skos:hasTopConcept ?tc . ?s skos:broader* ?tc; skos:prefLabel ?l . FILTER(lang(?l)="${lang.ID}") 
                     OPTIONAL{?cs dcterms:description ?csd .  FILTER(lang(?csd)="${lang.ID}") } 
                     OPTIONAL{?s skos:definition ?sd .  FILTER(lang(?sd)="${lang.ID}") } 
+                    OPTIONAL {?o dbpo:colourHexCode ?oC}
                     } 
                     ORDER BY ?Label 
                     LIMIT 50 
@@ -304,10 +307,11 @@ var detail = {
             allConcepts.empty().append('<div>' + data.results.bindings[0].SchemaDesc.value + '</div><br>');
 
             data.results.bindings.forEach((i) => {
+                let color = i.sColor ? ' style="color:' + i.sColor.value + ';"' : '';
                 if (i.s.value == i.tc.value) {
-                    a.push('<a data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)');
+                    a.push('<a ' + color + ' data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)');
                 } else {
-                    a.push('<a data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a>');
+                    a.push('<a ' + color + ' data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a>');
                 }
 
             });
