@@ -34,8 +34,6 @@ var d3data = {
                                                 VALUES ?p1 {skos:narrower}
                                                 VALUES ?p2 {skos:broader}
                                                 {?s ?p1 ?o BIND (?p1 AS ?x)}
-                                                UNION
-                                                {?o ?p2 ?s BIND (skos:narrowMatch AS ?x)}
                                                 OPTIONAL {?s skos:prefLabel ?sL . FILTER(lang(?sL)='${lang}')}
                                                 OPTIONAL {?o skos:prefLabel ?oL . FILTER(lang(?oL)='${lang}')}
                                                 OPTIONAL {?s dbpo:colourHexCode ?sC}

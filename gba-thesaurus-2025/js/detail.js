@@ -349,15 +349,18 @@ var detail = {
     provideAll: function (divID, uri, offset) { //provide all available concepts for navigation
         let AT = page.isEmbedded ? "target=\"_blank\" " : "";
         //query Sparql endpoint
-        var query = `PREFIX dcterms:<http://purl.org/dc/terms/> 
+        var query = `PREFIX dcterms:<http://purl.org/dc/terms/>
+                    PREFIX dbpo:<http://dbpedia.org/ontology/>
                     PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
-                    SELECT DISTINCT ?s (STR(?l) AS ?Label) ?cs (STR(?csl) AS ?Schema) (COALESCE(?csd, "") AS ?SchemaDesc) (COALESCE(?sd, "") AS ?Desc) ?tc 
+                    SELECT DISTINCT ?s (STR(?l) AS ?Label) ?cs (STR(?csl) AS ?Schema) (COALESCE(?csd, "") AS ?SchemaDesc) (COALESCE(?sd, "") AS ?Desc) ?tc
+                    (COALESCE(?sC, '') AS ?sColor)
                     WHERE { 
                     <${uri}> skos:broader* ?b . ?b skos:topConceptOf ?cs . 
                     ?cs dcterms:title ?csl .  FILTER(lang(?csl)="${lang.ID}") . 
                     ?cs skos:hasTopConcept ?tc . ?s skos:broader* ?tc; skos:prefLabel ?l . FILTER(lang(?l)="${lang.ID}") 
                     OPTIONAL{?cs dcterms:description ?csd .  FILTER(lang(?csd)="${lang.ID}") } 
-                    OPTIONAL{?s skos:definition ?sd .  FILTER(lang(?sd)="${lang.ID}") } 
+                    OPTIONAL{?s skos:definition ?sd .  FILTER(lang(?sd)="${lang.ID}") }
+                    OPTIONAL {?s dbpo:colourHexCode ?sC}
                     } 
                     ORDER BY ?Label 
                     LIMIT 50 
@@ -378,10 +381,11 @@ var detail = {
                 `);
             }
             data.results.bindings.forEach((i) => {
+                let color = i.sColor ? ' style="background-color:' + i.sColor.value + ';" ' : '';
                 if (i.s.value == i.tc.value) {
-                    a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)</div>');
+                    a.push('<div' + color + '><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '"><strong>' + i.Label.value + '</strong></a> (&#8658; top concept)</div>');
                 } else {
-                    a.push('<div><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a></div>');
+                    a.push('<div' + color + '><a ' + AT + 'data-toggle="tooltip" data-placement="right" data-html="true" title="<h4>' + i.Label.value + '</h4>' + i.Desc.value.slice(0, 230) + '.." href="' + page.BASE + '?uri=' + i.s.value + '&lang=' + lang.ID + '">' + i.Label.value + '</a></div>');
                 }
 
             });
