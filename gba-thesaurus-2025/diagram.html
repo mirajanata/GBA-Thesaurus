@@ -162,7 +162,10 @@
             <div class="row">
                 <!-- Each column is a flex item -->
                 <div id="diagramPanel" class="col-12 col-md-12 col-lg-12 mb-2 p-0 ">
-                    <div id="d3tree" class="panel p-0 text-center maximized">
+                    <div class="panel p-0 text-center maximized">
+                        <h5 id="stackContent" style="position:absolute; top: 0px; left:0px; right:0px; bottom:0px;"></h5>
+                        <div id="divDiagram" style="position:absolute; top: 30px; left:0px; right:0px; bottom:0px;" class="overflow-auto">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -192,18 +195,18 @@
                 }
                 if (conf.diagram == 'tree') {
                     let chart = treeChart(data);
-                    d3.select("#d3tree").append(() => chart);
+                    d3.select("#divDiagram").append(() => chart);
                 }
                 else if (conf.diagram == 'sunburst') {
-                    eCharts_sunburstChart(data, 'd3radial');
+                    eCharts_sunburstChart(data, 'divDiagram');
                 }
                 else if (conf.diagram == 'circle') {
-                    eCharts_circleChart(data, 'd3cluster');
+                    eCharts_circleChart(data, 'divDiagram');
                 }
                 else {
                     // Default to tree chart if no specific diagram type is set
                     let chart = treeChart(data);
-                    d3.select("#d3tree").append(() => chart);
+                    d3.select("#divDiagram").append(() => chart);
                 }
             }, 4);
         });

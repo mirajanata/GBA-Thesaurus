@@ -54,7 +54,7 @@ var page = {
                 this.initApps(uri);
                 detail.details(uri);
                 let projectId = ws.getProject(uri);
-                let item = projects.find((m) => m.id == projectId);
+                let item = config.projectConfiguration[projectId];
                 this.insertSideCard_projectInfo(item);
             } else {
                 this.insertPageDesc(); //general intro
@@ -90,8 +90,7 @@ var page = {
             }
         };
         if (urlParams.has('uri') || urlParams.has('search')) {
-            config.init(false, USER_LANG);
-            startup();
+            config.init(true, USER_LANG).then(startup);
         }
         else {
             config.init(true, USER_LANG).then(startup);

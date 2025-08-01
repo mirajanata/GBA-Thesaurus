@@ -67,7 +67,7 @@ WHERE {
         return readMetadata ? ws.json(null, projectQuery, null, jsonData => {
             let d = jsonData.results.bindings;
             for (let i of d) {
-                let projectId = i.s.value.split("/")[4];
+                let projectId = config.getProject(i.s.value);
                 let project = config.projectConfiguration[projectId];
                 if (project) {
                     project.id = projectId;
@@ -77,5 +77,10 @@ WHERE {
                 }
             }
         }) : null;
+    },
+    getProject: function (uri) {
+        let p = uri.split('/')[4];
+        p = p.split('-')[0];
+        return p;
     }
 }

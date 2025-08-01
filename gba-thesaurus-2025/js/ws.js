@@ -3,9 +3,7 @@
 var ws = {
     endpoint: 'https://resource.geosphere.at/graphdb/repositories/thes',
     getProject: function (uri) {
-        let p = uri.split('/')[4];
-        p = p.split('-')[0];
-        return p;
+        return config.getProject(uri);
     },
 
     doc: function (query, thenFunc) {

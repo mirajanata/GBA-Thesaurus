@@ -9,7 +9,7 @@ var search = {
                                         WHERE { 
                                         VALUES ?p {skos:prefLabel skos:altLabel} 
                                         ?s a skos:Concept; ?p ?L . FILTER(lang(?L)="${lang.ID}") 
-                                        } ORDER BY STRLEN(STR(?L)) ?L`;
+                                        }`;
 
         let ids = [];
         let from = "";
@@ -18,7 +18,7 @@ var search = {
         }
         query = query.replace('@@from', from);
         ws.projectJson(null, query, "s", jsonData => {
-            for (let binding of jsonData.results.bindings) {
+            for (let binding of jsonData.results.bindings.sort(search.sortFunction)) {
                 if (ids.indexOf(binding.s.value) >= 0) {
                     continue;
                 }
@@ -34,7 +34,26 @@ var search = {
             window.fuse = new Fuse(a, options);
         });
     },
+    sortFunction: function (a, b) {
+        const nameA = a.L ? a.L.value.toUpperCase() : ""; // ignore upper and lowercase
+        const nameB = b.L ? b.L.value.toUpperCase() : ""; // ignore upper and lowercase
+        let al = nameA.length;
+        let bl = nameB.length;
+        if (al < bl)
+            return -1;
+        else if (al > bl)
+            return 1;
 
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+
+        // names must be equal
+        return 0;
+    },
     insertSparql: function (uri, label) {
         var pageContent = $('#pageContent');
         pageContent.append(`<br>

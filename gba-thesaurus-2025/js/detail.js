@@ -163,7 +163,9 @@ var detail = {
                         ul.forEach(i => {
                             var p = $.parseHTML(i)[0];
                             // fix invalid citation uri
-                            p = $(p).attr("href").split("uri=")[1];
+                            //p = $(p).attr("href").split("uri=")[1];
+                            var url = new URL($(p).attr("href"));
+                            p = url.searchParams.get("uri");
                             a.push(p);
                             //a.push($.parseHTML(i)[0].innerHTML);
                         });

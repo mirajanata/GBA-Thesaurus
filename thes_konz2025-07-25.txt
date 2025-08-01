@@ -1,4 +1,4 @@
-config.js and move the config for each of project, name, types of diagrams
+1. config.js and move the config for each of project, name, types of diagrams
 
 2. remove extern links - for new diagrams narrow/broader relationsips only
 
@@ -13,6 +13,7 @@ config.js and move the config for each of project, name, types of diagrams
 
 7.  for biblres user /citation
 
+8. speedup
 
 PV:
 
