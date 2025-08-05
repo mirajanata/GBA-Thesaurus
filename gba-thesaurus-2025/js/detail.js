@@ -42,7 +42,7 @@ var detail = {
                     OPTIONAL {?o a skos:Concept; skos:prefLabel ?L}
 					OPTIONAL {?o skos:notation ?sN}
                     }
-                    GROUP BY ?p ?o 
+                    GROUP BY ?sN ?p ?o 
 					ORDER BY ?sN ?p ?o
         `;
         let projectId = ws.getProject(uri);
