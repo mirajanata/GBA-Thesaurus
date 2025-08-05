@@ -125,8 +125,6 @@ var visNet = {
 
         ws.projectJson(project, query, "s", function (jsonData) {
             visNet.visData = jsonData.results.bindings.sort(d3data.sortFunction);
-            //console.log(visNet.visData);
-
 
             visNet.visData.forEach((i) => {
                 if (!visNet.edgesArr.some(n => n.from + n.to === i.s.value + i.o.value) && !visNet.edgesArr.some(n => n.to + n.from === i.s.value + i.o.value)) {
