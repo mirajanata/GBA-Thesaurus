@@ -119,7 +119,7 @@ var visNet = {
                                                 OPTIONAL {?o dbpo:colourHexCode ?oC}
                                                 OPTIONAL {?s so:Quantity ?sQ}
                                                 OPTIONAL {?o so:Quantity ?oQ}
-                                                OPTIONAL {?s skos:notation ?sN}
+                                                OPTIONAL {?o skos:notation ?sN}
                                                 @@filter
                                                 }`;
 

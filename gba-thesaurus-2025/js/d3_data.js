@@ -40,7 +40,7 @@ var d3data = {
                                                 OPTIONAL {?o dbpo:colourHexCode ?oC}
                                                 OPTIONAL {?s so:Quantity ?sQ}
                                                 OPTIONAL {?o so:Quantity ?oQ}
-                                                OPTIONAL {?s skos:notation ?sN}
+                                                OPTIONAL {?o skos:notation ?sN}
                                                 @@filter
                                                 }`;
         if (!d3data.visData) {
