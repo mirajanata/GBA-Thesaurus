@@ -51,21 +51,11 @@ var detail = {
                 var F = page.isEmbedded ? detail.FRONT_LIST_EMBEDDED : detail.FRONT_LIST;
                 for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()));
                 var div = $('#pageContent');
-                /*
-                div.append(`<hr>
-                                <div style="cursor: pointer; color: #757575;" id="detailsBtn" 
-                                    onclick="javascript: page.toggleRead(\'detailsBtn\', \'detailsToggle\', \'read more\');"> <span class="fa fa-caret-down"></span> <em>read more ..</em>
-                                </div>
-                                <div style="display:none;" id="detailsToggle">
-                                <br>
-                                    <table id="details"></table>
-                                </div>
-                                `);
-                                */
+
                 div.append(`<hr>
                                 <details>
                                 <summary>
-                                    <h4 id="detailsBtn" style="display:inline-block;">read more .</h4>
+                                    <h4 id="detailsBtn" style="display:inline-block;">read more ...</h4>
                                 </summary>
                                     <table id="details"></table>
                                 </details>
