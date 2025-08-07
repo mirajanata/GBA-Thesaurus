@@ -403,15 +403,14 @@ var detail = {
     insertConceptBrowser: function (div, uri, offset) {
         div.append(`
         <hr>
-        <div class="card my-4">
             <details>
             <summary>
             <h4 id="allConceptsHeader" style="display:inline-block;"></h4>
             </summary>
             <div id="allConcepts" class="card-body"></div>
             </details>
-        </div>
-                           `);
+        <hr>
+		`);
         this.provideAll('allConcepts', uri, 0);
     },
 
