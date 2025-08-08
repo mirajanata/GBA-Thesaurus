@@ -54,7 +54,7 @@ var detail = {
 
                 div.append(`<hr>
                                 <details>
-                                <summary>
+                                <summary class="card-header">
                                     <h4 id="detailsBtn" style="display:inline-block;">read more ...</h4>
                                 </summary>
                                     <table id="details"></table>
@@ -403,7 +403,7 @@ var detail = {
         div.append(`
         <hr>
             <details>
-            <summary>
+            <summary class="card-header">
             <h4 id="allConceptsHeader" style="display:inline-block;"></h4>
             </summary>
             <div id="allConcepts" class="card-body"></div>
