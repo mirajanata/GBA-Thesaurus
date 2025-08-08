@@ -109,7 +109,6 @@ var detail = {
                                     <a href="javascript:detail.rdfTS('${uri}')"> RDF download</a>
                                 </p>
                                 <hr>`;
-                        this.insertApp('Database', 'queries', `${ws.endpoint}${ws.getProject(uri)}`, 'list-alt'); //&list=${encodeURIComponent(pL)}&lang=${lang.ID}`, 'list-alt');
                         page.updateSharingTexts(pL);
                         break;
                     case 'dataViewer': //*********************########################################################
