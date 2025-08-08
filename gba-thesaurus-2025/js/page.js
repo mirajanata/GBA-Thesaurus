@@ -48,7 +48,7 @@ var page = {
                 search.insertSparql(uri, label);
                 this.insertProjCards(); //quick access cards, plus extended project comments from sparql
             } else if (urlParams.has('uri')) {
-                let uri = decodeURI(urlParams.get('uri').replace(/["';><]/gi, '')); //avoid injection
+                let uri = config.checkUri(decodeURI(urlParams.get('uri').replace(/["';><]/gi, ''))); //avoid injection
                 this.uriParameter = uri;
                 $('#pageContent').empty();
                 this.initApps(uri);

@@ -65,9 +65,9 @@ var config = {
 
     projects: [],
 
-    topicImages: {
-        'inspire': 'INSPIRE.png',
-        'linkedData': 'linkedData.png'
+    uriReplacements: {
+        'GeologicUnit': 'thes/geolunit',
+        'resource.geolba.ac.at': 'resource.geosphere.at'
     },
 
     init: function (readMetadata, langID) {
@@ -113,5 +113,12 @@ WHERE {
         let p = uri.split('/')[4];
         p = p.split('-')[0];
         return p;
+    },
+    checkUri: function (uri) {
+        if (!uri) return uri;
+        for (let [key, value] of Object.entries(config.uriReplacements)) {
+            uri = uri.replace(key, value);
+        }
+        return uri;
     }
 }

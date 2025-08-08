@@ -15,7 +15,7 @@ var visNet = {
 
     init: function (afterInit) {
         let urlParams = new URLSearchParams(window.location.search);
-        let uri = urlParams.get('uri');
+        let uri = config.checkUri(decodeURI(urlParams.get('uri').replace(/["';><]/gi, ''))); //avoid injection;
         let project = ws.getProject(uri);
         let lang = urlParams.get('lang');
 
