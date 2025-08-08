@@ -51,10 +51,10 @@ var page = {
                 let uri = config.checkUri(decodeURI(urlParams.get('uri').replace(/["';><]/gi, ''))); //avoid injection
                 this.uriParameter = uri;
                 $('#pageContent').empty();
-                this.initApps(uri);
-                detail.details(uri);
                 let projectId = ws.getProject(uri);
                 let item = config.projectConfiguration[projectId];
+                this.initApps(uri, item);
+                detail.details(uri);
                 this.insertSideCard_projectInfo(item);
             } else {
                 this.insertPageDesc(); //general intro
@@ -276,11 +276,11 @@ var page = {
             .append('<p>' + lang.DESC_THESAURUS + '</p>');
     },
 
-    initApps: function (uri) {
+    initApps: function (uri, project) {
         $('#appsCard').toggle();
         $('#appsCard .card-header').html('<h4>' + lang.APPS + '</h4>');
         $('#appsBody1').append(page.getAppLink(uri, "network.html", "<br>Network<br>diagram", "Visual Network"));
-        $('#appsBody1').append(page.getAppLink(uri, "diagram.html", "<br>Diagram<br>", "Relations Diagram"));
+        $('#appsBody1').append(page.getDiagramLink(uri, project));
     },
     getAppLink: function (uri, page, label, title) {
         return `<div class="apps">
@@ -305,5 +305,61 @@ var page = {
                                                 ${label}
                                             </a>
                                         </div>`;
+    },
+    getDiagramLink: function (uri, project) {
+        let icon;
+
+        switch (project.diagram) {
+            case 'tree':
+                icon = `<svg width="28px" height="28px" viewBox="0 0 14 14" role="img" focusable="false" aria-hidden="true">
+                <path fill="#cfd8dc" d="M4.3 7.3v3.3h4.8v1.5h2.7v-.6H9.7V9.1h2.1v-.6H9.1V10H4.9V4h4.2v1.5h2.7v-.6H9.7V2.5h2.1v-.6H9.1v1.5H4.3v3.3H2.2v.6z" id="element_0637e0a3"></path><path fill="#000000" d="M1 5.8h2.4v2.4H1z" id="element_10de2f02"></path><path fill="#000000" d="M10.6 4H13v2.4h-2.4zm0-3H13v2.4h-2.4zM5.8 2.5h2.4v2.4H5.8zm0 6.6h2.4v2.4H5.8zm4.8 1.5H13V13h-2.4zm0-3H13V10h-2.4z" id="element_0b3d7880">
+                </path></svg>`;
+                break;
+            case 'sunburst':
+                icon = `<svg fill="#000000" viewBox="0 0 32 32" width="28px" height="28px" xml:space="preserve">
+<path id="chart--sunburst_1_" d="M16,31.36c-4.103,0-7.96-1.598-10.861-4.499c-0.141-0.141-0.141-0.369,0-0.51l3.289-3.288
+	c-1.652-1.771-2.693-4.118-2.782-6.704H1c-0.199,0-0.36-0.161-0.36-0.36c0-4.103,1.597-7.959,4.498-10.86
+	c0.027-0.027,0.059-0.05,0.093-0.067c0.185-0.093,0.227-0.107,3.704,3.357c1.77-1.653,4.119-2.694,6.705-2.783V1
+	c0-0.199,0.161-0.36,0.36-0.36c8.47,0,15.36,6.89,15.36,15.36c0,0.199-0.161,0.36-0.36,0.36h-4.646
+	c-0.187,5.427-4.566,9.807-9.994,9.994V31C16.36,31.199,16.199,31.36,16,31.36z M5.906,26.604c2.646,2.523,6.078,3.944,9.734,4.032
+	v-4.282c-2.585-0.089-4.934-1.129-6.704-2.781L5.906,26.604z M16.36,21.348v4.286c5.031-0.186,9.088-4.243,9.274-9.274h-4.286
+	C21.17,19.029,19.029,21.17,16.36,21.348z M9.446,23.063c1.64,1.522,3.807,2.482,6.194,2.57v-4.286
+	c-1.208-0.08-2.307-0.562-3.166-1.313L9.446,23.063z M6.367,16.36c0.088,2.387,1.048,4.555,2.57,6.194l3.029-3.028
+	c-0.751-0.858-1.233-1.958-1.314-3.166H6.367z M16,11.36c-2.559,0-4.64,2.082-4.64,4.64s2.082,4.64,4.64,4.64s4.64-2.081,4.64-4.64
+	S18.559,11.36,16,11.36z M26.354,15.64h4.282C30.447,7.853,24.147,1.553,16.36,1.364v4.282C21.787,5.833,26.167,10.213,26.354,15.64
+	z M21.348,15.64h4.286c-0.186-5.03-4.243-9.088-9.274-9.273v4.285C19.029,10.83,21.17,12.971,21.348,15.64z M6.367,15.64h4.285
+	c0.081-1.208,0.563-2.307,1.314-3.166c-0.492-0.492-1.736-1.735-3.029-3.029C7.415,11.085,6.455,13.253,6.367,15.64z M1.364,15.64
+	h4.282c0.089-2.585,1.13-4.934,2.782-6.703C7.15,7.66,5.915,6.424,5.396,5.906C2.873,8.553,1.452,11.984,1.364,15.64z M9.445,8.938
+	c0.828,0.826,1.825,1.823,3.03,3.028c0.858-0.751,1.958-1.233,3.166-1.314V6.367C13.252,6.455,11.084,7.415,9.445,8.938z"></path>
+<rect id="_Transparent_Rectangle" style="fill:none;" width="32" height="32"></rect>
+</svg>`;
+                break;
+            default: // circles etc
+                icon = `<svg fill="#000000" viewBox="0 0 32 32" width="28px" height="28px" xml:space="preserve">
+<path id="chart--bubble_1_" d="M4,31.36c-1.301,0-2.36-1.059-2.36-2.36S2.699,26.64,4,26.64S6.36,27.698,6.36,29
+	S5.301,31.36,4,31.36z M4,27.36c-0.904,0-1.64,0.735-1.64,1.64S3.096,30.64,4,30.64S5.64,29.904,5.64,29S4.904,27.36,4,27.36z
+	 M20,30.36c-1.853,0-3.36-1.508-3.36-3.36s1.507-3.36,3.36-3.36s3.36,1.508,3.36,3.36S21.853,30.36,20,30.36z M20,24.36
+	c-1.456,0-2.64,1.184-2.64,2.64s1.184,2.64,2.64,2.64s2.64-1.184,2.64-2.64S21.456,24.36,20,24.36z M10,26.36
+	c-4.058,0-7.36-3.302-7.36-7.36s3.302-7.36,7.36-7.36s7.36,3.302,7.36,7.36C17.36,23.059,14.058,26.36,10,26.36z M10,12.36
+	c-3.661,0-6.64,2.979-6.64,6.64s2.979,6.64,6.64,6.64s6.64-2.979,6.64-6.64S13.661,12.36,10,12.36z M25,22.36
+	c-2.955,0-5.36-2.405-5.36-5.36c0-2.956,2.405-5.36,5.36-5.36s5.36,2.404,5.36,5.36C30.36,19.955,27.955,22.36,25,22.36z M25,12.36
+	c-2.559,0-4.64,2.082-4.64,4.64s2.081,4.64,4.64,4.64s4.64-2.081,4.64-4.64S27.559,12.36,25,12.36z M18,11.36
+	c-2.956,0-5.36-2.404-5.36-5.36S15.044,0.64,18,0.64c2.955,0,5.36,2.404,5.36,5.36S20.955,11.36,18,11.36z M18,1.36
+	c-2.559,0-4.64,2.082-4.64,4.64s2.082,4.64,4.64,4.64S22.64,8.559,22.64,6S20.559,1.36,18,1.36z M7,10.36
+	c-1.853,0-3.36-1.507-3.36-3.36S5.147,3.64,7,3.64S10.36,5.147,10.36,7S8.853,10.36,7,10.36z M7,4.36C5.544,4.36,4.36,5.544,4.36,7
+	S5.544,9.64,7,9.64S9.64,8.456,9.64,7S8.456,4.36,7,4.36z"></path>
+<rect id="_Transparent_Rectangle" style="fill:none;" width="32" height="32"></rect>
+</svg>`;
+        }
+
+        return `
+<div class="apps">
+<a href="diagram.html?uri=${uri}&lang=${lang.ID}" title="Relations Diagram" class="card-link" target="_blank">
+<span >
+    ${icon}
+</span>
+    <br>Diagram</br>
+</a>
+</div>`;
     }
 };
