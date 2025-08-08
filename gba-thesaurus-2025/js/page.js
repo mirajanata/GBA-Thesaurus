@@ -194,7 +194,8 @@ var page = {
 
         let from = "";
         for (let project of config.projects) {
-            from += " " + project.from.replace("FROM", "FROM NAMED");
+            if (project.from)
+                from += " " + project.from.replace("FROM", "FROM NAMED");
         }
         query = query.replace('@@from', "");
         ws.projectJson(null, query, "c", jsonData => {

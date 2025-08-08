@@ -14,7 +14,8 @@ var search = {
         let ids = [];
         let from = "";
         for (let project of config.projects) {
-            from += " " + project.from;
+            if (project.from)
+                from += " " + project.from;
         }
         query = query.replace('@@from', from);
         ws.projectJson(null, query, "s", jsonData => {
