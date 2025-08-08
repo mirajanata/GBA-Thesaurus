@@ -360,7 +360,7 @@ var detail = {
                     OPTIONAL {?s dbpo:colourHexCode ?sC}
                     } 
                     ORDER BY ?Label 
-                    LIMIT 50 
+                    LIMIT 100 
                     OFFSET ${offset}`;
         ws.json(ws.getProject(uri), query, "b", function (data) {
             var allConcepts = $('#allConcepts');
@@ -371,8 +371,8 @@ var detail = {
                 allConcepts.empty().append('<div class="allConceptsPerex">' + data.results.bindings[0].SchemaDesc.value + '</div><br>');
                 allConcepts.append('<div class="allConceptsCards"></div>');
                 allConcepts.append(`<div id="coBr" style="justify-content: center; display:flex; margin:5px;">
-                    <button type="button" id="rightBtn" class="btn btn-outline-primary" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+50)">
-                        Show next 50...
+                    <button type="button" id="rightBtn" class="btn" style="background-color: #004953; color:white;" onclick="detail.provideAll('allConcepts', '${uri}', Number(this.value)+100)">
+                        Show next 100...
                     </button>
             </div>
                 `);
@@ -390,7 +390,7 @@ var detail = {
             $(".allConceptsCards").append(links);
 
             document.getElementById("rightBtn").value = offset;
-            if (Object.keys(data.results.bindings).length < 50) {
+            if (Object.keys(data.results.bindings).length < 100) {
                 $("#coBr").hide();
             }
 
