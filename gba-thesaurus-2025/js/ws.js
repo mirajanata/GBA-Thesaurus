@@ -58,7 +58,8 @@ var ws = {
 
         return query;
     },
-    getProjUrl: function (projectId, query) {
+    getProjUrl: function (projectId, query, filteredItem) {
+        query = ws.processSparql(projectId, query, filteredItem);
         return this.endpoint + '?query=' + encodeURIComponent(query) + '&Accept=application%2Fsparql-results%2Bjson';
     },
     getRefUrl: function (query) {

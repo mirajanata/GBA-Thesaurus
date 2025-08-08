@@ -242,9 +242,6 @@ var page = {
                             <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='rdf/${projectId}.rdf'">
                                 RDF/XML download
                             </button>
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='${ws.endpoint}${projectId}'">
-                                SparQL endpoint
-                            </button>
                             <button type="button" class="btn btn-outline-info btn-sm" onclick="location.href='bibl_res.html?proj=${projectId}';">
                                 ${lang.LABEL_BIBLREF}
                             </button>

@@ -10,14 +10,15 @@ var biblRes = {
 
         //$('#headRef').text(`Bibliographic references used for ${thesProjName}`);
         //console.log(urlParams.get('uri')); // "http.." 
-        let query1 = encodeURIComponent(`   PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
+        let query1 = (`   PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
                                             PREFIX dcterms:<http://purl.org/dc/terms/>
                                             SELECT DISTINCT ?o
+                                            @@from
                                             WHERE {
                                             ?s dcterms:references ?o
                                             }`);
 
-        let query2 = encodeURIComponent(`   PREFIX dcterms:<http://purl.org/dc/terms/>
+        let query2 = (`   PREFIX dcterms:<http://purl.org/dc/terms/>
                                             SELECT DISTINCT *
                                             WHERE {
                                             ?s dcterms:bibliographicCitation ?C
