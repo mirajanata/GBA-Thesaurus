@@ -353,7 +353,7 @@ var page = {
         }
 
         return `
-<div class="apps">
+<div class="apps" id="appDiagram" style="display:none;">
 <a href="diagram.html?uri=${uri}&lang=${lang.ID}" title="Relations Diagram" class="card-link" target="_blank">
 <span >
     ${icon}

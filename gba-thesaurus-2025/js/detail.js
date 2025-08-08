@@ -49,7 +49,11 @@ var detail = {
         ws.json(projectId, query, "s", function (data) {
             if (data.results.bindings.length > 1) {
                 var F = page.isEmbedded ? detail.FRONT_LIST_EMBEDDED : detail.FRONT_LIST;
-                for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()));
+                let res = {};
+                for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()), res);
+                if (res.isNarrower) {
+                    $("#appDiagram").show();
+                }
                 var div = $('#pageContent');
 
                 div.append(`<hr>
@@ -93,7 +97,7 @@ var detail = {
         document.getElementById('irdfQuery').value = "CONSTRUCT {?s ?p ?o} WHERE {VALUES ?s {<" + url + ">} ?s ?p ?o}";
         document.getElementById('irdfForm').submit();
     },
-    insertFrontPart: function (key, uri, data, props) {
+    insertFrontPart: function (key, uri, data, props, res) {
         var div = $('#pageContent');
         let html = `<form id="irdfForm" target="_blank" style="display:none;" method="post" action="${ws.endpoint}${uri.split("/")[3]}"><input type="hidden" name="query" id="irdfQuery"/></form>`;
         props.forEach((i) => {
@@ -166,9 +170,12 @@ var detail = {
                         if (html.search('<h4') == -1) {
                             html += '<hr><h4 style="margin-bottom: 1rem;">' + lang.SEM_REL + '</h4>';
                         }
-                        html += '<table><tr><td class="skosRel' + i.search('Match') + ' skosRel">' + i.replace(BaseUri.skos, '') + '</td><td class="skosRelUl"><ul><li>' +
+                        let relation = i.replace(BaseUri.skos, '');
+                        html += '<table><tr><td class="skosRel' + i.search('Match') + ' skosRel">' + relation + '</td><td class="skosRelUl"><ul><li>' +
                             this.shortenText(Array.from(ul).join('</li><li>')) + '</li></ul></td></tr></table>';
-
+                        if (relation == "narrower") {
+                            res.isNarrower = true;
+                        }
                         break;
                     default:
                         html += `<h3 id="title" class="mt-4">Error: Undefined key ${key}</h3><hr>`;
@@ -177,6 +184,7 @@ var detail = {
             }
         });
         div.append(html);
+        return res;
     },
 
     shortenText: function (text) {
