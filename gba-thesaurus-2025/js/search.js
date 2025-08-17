@@ -285,13 +285,10 @@ var search = {
         var pageContent = $('#pageContent');
         pageContent.empty().append('<br><h3 id="title">' + lang.TITLE_SEARCHRESULTS + '</h3><p id="hits" class="lead">' + lang.HITS_SEARCHRESULTS +
             '\"' + searchText + '\"</p><hr><ul id="searchresults" class="searchresults"></ul>');
-        $('#searchresults').bind("DOMSubtreeModified", function () {
-            $('#hits').html(lang.HITS_SEARCHRESULTS.replace('0', $('#searchresults li').length) + '\"' + searchText + '\"');
-        });
-
         let query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
                                         SELECT DISTINCT ?s (MIN(?pL) AS ?title) (GROUP_CONCAT(DISTINCT ?label; separator = "$") as ?text) (MIN(?so) AS ?sort) 
-                                        (MIN(?stat) AS ?Status) 
+                                        (MIN(?stat) AS ?Status)
+                                        @@from
                                         WHERE {
                                         VALUES ?n {"${search.sparqlEncode(searchText)}"} 
                                         VALUES ?p {skos:prefLabel skos:altLabel skos:definition skos:scopeNote <http://purl.org/dc/terms/description>} 
@@ -306,13 +303,12 @@ var search = {
                                         ORDER BY ?sort 
                                         LIMIT 100`;
 
+        let hits = 0;
         for (let project of config.projects) {
-
             ws.projectJson(project.id, query, "s", jsonData => {
-
-                jsonData.results.bindings.forEach(function (a) {
-                    if ($('#searchresults li').length > 199) {
-                        return false;
+                for (let a of jsonData.results.bindings) {
+                    if (hits > 199) {
+                        break;
                     } else if (a.title && a.s) {
                         $('#searchresults').append(`
                                             <li>
@@ -329,14 +325,10 @@ var search = {
                                                     ${search.createSearchResultsText(a.text.value, searchText)}
                                                 </p>
                                             </li>`);
-                        if ($('#searchresults li').length > 199) {
-                            $('#hits').prepend('>');
-                        }
+                        hits++;
                     }
-                });
-
-            }).catch(function (error) {
-                console.log(error);
+                }
+                $('#hits').html(lang.HITS_SEARCHRESULTS.replace('0', (hits > 199 ? "200+" : hits)) + '\"' + searchText + '\"');
             });
         }
     },

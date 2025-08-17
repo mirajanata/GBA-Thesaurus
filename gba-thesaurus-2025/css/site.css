@@ -506,3 +506,6 @@ figure {
             width: 100%;
         }
 
+        summary {
+            color:rgb(117,117,117); 
+        }

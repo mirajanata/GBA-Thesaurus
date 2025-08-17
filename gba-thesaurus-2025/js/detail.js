@@ -58,8 +58,8 @@ var detail = {
 
                 div.append(`<hr>
                                 <details>
-                                <summary class="card-header">
-                                    <h4 id="detailsBtn" style="display:inline-block;">read more ...</h4>
+                                <summary>
+                                    <em id="detailsBtn" style="display:inline-block;">read more ...</em>
                                 </summary>
                                     <table id="details"></table>
                                 </details>
@@ -411,8 +411,8 @@ var detail = {
         div.append(`
         <hr>
             <details>
-            <summary class="card-header">
-            <h4 id="allConceptsHeader" style="display:inline-block;"></h4>
+            <summary>
+            <em id="allConceptsHeader" style="display:inline-block;"></em>
             </summary>
             <div id="allConcepts" class="card-body"></div>
             </details>
