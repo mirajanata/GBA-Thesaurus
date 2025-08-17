@@ -305,6 +305,8 @@ var search = {
 
         let hits = 0;
         for (let project of config.projects) {
+            if (!project.from)
+                continue;
             ws.projectJson(project.id, query, "s", jsonData => {
                 for (let a of jsonData.results.bindings) {
                     if (hits > 199) {

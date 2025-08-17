@@ -200,7 +200,7 @@ var page = {
         query = query.replace('@@from', "");
         ws.projectJson(null, query, "c", jsonData => {
             for (let project of config.projects) {
-                if (project.noRMnoCards)
+                if (!project.from)
                     continue;
                 let projectId = project.id;
                 let projectName = project.name;
