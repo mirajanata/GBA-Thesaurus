@@ -43,11 +43,12 @@ var detail = {
 					OPTIONAL {?o skos:notation ?sN}
                     }
                     GROUP BY ?sN ?p ?o 
-					ORDER BY ?sN ?p ?o
+					ORDER BY ?sN
         `;
         let projectId = ws.getProject(uri);
         ws.json(projectId, query, "s", function (data) {
             if (data.results.bindings.length > 1) {
+                data.results.bindings = data.results.bindings.sort(detail.sortFunction);
                 var F = page.isEmbedded ? detail.FRONT_LIST_EMBEDDED : detail.FRONT_LIST;
                 let res = {};
                 for (var key in F) detail.insertFrontPart(key, uri, data, Array.from(F[key].values()), res);
@@ -92,6 +93,14 @@ var detail = {
                 $('#pageContent').append(`<br>no results for <br>URI: <span style="color: red;"><strong>${uri}</strong></span> <br>`);
             }
         });
+    },
+    sortFunction: function (a, b) {
+        const nameA = a.sN ? a.sN.value.toUpperCase() : ""; // ignore upper and lowercase
+        const nameB = b.sN ? b.sN.value.toUpperCase() : ""; // ignore upper and lowercase
+        if (!nameA) {
+            return !nameB ? 0 : -1; // if nameA is empty, it comes before nameB
+        }
+        return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
     },
     rdfTS: function (url) {
         document.getElementById('irdfQuery').value = "CONSTRUCT {?s ?p ?o} WHERE {VALUES ?s {<" + url + ">} ?s ?p ?o}";

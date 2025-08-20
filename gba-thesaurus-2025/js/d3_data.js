@@ -65,15 +65,10 @@ var d3data = {
     sortFunction: function (a, b) {
         const nameA = a.sN ? a.sN.value.toUpperCase() : ""; // ignore upper and lowercase
         const nameB = b.sN ? b.sN.value.toUpperCase() : ""; // ignore upper and lowercase
-        if (nameA < nameB) {
-            return -1;
+        if (!nameA) {
+            return !nameB ? 0 : -1; // if nameA is empty, it comes before nameB
         }
-        if (nameA > nameB) {
-            return 1;
-        }
-
-        // names must be equal
-        return 0;
+        return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
     },
     createHierarchy: function (uri, expandTo) {
         d3data.hRoot = null;
