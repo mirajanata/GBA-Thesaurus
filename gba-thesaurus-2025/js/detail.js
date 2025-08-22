@@ -36,7 +36,7 @@ var detail = {
 
     details: function (uri) { //build the web page content
         var query = `PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
-                    SELECT DISTINCT ?p ?o (GROUP_CONCAT(DISTINCT CONCAT(STR(?L), "@", lang(?L)) ; separator="|") AS ?Label) 
+                    SELECT DISTINCT ?p ?o (GROUP_CONCAT(DISTINCT CONCAT(STR(?L), "@", lang(?L)) ; separator="|") AS ?Label) ?sN
                     WHERE { 
                     VALUES ?s {<${uri}>} ?s a skos:Concept . ?s ?p ?o .
                     OPTIONAL {?o a skos:Concept; skos:prefLabel ?L}
